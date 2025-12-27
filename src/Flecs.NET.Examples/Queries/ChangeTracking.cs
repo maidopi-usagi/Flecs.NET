@@ -5,6 +5,7 @@
 // This example shows how to use change tracking in combination with using
 // prefabs to store a single dirty state for multiple entities.
 
+using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 
 // Components
@@ -28,6 +29,7 @@ public static class Queries_ChangeTracking
         using Query qRead = world.QueryBuilder()
             .Cached()
             .With<Position>().In()
+            .QueryFlags(flecs.EcsQueryDetectChanges)
             .Build();
 
         // Create a query that writes the component based on a Dirty state.

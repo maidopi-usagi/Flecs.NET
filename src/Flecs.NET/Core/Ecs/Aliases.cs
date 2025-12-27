@@ -451,11 +451,6 @@ public static partial class Ecs
     /// </summary>
     public static ref ulong Sparse => ref EcsSparse;
 
-    /// <summary>
-    ///     Reference to <see cref="EcsUnion"/>.
-    /// </summary>
-    public static ref ulong Union => ref EcsUnion;
-
     // Built-in predicates for comparing entity ids in queries.
 
     /// <summary>
@@ -633,6 +628,11 @@ public static partial class Ecs
     ///     Reference to <see cref="EcsQuantity"/>.
     /// </summary>
     public static ref ulong Quantity => ref EcsQuantity;
+
+    /// <summary>
+    ///     Reference to <see cref="EcsSingleton"/>.
+    /// </summary>
+    public static ref ulong Singleton => ref EcsSingleton;
 
     /// <summary>
     ///     Query must match prefabs.

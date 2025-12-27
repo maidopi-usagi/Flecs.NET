@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Xunit;
 using static Flecs.NET.Bindings.flecs;
@@ -1421,6 +1422,7 @@ public unsafe class QueryTests
 
         using Query<Position> q = world.QueryBuilder<Position>()
             .Cached()
+            .QueryFlags(EcsQueryDetectChanges)
             .Build();
 
         using Query<Position> qW = world.Query<Position>();
@@ -2575,6 +2577,7 @@ public unsafe class QueryTests
         using Query<Position> qw = world.Query<Position>();
         using Query<Position> qr = world.QueryBuilder<Position>()
             .Cached()
+            .QueryFlags(EcsQueryDetectChanges)
             .Build();
 
         Entity e1 = world.Entity().Add<Tag>().Set(new Position(10, 20));

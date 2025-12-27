@@ -17,13 +17,16 @@ public static unsafe partial class flecs
     public static extern void ecs_abort_(int error_code, byte* file, int line, byte* fmt);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_add_id")]
-    public static extern void ecs_add_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void ecs_add_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_add_path_w_sep")]
     public static extern ulong ecs_add_path_w_sep(ecs_world_t* world, ulong entity, ulong parent, byte* path, byte* sep, byte* prefix);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_alert_init")]
     public static extern ulong ecs_alert_init(ecs_world_t* world, ecs_alert_desc_t* desc);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_allocator_memory_get")]
+    public static extern ecs_allocator_memory_t ecs_allocator_memory_get(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_app_run")]
     public static extern int ecs_app_run(ecs_world_t* world, ecs_app_desc_t* desc);
@@ -53,7 +56,7 @@ public static unsafe partial class flecs
     public static extern void ecs_atfini(ecs_world_t* world, delegate* unmanaged<ecs_world_t*, void*, void> action, void* ctx);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_auto_override_id")]
-    public static extern void ecs_auto_override_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void ecs_auto_override_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_bitmask_init")]
     public static extern ulong ecs_bitmask_init(ecs_world_t* world, ecs_bitmask_desc_t* desc);
@@ -62,13 +65,16 @@ public static unsafe partial class flecs
     public static extern ulong* ecs_bulk_init(ecs_world_t* world, ecs_bulk_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_bulk_new_w_id")]
-    public static extern ulong* ecs_bulk_new_w_id(ecs_world_t* world, ulong id, int count);
+    public static extern ulong* ecs_bulk_new_w_id(ecs_world_t* world, ulong component, int count);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_children")]
     public static extern ecs_iter_t ecs_children(ecs_world_t* world, ulong parent);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_children_next")]
     public static extern bool ecs_children_next(ecs_iter_t* it);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_children_w_rel")]
+    public static extern ecs_iter_t ecs_children_w_rel(ecs_world_t* world, ulong relationship, ulong parent);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_clear")]
     public static extern void ecs_clear(ecs_world_t* world, ulong entity);
@@ -79,14 +85,29 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_commit")]
     public static extern bool ecs_commit(ecs_world_t* world, ulong entity, ecs_record_t* record, ecs_table_t* table, ecs_type_t* added, ecs_type_t* removed);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_component_index_memory_get")]
+    public static extern ecs_component_index_memory_t ecs_component_index_memory_get(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_component_init")]
     public static extern ulong ecs_component_init(ecs_world_t* world, ecs_component_desc_t* desc);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_component_memory_get")]
+    public static extern ecs_component_memory_t ecs_component_memory_get(ecs_world_t* world);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_component_record_memory_get")]
+    public static extern void ecs_component_record_memory_get(ecs_component_record_t* cr, ecs_component_index_memory_t* result);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_const_var_get")]
+    public static extern ecs_value_t ecs_const_var_get(ecs_world_t* world, ulong var);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_const_var_init")]
     public static extern ulong ecs_const_var_init(ecs_world_t* world, ecs_const_var_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_count_id")]
     public static extern int ecs_count_id(ecs_world_t* world, ulong entity);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_assign")]
+    public static extern ecs_cpp_get_mut_t ecs_cpp_assign(ecs_world_t* world, ulong entity, ulong component, void* new_ptr, nint size);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_component_register")]
     public static extern ulong ecs_cpp_component_register(ecs_world_t* world, ulong id, int ids_index, byte* name, byte* cpp_name, byte* cpp_symbol, nint size, nint alignment, bool is_component, bool explicit_registration, bool* registered_out, bool* existing_out);
@@ -108,6 +129,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_last_member")]
     public static extern ecs_member_t* ecs_cpp_last_member(ecs_world_t* world, ulong type);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_set")]
+    public static extern ecs_cpp_get_mut_t ecs_cpp_set(ecs_world_t* world, ulong entity, ulong component, void* new_ptr, nint size);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_trim_module")]
     public static extern byte* ecs_cpp_trim_module(ecs_world_t* world, byte* type_name);
@@ -131,7 +155,7 @@ public static unsafe partial class flecs
     public static extern int ecs_delete_empty_tables(ecs_world_t* world, ecs_delete_empty_tables_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_delete_with")]
-    public static extern void ecs_delete_with(ecs_world_t* world, ulong id);
+    public static extern void ecs_delete_with(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_deprecated_")]
     public static extern void ecs_deprecated_(byte* file, int line, byte* msg);
@@ -176,7 +200,7 @@ public static unsafe partial class flecs
     public static extern void ecs_doc_set_uuid(ecs_world_t* world, ulong entity, byte* uuid);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_each_id")]
-    public static extern ecs_iter_t ecs_each_id(ecs_world_t* world, ulong id);
+    public static extern ecs_iter_t ecs_each_id(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_each_next")]
     public static extern bool ecs_each_next(ecs_iter_t* it);
@@ -185,13 +209,13 @@ public static unsafe partial class flecs
     public static extern void ecs_emit(ecs_world_t* world, ecs_event_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_emplace_id")]
-    public static extern void* ecs_emplace_id(ecs_world_t* world, ulong entity, ulong id, bool* is_new);
+    public static extern void* ecs_emplace_id(ecs_world_t* world, ulong entity, ulong component, nint size, bool* is_new);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_enable")]
     public static extern void ecs_enable(ecs_world_t* world, ulong entity, bool enabled);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_enable_id")]
-    public static extern void ecs_enable_id(ecs_world_t* world, ulong entity, ulong id, bool enable);
+    public static extern void ecs_enable_id(ecs_world_t* world, ulong entity, ulong component, bool enable);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_enable_range_check")]
     public static extern bool ecs_enable_range_check(ecs_world_t* world, bool enable);
@@ -200,16 +224,16 @@ public static unsafe partial class flecs
     public static extern void ecs_enqueue(ecs_world_t* world, ecs_event_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_ensure_id")]
-    public static extern void* ecs_ensure_id(ecs_world_t* world, ulong entity, ulong id);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_ensure_modified_id")]
-    public static extern void* ecs_ensure_modified_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void* ecs_ensure_id(ecs_world_t* world, ulong entity, ulong component, nint size);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_entity_from_json")]
     public static extern byte* ecs_entity_from_json(ecs_world_t* world, ulong entity, byte* json, ecs_from_json_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_entity_init")]
     public static extern ulong ecs_entity_init(ecs_world_t* world, ecs_entity_desc_t* desc);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_entity_memory_get")]
+    public static extern ecs_entities_memory_t ecs_entity_memory_get(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_entity_str")]
     public static extern byte* ecs_entity_str(ecs_world_t* world, ulong entity);
@@ -222,6 +246,12 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_enum_init")]
     public static extern ulong ecs_enum_init(ecs_world_t* world, ecs_enum_desc_t* desc);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_exclusive_access_begin")]
+    public static extern void ecs_exclusive_access_begin(ecs_world_t* world, byte* thread_name);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_exclusive_access_end")]
+    public static extern void ecs_exclusive_access_end(ecs_world_t* world, bool lock_world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_exists")]
     public static extern bool ecs_exists(ecs_world_t* world, ulong entity);
@@ -305,10 +335,10 @@ public static unsafe partial class flecs
     public static extern ulong ecs_get_entity(void* poly);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_hooks_id")]
-    public static extern ecs_type_hooks_t* ecs_get_hooks_id(ecs_world_t* world, ulong id);
+    public static extern ecs_type_hooks_t* ecs_get_hooks_id(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_id")]
-    public static extern void* ecs_get_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void* ecs_get_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_interval")]
     public static extern float ecs_get_interval(ecs_world_t* world, ulong tick_source);
@@ -320,10 +350,13 @@ public static unsafe partial class flecs
     public static extern ulong ecs_get_max_id(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_mut_id")]
-    public static extern void* ecs_get_mut_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void* ecs_get_mut_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_name")]
     public static extern byte* ecs_get_name(ecs_world_t* world, ulong entity);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_ordered_children")]
+    public static extern ecs_entities_t ecs_get_ordered_children(ecs_world_t* world, ulong parent);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_parent")]
     public static extern ulong ecs_get_parent(ecs_world_t* world, ulong entity);
@@ -356,7 +389,7 @@ public static unsafe partial class flecs
     public static extern ulong ecs_get_target(ecs_world_t* world, ulong entity, ulong rel, int index);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_target_for_id")]
-    public static extern ulong ecs_get_target_for_id(ecs_world_t* world, ulong entity, ulong rel, ulong id);
+    public static extern ulong ecs_get_target_for_id(ecs_world_t* world, ulong entity, ulong rel, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_timeout")]
     public static extern float ecs_get_timeout(ecs_world_t* world, ulong tick_source);
@@ -365,10 +398,13 @@ public static unsafe partial class flecs
     public static extern ecs_type_t* ecs_get_type(ecs_world_t* world, ulong entity);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_type_info")]
-    public static extern ecs_type_info_t* ecs_get_type_info(ecs_world_t* world, ulong id);
+    public static extern ecs_type_info_t* ecs_get_type_info(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_typeid")]
-    public static extern ulong ecs_get_typeid(ecs_world_t* world, ulong id);
+    public static extern ulong ecs_get_typeid(ecs_world_t* world, ulong component);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_version")]
+    public static extern uint ecs_get_version(ulong entity);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_get_with")]
     public static extern ulong ecs_get_with(ecs_world_t* world);
@@ -380,7 +416,7 @@ public static unsafe partial class flecs
     public static extern ecs_world_info_t* ecs_get_world_info(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_has_id")]
-    public static extern bool ecs_has_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern bool ecs_has_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_get_header")]
     public static extern byte* ecs_http_get_header(ecs_http_request_t* req, byte* name);
@@ -413,37 +449,40 @@ public static unsafe partial class flecs
     public static extern void ecs_http_server_stop(ecs_http_server_t* server);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_flag_str")]
-    public static extern byte* ecs_id_flag_str(ulong id_flags);
+    public static extern byte* ecs_id_flag_str(ulong component_flags);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_from_str")]
     public static extern ulong ecs_id_from_str(ecs_world_t* world, byte* expr);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_get_flags")]
-    public static extern uint ecs_id_get_flags(ecs_world_t* world, ulong id);
+    public static extern uint ecs_id_get_flags(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_in_use")]
-    public static extern bool ecs_id_in_use(ecs_world_t* world, ulong id);
+    public static extern bool ecs_id_in_use(ecs_world_t* world, ulong component);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_is_any")]
+    public static extern bool ecs_id_is_any(ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_is_pair")]
-    public static extern bool ecs_id_is_pair(ulong id);
+    public static extern bool ecs_id_is_pair(ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_is_tag")]
-    public static extern bool ecs_id_is_tag(ecs_world_t* world, ulong id);
+    public static extern bool ecs_id_is_tag(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_is_valid")]
-    public static extern bool ecs_id_is_valid(ecs_world_t* world, ulong id);
+    public static extern bool ecs_id_is_valid(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_is_wildcard")]
-    public static extern bool ecs_id_is_wildcard(ulong id);
+    public static extern bool ecs_id_is_wildcard(ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_match")]
-    public static extern bool ecs_id_match(ulong id, ulong pattern);
+    public static extern bool ecs_id_match(ulong component, ulong pattern);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_str")]
-    public static extern byte* ecs_id_str(ecs_world_t* world, ulong id);
+    public static extern byte* ecs_id_str(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_id_str_buf")]
-    public static extern void ecs_id_str_buf(ecs_world_t* world, ulong id, ecs_strbuf_t* buf);
+    public static extern void ecs_id_str_buf(ecs_world_t* world, ulong component, ecs_strbuf_t* buf);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_import")]
     public static extern ulong ecs_import(ecs_world_t* world, delegate* unmanaged<ecs_world_t*, void> module, byte* module_name);
@@ -463,11 +502,14 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_is_alive")]
     public static extern bool ecs_is_alive(ecs_world_t* world, ulong e);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_is_defer_suspended")]
+    public static extern bool ecs_is_defer_suspended(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_is_deferred")]
     public static extern bool ecs_is_deferred(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_is_enabled_id")]
-    public static extern bool ecs_is_enabled_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern bool ecs_is_enabled_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_is_fini")]
     public static extern bool ecs_is_fini(ecs_world_t* world);
@@ -487,6 +529,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_first")]
     public static extern ulong ecs_iter_first(ecs_iter_t* it);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_group")]
+    public static extern ulong ecs_iter_get_group(ecs_iter_t* it);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_var")]
     public static extern ulong ecs_iter_get_var(ecs_iter_t* it, int var_id);
 
@@ -495,6 +540,15 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_var_as_table")]
     public static extern ecs_table_t* ecs_iter_get_var_as_table(ecs_iter_t* it, int var_id);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_var_count")]
+    public static extern int ecs_iter_get_var_count(ecs_iter_t* it);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_var_name")]
+    public static extern byte* ecs_iter_get_var_name(ecs_iter_t* it, int var_id);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_get_vars")]
+    public static extern ecs_var_t* ecs_iter_get_vars(ecs_iter_t* it);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_iter_is_true")]
     public static extern bool ecs_iter_is_true(ecs_iter_t* it);
@@ -556,6 +610,12 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_log_set_level")]
     public static extern int ecs_log_set_level(int level);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_log_start_capture")]
+    public static extern void ecs_log_start_capture(bool capture_try);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_log_stop_capture")]
+    public static extern byte* ecs_log_stop_capture();
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_logv_")]
     public static extern void ecs_logv_(int level, byte* file, int line, byte* fmt, void* args);
 
@@ -575,7 +635,7 @@ public static unsafe partial class flecs
     public static extern void ecs_make_alive(ecs_world_t* world, ulong entity);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_make_alive_id")]
-    public static extern void ecs_make_alive_id(ecs_world_t* world, ulong id);
+    public static extern void ecs_make_alive_id(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_make_pair")]
     public static extern ulong ecs_make_pair(ulong first, ulong second);
@@ -607,12 +667,6 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_init_if")]
     public static extern void ecs_map_init_if(ecs_map_t* map, ecs_allocator_t* allocator);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_init_w_params")]
-    public static extern void ecs_map_init_w_params(ecs_map_t* map, ecs_map_params_t* @params);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_init_w_params_if")]
-    public static extern void ecs_map_init_w_params_if(ecs_map_t* result, ecs_map_params_t* @params);
-
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_insert")]
     public static extern void ecs_map_insert(ecs_map_t* map, ulong key, ulong value);
 
@@ -622,14 +676,14 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_iter")]
     public static extern ecs_map_iter_t ecs_map_iter(ecs_map_t* map);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_iter_valid")]
+    public static extern bool ecs_map_iter_valid(ecs_map_iter_t* iter);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_next")]
     public static extern bool ecs_map_next(ecs_map_iter_t* iter);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_params_fini")]
-    public static extern void ecs_map_params_fini(ecs_map_params_t* @params);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_params_init")]
-    public static extern void ecs_map_params_init(ecs_map_params_t* @params, ecs_allocator_t* allocator);
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_reclaim")]
+    public static extern void ecs_map_reclaim(ecs_map_t* map);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_map_remove")]
     public static extern ulong ecs_map_remove(ecs_map_t* map, ulong key);
@@ -643,8 +697,11 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_measure_system_time")]
     public static extern void ecs_measure_system_time(ecs_world_t* world, bool enable);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_memory_get")]
+    public static extern int ecs_memory_get(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_merge")]
-    public static extern void ecs_merge(ecs_world_t* world);
+    public static extern void ecs_merge(ecs_world_t* stage);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_cursor")]
     public static extern ecs_meta_cursor_t ecs_meta_cursor(ecs_world_t* world, ulong type, void* ptr);
@@ -706,6 +763,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_next")]
     public static extern int ecs_meta_next(ecs_meta_cursor_t* cursor);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_op_get_elem_count")]
+    public static extern int ecs_meta_op_get_elem_count(ecs_meta_op_t* op, void* ptr);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_pop")]
     public static extern int ecs_meta_pop(ecs_meta_cursor_t* cursor);
 
@@ -714,6 +774,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_push")]
     public static extern int ecs_meta_push(ecs_meta_cursor_t* cursor);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_serializer_to_str")]
+    public static extern byte* ecs_meta_serializer_to_str(ecs_world_t* world, ulong type);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_set_bool")]
     public static extern int ecs_meta_set_bool(ecs_meta_cursor_t* cursor, bool value);
@@ -748,6 +811,12 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_set_value")]
     public static extern int ecs_meta_set_value(ecs_meta_cursor_t* cursor, ecs_value_t* value);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_try_dotmember")]
+    public static extern int ecs_meta_try_dotmember(ecs_meta_cursor_t* cursor, byte* name);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_meta_try_member")]
+    public static extern int ecs_meta_try_member(ecs_meta_cursor_t* cursor, byte* name);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_method_init")]
     public static extern ulong ecs_method_init(ecs_world_t* world, ecs_function_desc_t* desc);
 
@@ -766,8 +835,11 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_mini")]
     public static extern ecs_world_t* ecs_mini();
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_misc_memory_get")]
+    public static extern ecs_misc_memory_t ecs_misc_memory_get(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_modified_id")]
-    public static extern void ecs_modified_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void ecs_modified_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_module_init")]
     public static extern ulong ecs_module_init(ecs_world_t* world, byte* c_name, ecs_component_desc_t* desc);
@@ -782,7 +854,7 @@ public static unsafe partial class flecs
     public static extern ulong ecs_new_low_id(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_new_w_id")]
-    public static extern ulong ecs_new_w_id(ecs_world_t* world, ulong id);
+    public static extern ulong ecs_new_w_id(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_new_w_table")]
     public static extern ulong ecs_new_w_table(ecs_world_t* world, ecs_table_t* table);
@@ -863,7 +935,7 @@ public static unsafe partial class flecs
     public static extern void ecs_os_warn(byte* file, int line, byte* msg);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_owns_id")]
-    public static extern bool ecs_owns_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern bool ecs_owns_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_page_iter")]
     public static extern ecs_iter_t ecs_page_iter(ecs_iter_t* it, int offset, int limit);
@@ -940,6 +1012,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_quantity_init")]
     public static extern ulong ecs_quantity_init(ecs_world_t* world, ecs_entity_desc_t* desc);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_queries_memory_get")]
+    public static extern ecs_query_memory_t ecs_queries_memory_get(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_args_parse")]
     public static extern byte* ecs_query_args_parse(ecs_query_t* query, ecs_iter_t* it, byte* expr);
 
@@ -1000,6 +1075,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_match_count")]
     public static extern int ecs_query_match_count(ecs_query_t* query);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_memory_get")]
+    public static extern void ecs_query_memory_get(ecs_query_t* query, ecs_query_memory_t* result);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_next")]
     public static extern bool ecs_query_next(ecs_iter_t* it);
 
@@ -1058,19 +1136,19 @@ public static unsafe partial class flecs
     public static extern bool ecs_record_has_id(ecs_world_t* world, ecs_record_t* record, ulong id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_ref_get_id")]
-    public static extern void* ecs_ref_get_id(ecs_world_t* world, ecs_ref_t* @ref, ulong id);
+    public static extern void* ecs_ref_get_id(ecs_world_t* world, ecs_ref_t* @ref, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_ref_init_id")]
-    public static extern ecs_ref_t ecs_ref_init_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern ecs_ref_t ecs_ref_init_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_ref_update")]
     public static extern void ecs_ref_update(ecs_world_t* world, ecs_ref_t* @ref);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_remove_all")]
-    public static extern void ecs_remove_all(ecs_world_t* world, ulong id);
+    public static extern void ecs_remove_all(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_remove_id")]
-    public static extern void ecs_remove_id(ecs_world_t* world, ulong entity, ulong id);
+    public static extern void ecs_remove_id(ecs_world_t* world, ulong entity, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_reset_clock")]
     public static extern void ecs_reset_clock(ecs_world_t* world);
@@ -1109,7 +1187,7 @@ public static unsafe partial class flecs
     public static extern void ecs_script_clear(ecs_world_t* world, ulong script, ulong instance);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_script_eval")]
-    public static extern int ecs_script_eval(ecs_script_t* script, ecs_script_eval_desc_t* desc);
+    public static extern int ecs_script_eval(ecs_script_t* script, ecs_script_eval_desc_t* desc, ecs_script_eval_result_t* result);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_script_free")]
     public static extern void ecs_script_free(ecs_script_t* script);
@@ -1118,10 +1196,10 @@ public static unsafe partial class flecs
     public static extern ulong ecs_script_init(ecs_world_t* world, ecs_script_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_script_parse")]
-    public static extern ecs_script_t* ecs_script_parse(ecs_world_t* world, byte* name, byte* code, ecs_script_eval_desc_t* desc);
+    public static extern ecs_script_t* ecs_script_parse(ecs_world_t* world, byte* name, byte* code, ecs_script_eval_desc_t* desc, ecs_script_eval_result_t* result);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_script_run")]
-    public static extern int ecs_script_run(ecs_world_t* world, byte* name, byte* code);
+    public static extern int ecs_script_run(ecs_world_t* world, byte* name, byte* code, ecs_script_eval_result_t* result);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_script_run_file")]
     public static extern int ecs_script_run_file(ecs_world_t* world, byte* filename);
@@ -1172,19 +1250,22 @@ public static unsafe partial class flecs
     public static extern void ecs_script_vars_set_size(ecs_script_vars_t* vars, int count);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_search")]
-    public static extern int ecs_search(ecs_world_t* world, ecs_table_t* table, ulong id, ulong* id_out);
+    public static extern int ecs_search(ecs_world_t* world, ecs_table_t* table, ulong component, ulong* component_out);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_search_offset")]
-    public static extern int ecs_search_offset(ecs_world_t* world, ecs_table_t* table, int offset, ulong id, ulong* id_out);
+    public static extern int ecs_search_offset(ecs_world_t* world, ecs_table_t* table, int offset, ulong component, ulong* component_out);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_search_relation")]
-    public static extern int ecs_search_relation(ecs_world_t* world, ecs_table_t* table, int offset, ulong id, ulong rel, ulong flags, ulong* subject_out, ulong* id_out, ecs_table_record_t** tr_out);
+    public static extern int ecs_search_relation(ecs_world_t* world, ecs_table_t* table, int offset, ulong component, ulong rel, ulong flags, ulong* subject_out, ulong* component_out, ecs_table_record_t** tr_out);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_alias")]
     public static extern void ecs_set_alias(ecs_world_t* world, ulong entity, byte* alias);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_binding_ctx")]
     public static extern void ecs_set_binding_ctx(ecs_world_t* world, void* ctx, delegate* unmanaged<void*, void> ctx_free);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_child_order")]
+    public static extern void ecs_set_child_order(ecs_world_t* world, ulong parent, ulong* children, int child_count);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_ctx")]
     public static extern void ecs_set_ctx(ecs_world_t* world, void* ctx, delegate* unmanaged<void*, void> ctx_free);
@@ -1196,10 +1277,10 @@ public static unsafe partial class flecs
     public static extern void ecs_set_entity_range(ecs_world_t* world, ulong id_start, ulong id_end);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_hooks_id")]
-    public static extern void ecs_set_hooks_id(ecs_world_t* world, ulong id, ecs_type_hooks_t* hooks);
+    public static extern void ecs_set_hooks_id(ecs_world_t* world, ulong component, ecs_type_hooks_t* hooks);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_id")]
-    public static extern void ecs_set_id(ecs_world_t* world, ulong entity, ulong id, nint size, void* ptr);
+    public static extern void ecs_set_id(ecs_world_t* world, ulong entity, ulong component, nint size, void* ptr);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_interval")]
     public static extern ulong ecs_set_interval(ecs_world_t* world, ulong tick_source, float interval);
@@ -1253,13 +1334,16 @@ public static unsafe partial class flecs
     public static extern void ecs_set_version(ecs_world_t* world, ulong entity);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_with")]
-    public static extern ulong ecs_set_with(ecs_world_t* world, ulong id);
+    public static extern ulong ecs_set_with(ecs_world_t* world, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_should_log")]
     public static extern bool ecs_should_log(int level);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_should_quit")]
     public static extern bool ecs_should_quit(ecs_world_t* world);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_shrink")]
+    public static extern void ecs_shrink(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_sleepf")]
     public static extern void ecs_sleepf(double t);
@@ -1391,7 +1475,7 @@ public static unsafe partial class flecs
     public static extern void ecs_system_stats_repeat_last(ecs_system_stats_t* stats);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_add_id")]
-    public static extern ecs_table_t* ecs_table_add_id(ecs_world_t* world, ecs_table_t* table, ulong id);
+    public static extern ecs_table_t* ecs_table_add_id(ecs_world_t* world, ecs_table_t* table, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_clear_entities")]
     public static extern void ecs_table_clear_entities(ecs_world_t* world, ecs_table_t* table);
@@ -1401,6 +1485,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_column_to_type_index")]
     public static extern int ecs_table_column_to_type_index(ecs_table_t* table, int index);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_component_memory_get")]
+    public static extern void ecs_table_component_memory_get(ecs_table_t* table, ecs_component_memory_t* result);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_count")]
     public static extern int ecs_table_count(ecs_table_t* table);
@@ -1415,7 +1502,7 @@ public static unsafe partial class flecs
     public static extern void* ecs_table_get_column(ecs_table_t* table, int index, int offset);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_column_index")]
-    public static extern int ecs_table_get_column_index(ecs_world_t* world, ecs_table_t* table, ulong id);
+    public static extern int ecs_table_get_column_index(ecs_world_t* world, ecs_table_t* table, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_column_size")]
     public static extern nint ecs_table_get_column_size(ecs_table_t* table, int index);
@@ -1424,25 +1511,37 @@ public static unsafe partial class flecs
     public static extern int ecs_table_get_depth(ecs_world_t* world, ecs_table_t* table, ulong rel);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_id")]
-    public static extern void* ecs_table_get_id(ecs_world_t* world, ecs_table_t* table, ulong id, int offset);
+    public static extern void* ecs_table_get_id(ecs_world_t* world, ecs_table_t* table, ulong component, int offset);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_target")]
+    public static extern ulong ecs_table_get_target(ecs_world_t* world, ecs_table_t* table, ulong relationship, int index);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_type")]
     public static extern ecs_type_t* ecs_table_get_type(ecs_table_t* table);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_get_type_index")]
-    public static extern int ecs_table_get_type_index(ecs_world_t* world, ecs_table_t* table, ulong id);
+    public static extern int ecs_table_get_type_index(ecs_world_t* world, ecs_table_t* table, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_has_flags")]
     public static extern bool ecs_table_has_flags(ecs_table_t* table, uint flags);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_has_id")]
-    public static extern bool ecs_table_has_id(ecs_world_t* world, ecs_table_t* table, ulong id);
+    public static extern bool ecs_table_has_id(ecs_world_t* world, ecs_table_t* table, ulong component);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_has_traversable")]
+    public static extern bool ecs_table_has_traversable(ecs_table_t* table);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_histogram_get")]
+    public static extern ecs_table_histogram_t ecs_table_histogram_get(ecs_world_t* world);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_lock")]
     public static extern void ecs_table_lock(ecs_world_t* world, ecs_table_t* table);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_memory_get")]
+    public static extern void ecs_table_memory_get(ecs_table_t* table, ecs_table_memory_t* result);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_remove_id")]
-    public static extern ecs_table_t* ecs_table_remove_id(ecs_world_t* world, ecs_table_t* table, ulong id);
+    public static extern ecs_table_t* ecs_table_remove_id(ecs_world_t* world, ecs_table_t* table, ulong component);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_size")]
     public static extern int ecs_table_size(ecs_table_t* table);
@@ -1459,6 +1558,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_table_unlock")]
     public static extern void ecs_table_unlock(ecs_world_t* world, ecs_table_t* table);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_tables_memory_get")]
+    public static extern ecs_table_memory_t ecs_tables_memory_get(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_term_is_initialized")]
     public static extern bool ecs_term_is_initialized(ecs_term_t* term);
 
@@ -1469,7 +1571,7 @@ public static unsafe partial class flecs
     public static extern bool ecs_term_match_this(ecs_term_t* term);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_term_ref_is_set")]
-    public static extern bool ecs_term_ref_is_set(ecs_term_ref_t* id);
+    public static extern bool ecs_term_ref_is_set(ecs_term_ref_t* @ref);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_term_str")]
     public static extern byte* ecs_term_str(ecs_world_t* world, ecs_term_t* term);
@@ -1588,20 +1690,32 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_remove_last")]
     public static extern void ecs_vec_remove_last(ecs_vec_t* vec);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_remove_ordered")]
+    public static extern void ecs_vec_remove_ordered(ecs_vec_t* v, int size, int index);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_reset")]
     public static extern ecs_vec_t* ecs_vec_reset(ecs_allocator_t* allocator, ecs_vec_t* vec, int size);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_count")]
     public static extern void ecs_vec_set_count(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_count_w_type_info")]
+    public static extern void ecs_vec_set_count_w_type_info(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count, ecs_type_info_t* ti);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_min_count")]
     public static extern void ecs_vec_set_min_count(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_min_count_w_type_info")]
+    public static extern void ecs_vec_set_min_count_w_type_info(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count, ecs_type_info_t* ti);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_min_count_zeromem")]
     public static extern void ecs_vec_set_min_count_zeromem(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_min_size")]
     public static extern void ecs_vec_set_min_size(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_min_size_w_type_info")]
+    public static extern void ecs_vec_set_min_size_w_type_info(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count, ecs_type_info_t* ti);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_vec_set_size")]
     public static extern void ecs_vec_set_size(ecs_allocator_t* allocator, ecs_vec_t* vec, int size, int elem_count);
@@ -1711,17 +1825,32 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_brealloc_w_dbg_info")]
     public static extern void* flecs_brealloc_w_dbg_info(ecs_block_allocator_t* dst, ecs_block_allocator_t* src, void* memory, byte* type_name);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_check_exclusive_world_access_read")]
+    public static extern void flecs_check_exclusive_world_access_read(ecs_world_t* world);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_check_exclusive_world_access_write")]
+    public static extern void flecs_check_exclusive_world_access_write(ecs_world_t* world);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_chresc")]
     public static extern byte* flecs_chresc(byte* @out, byte @in, byte delimiter);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_chrparse")]
     public static extern byte* flecs_chrparse(byte* @in, byte* @out);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_flags")]
+    public static extern uint flecs_component_get_flags(ecs_world_t* world, ulong id);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_id")]
+    public static extern ulong flecs_component_get_id(ecs_component_record_t* cr);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_table")]
+    public static extern ecs_table_record_t* flecs_component_get_table(ecs_component_record_t* cr, ecs_table_t* table);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_ids_get")]
     public static extern ulong flecs_component_ids_get(ecs_world_t* world, int index);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_ids_get_alive")]
-    public static extern ulong flecs_component_ids_get_alive(ecs_world_t* stage_world, int index);
+    public static extern ulong flecs_component_ids_get_alive(ecs_world_t* world, int index);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_ids_index_get")]
     public static extern int flecs_component_ids_index_get();
@@ -1729,8 +1858,17 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_ids_set")]
     public static extern void flecs_component_ids_set(ecs_world_t* world, int index, ulong id);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_iter")]
+    public static extern bool flecs_component_iter(ecs_component_record_t* cr, ecs_table_cache_iter_t* iter_out);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_next")]
+    public static extern ecs_table_record_t* flecs_component_next(ecs_table_cache_iter_t* iter);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_components_get")]
+    public static extern ecs_component_record_t* flecs_components_get(ecs_world_t* world, ulong id);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_default_ctor")]
-    public static extern void flecs_default_ctor(void* ptr, int count, ecs_type_info_t* ctx);
+    public static extern void flecs_default_ctor(void* ptr, int count, ecs_type_info_t* type_info);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_dump_backtrace")]
     public static extern void flecs_dump_backtrace(void* stream);
@@ -1774,9 +1912,6 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_hm_bucket_remove")]
     public static extern void flecs_hm_bucket_remove(ecs_hashmap_t* map, ecs_hm_bucket_t* bucket, ulong hash, int index);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_identifier_is_0")]
-    public static extern bool flecs_identifier_is_0(byte* id);
-
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_module_path_from_c")]
     public static extern byte* flecs_module_path_from_c(byte* c_name);
 
@@ -1798,6 +1933,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_poly_release_")]
     public static extern int flecs_poly_release_(void* poly);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_query_trivial_cached_next")]
+    public static extern bool flecs_query_trivial_cached_next(ecs_iter_t* it);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_resume_readonly")]
     public static extern void flecs_resume_readonly(ecs_world_t* world, ecs_suspend_readonly_state_t* state);
 
@@ -1811,7 +1949,7 @@ public static unsafe partial class flecs
     public static extern int flecs_sparse_count(ecs_sparse_t* sparse);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_ensure")]
-    public static extern void* flecs_sparse_ensure(ecs_sparse_t* sparse, int elem_size, ulong id);
+    public static extern void* flecs_sparse_ensure(ecs_sparse_t* sparse, int elem_size, ulong id, bool* is_new);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_ensure_fast")]
     public static extern void* flecs_sparse_ensure_fast(ecs_sparse_t* sparse, int elem_size, ulong id);
@@ -1822,17 +1960,20 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_get")]
     public static extern void* flecs_sparse_get(ecs_sparse_t* sparse, int elem_size, ulong id);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_get_any")]
-    public static extern void* flecs_sparse_get_any(ecs_sparse_t* sparse, int elem_size, ulong id);
-
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_get_dense")]
     public static extern void* flecs_sparse_get_dense(ecs_sparse_t* sparse, int elem_size, int index);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_has")]
+    public static extern bool flecs_sparse_has(ecs_sparse_t* sparse, ulong id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_ids")]
     public static extern ulong* flecs_sparse_ids(ecs_sparse_t* sparse);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_init")]
     public static extern void flecs_sparse_init(ecs_sparse_t* result, ecs_allocator_t* allocator, ecs_block_allocator_t* page_allocator, int size);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_insert")]
+    public static extern void* flecs_sparse_insert(ecs_sparse_t* sparse, int elem_size, ulong id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_is_alive")]
     public static extern bool flecs_sparse_is_alive(ecs_sparse_t* sparse, ulong id);
@@ -1844,13 +1985,13 @@ public static unsafe partial class flecs
     public static extern ulong flecs_sparse_new_id(ecs_sparse_t* sparse);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_remove")]
-    public static extern void flecs_sparse_remove(ecs_sparse_t* sparse, int elem_size, ulong id);
+    public static extern bool flecs_sparse_remove(ecs_sparse_t* sparse, int size, ulong id);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_remove_fast")]
-    public static extern void* flecs_sparse_remove_fast(ecs_sparse_t* sparse, int size, ulong index);
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_remove_w_gen")]
+    public static extern bool flecs_sparse_remove_w_gen(ecs_sparse_t* sparse, int size, ulong id);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_try")]
-    public static extern void* flecs_sparse_try(ecs_sparse_t* sparse, int elem_size, ulong id);
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_sparse_shrink")]
+    public static extern void flecs_sparse_shrink(ecs_sparse_t* sparse);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_stack_alloc")]
     public static extern void* flecs_stack_alloc(ecs_stack_t* stack, int size, int align);
@@ -1888,32 +2029,20 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_suspend_readonly")]
     public static extern ecs_world_t* flecs_suspend_readonly(ecs_world_t* world, ecs_suspend_readonly_state_t* state);
 
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_fini")]
-    public static extern void flecs_switch_fini(ecs_switch_t* sw);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_first")]
-    public static extern uint flecs_switch_first(ecs_switch_t* sw, ulong value);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_get")]
-    public static extern ulong flecs_switch_get(ecs_switch_t* sw, uint element);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_init")]
-    public static extern void flecs_switch_init(ecs_switch_t* sw, ecs_allocator_t* allocator);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_next")]
-    public static extern uint flecs_switch_next(ecs_switch_t* sw, uint previous);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_reset")]
-    public static extern bool flecs_switch_reset(ecs_switch_t* sw, uint element);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_set")]
-    public static extern bool flecs_switch_set(ecs_switch_t* sw, uint element, ulong value);
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_switch_targets")]
-    public static extern ecs_map_iter_t flecs_switch_targets(ecs_switch_t* sw);
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_table_id")]
+    public static extern ulong flecs_table_id(ecs_table_t* table);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_table_observed_count")]
     public static extern int flecs_table_observed_count(ecs_table_t* table);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_table_record_get_component")]
+    public static extern ecs_component_record_t* flecs_table_record_get_component(ecs_table_record_t* tr);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_table_records")]
+    public static extern ecs_table_records_t flecs_table_records(ecs_table_t* table);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_table_traverse_add")]
+    public static extern ecs_table_t* flecs_table_traverse_add(ecs_world_t* world, ecs_table_t* table, ulong* id_ptr, ecs_table_diff_t* diff);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_to_snake_case")]
     public static extern byte* flecs_to_snake_case(byte* str);
@@ -1974,36 +2103,40 @@ public static unsafe partial class flecs
         EcsOut = 5
     }
 
-    public enum ecs_meta_type_op_kind_t : uint
+    public enum ecs_meta_op_kind_t : uint
     {
-        EcsOpArray = 0,
-        EcsOpVector = 1,
-        EcsOpOpaque = 2,
-        EcsOpPush = 3,
-        EcsOpPop = 4,
-        EcsOpScope = 5,
-        EcsOpEnum = 6,
-        EcsOpBitmask = 7,
-        EcsOpPrimitive = 8,
-        EcsOpBool = 9,
-        EcsOpChar = 10,
-        EcsOpByte = 11,
-        EcsOpU8 = 12,
-        EcsOpU16 = 13,
-        EcsOpU32 = 14,
-        EcsOpU64 = 15,
-        EcsOpI8 = 16,
-        EcsOpI16 = 17,
-        EcsOpI32 = 18,
-        EcsOpI64 = 19,
-        EcsOpF32 = 20,
-        EcsOpF64 = 21,
-        EcsOpUPtr = 22,
-        EcsOpIPtr = 23,
-        EcsOpString = 24,
-        EcsOpEntity = 25,
-        EcsOpId = 26,
-        EcsMetaTypeOpKindLast = 26
+        EcsOpPushStruct = 0,
+        EcsOpPushArray = 1,
+        EcsOpPushVector = 2,
+        EcsOpPop = 3,
+        EcsOpOpaqueStruct = 4,
+        EcsOpOpaqueArray = 5,
+        EcsOpOpaqueVector = 6,
+        EcsOpForward = 7,
+        EcsOpScope = 8,
+        EcsOpOpaqueValue = 9,
+        EcsOpEnum = 10,
+        EcsOpBitmask = 11,
+        EcsOpPrimitive = 12,
+        EcsOpBool = 13,
+        EcsOpChar = 14,
+        EcsOpByte = 15,
+        EcsOpU8 = 16,
+        EcsOpU16 = 17,
+        EcsOpU32 = 18,
+        EcsOpU64 = 19,
+        EcsOpI8 = 20,
+        EcsOpI16 = 21,
+        EcsOpI32 = 22,
+        EcsOpI64 = 23,
+        EcsOpF32 = 24,
+        EcsOpF64 = 25,
+        EcsOpUPtr = 26,
+        EcsOpIPtr = 27,
+        EcsOpString = 28,
+        EcsOpEntity = 29,
+        EcsOpId = 30,
+        EcsMetaTypeOpKindLast = 30
     }
 
     public enum ecs_oper_kind_t : uint
@@ -2084,61 +2217,69 @@ public static unsafe partial class flecs
 
     public const ecs_inout_kind_t EcsOut = ecs_inout_kind_t.EcsOut;
 
-    public const ecs_meta_type_op_kind_t EcsOpArray = ecs_meta_type_op_kind_t.EcsOpArray;
+    public const ecs_meta_op_kind_t EcsOpPushStruct = ecs_meta_op_kind_t.EcsOpPushStruct;
 
-    public const ecs_meta_type_op_kind_t EcsOpVector = ecs_meta_type_op_kind_t.EcsOpVector;
+    public const ecs_meta_op_kind_t EcsOpPushArray = ecs_meta_op_kind_t.EcsOpPushArray;
 
-    public const ecs_meta_type_op_kind_t EcsOpOpaque = ecs_meta_type_op_kind_t.EcsOpOpaque;
+    public const ecs_meta_op_kind_t EcsOpPushVector = ecs_meta_op_kind_t.EcsOpPushVector;
 
-    public const ecs_meta_type_op_kind_t EcsOpPush = ecs_meta_type_op_kind_t.EcsOpPush;
+    public const ecs_meta_op_kind_t EcsOpPop = ecs_meta_op_kind_t.EcsOpPop;
 
-    public const ecs_meta_type_op_kind_t EcsOpPop = ecs_meta_type_op_kind_t.EcsOpPop;
+    public const ecs_meta_op_kind_t EcsOpOpaqueStruct = ecs_meta_op_kind_t.EcsOpOpaqueStruct;
 
-    public const ecs_meta_type_op_kind_t EcsOpScope = ecs_meta_type_op_kind_t.EcsOpScope;
+    public const ecs_meta_op_kind_t EcsOpOpaqueArray = ecs_meta_op_kind_t.EcsOpOpaqueArray;
 
-    public const ecs_meta_type_op_kind_t EcsOpEnum = ecs_meta_type_op_kind_t.EcsOpEnum;
+    public const ecs_meta_op_kind_t EcsOpOpaqueVector = ecs_meta_op_kind_t.EcsOpOpaqueVector;
 
-    public const ecs_meta_type_op_kind_t EcsOpBitmask = ecs_meta_type_op_kind_t.EcsOpBitmask;
+    public const ecs_meta_op_kind_t EcsOpForward = ecs_meta_op_kind_t.EcsOpForward;
 
-    public const ecs_meta_type_op_kind_t EcsOpPrimitive = ecs_meta_type_op_kind_t.EcsOpPrimitive;
+    public const ecs_meta_op_kind_t EcsOpScope = ecs_meta_op_kind_t.EcsOpScope;
 
-    public const ecs_meta_type_op_kind_t EcsOpBool = ecs_meta_type_op_kind_t.EcsOpBool;
+    public const ecs_meta_op_kind_t EcsOpOpaqueValue = ecs_meta_op_kind_t.EcsOpOpaqueValue;
 
-    public const ecs_meta_type_op_kind_t EcsOpChar = ecs_meta_type_op_kind_t.EcsOpChar;
+    public const ecs_meta_op_kind_t EcsOpEnum = ecs_meta_op_kind_t.EcsOpEnum;
 
-    public const ecs_meta_type_op_kind_t EcsOpByte = ecs_meta_type_op_kind_t.EcsOpByte;
+    public const ecs_meta_op_kind_t EcsOpBitmask = ecs_meta_op_kind_t.EcsOpBitmask;
 
-    public const ecs_meta_type_op_kind_t EcsOpU8 = ecs_meta_type_op_kind_t.EcsOpU8;
+    public const ecs_meta_op_kind_t EcsOpPrimitive = ecs_meta_op_kind_t.EcsOpPrimitive;
 
-    public const ecs_meta_type_op_kind_t EcsOpU16 = ecs_meta_type_op_kind_t.EcsOpU16;
+    public const ecs_meta_op_kind_t EcsOpBool = ecs_meta_op_kind_t.EcsOpBool;
 
-    public const ecs_meta_type_op_kind_t EcsOpU32 = ecs_meta_type_op_kind_t.EcsOpU32;
+    public const ecs_meta_op_kind_t EcsOpChar = ecs_meta_op_kind_t.EcsOpChar;
 
-    public const ecs_meta_type_op_kind_t EcsOpU64 = ecs_meta_type_op_kind_t.EcsOpU64;
+    public const ecs_meta_op_kind_t EcsOpByte = ecs_meta_op_kind_t.EcsOpByte;
 
-    public const ecs_meta_type_op_kind_t EcsOpI8 = ecs_meta_type_op_kind_t.EcsOpI8;
+    public const ecs_meta_op_kind_t EcsOpU8 = ecs_meta_op_kind_t.EcsOpU8;
 
-    public const ecs_meta_type_op_kind_t EcsOpI16 = ecs_meta_type_op_kind_t.EcsOpI16;
+    public const ecs_meta_op_kind_t EcsOpU16 = ecs_meta_op_kind_t.EcsOpU16;
 
-    public const ecs_meta_type_op_kind_t EcsOpI32 = ecs_meta_type_op_kind_t.EcsOpI32;
+    public const ecs_meta_op_kind_t EcsOpU32 = ecs_meta_op_kind_t.EcsOpU32;
 
-    public const ecs_meta_type_op_kind_t EcsOpI64 = ecs_meta_type_op_kind_t.EcsOpI64;
+    public const ecs_meta_op_kind_t EcsOpU64 = ecs_meta_op_kind_t.EcsOpU64;
 
-    public const ecs_meta_type_op_kind_t EcsOpF32 = ecs_meta_type_op_kind_t.EcsOpF32;
+    public const ecs_meta_op_kind_t EcsOpI8 = ecs_meta_op_kind_t.EcsOpI8;
 
-    public const ecs_meta_type_op_kind_t EcsOpF64 = ecs_meta_type_op_kind_t.EcsOpF64;
+    public const ecs_meta_op_kind_t EcsOpI16 = ecs_meta_op_kind_t.EcsOpI16;
 
-    public const ecs_meta_type_op_kind_t EcsOpUPtr = ecs_meta_type_op_kind_t.EcsOpUPtr;
+    public const ecs_meta_op_kind_t EcsOpI32 = ecs_meta_op_kind_t.EcsOpI32;
 
-    public const ecs_meta_type_op_kind_t EcsOpIPtr = ecs_meta_type_op_kind_t.EcsOpIPtr;
+    public const ecs_meta_op_kind_t EcsOpI64 = ecs_meta_op_kind_t.EcsOpI64;
 
-    public const ecs_meta_type_op_kind_t EcsOpString = ecs_meta_type_op_kind_t.EcsOpString;
+    public const ecs_meta_op_kind_t EcsOpF32 = ecs_meta_op_kind_t.EcsOpF32;
 
-    public const ecs_meta_type_op_kind_t EcsOpEntity = ecs_meta_type_op_kind_t.EcsOpEntity;
+    public const ecs_meta_op_kind_t EcsOpF64 = ecs_meta_op_kind_t.EcsOpF64;
 
-    public const ecs_meta_type_op_kind_t EcsOpId = ecs_meta_type_op_kind_t.EcsOpId;
+    public const ecs_meta_op_kind_t EcsOpUPtr = ecs_meta_op_kind_t.EcsOpUPtr;
 
-    public const ecs_meta_type_op_kind_t EcsMetaTypeOpKindLast = ecs_meta_type_op_kind_t.EcsMetaTypeOpKindLast;
+    public const ecs_meta_op_kind_t EcsOpIPtr = ecs_meta_op_kind_t.EcsOpIPtr;
+
+    public const ecs_meta_op_kind_t EcsOpString = ecs_meta_op_kind_t.EcsOpString;
+
+    public const ecs_meta_op_kind_t EcsOpEntity = ecs_meta_op_kind_t.EcsOpEntity;
+
+    public const ecs_meta_op_kind_t EcsOpId = ecs_meta_op_kind_t.EcsOpId;
+
+    public const ecs_meta_op_kind_t EcsMetaTypeOpKindLast = ecs_meta_op_kind_t.EcsMetaTypeOpKindLast;
 
     public const ecs_oper_kind_t EcsAnd = ecs_oper_kind_t.EcsAnd;
 
@@ -2223,6 +2364,342 @@ public static unsafe partial class flecs
         public ecs_sparse_t sizes;
     }
 
+    public partial struct ecs_type_t
+    {
+        public ulong* array;
+
+        public int count;
+    }
+
+    public partial struct ecs_world_t
+    {
+    }
+
+    public partial struct ecs_stage_t
+    {
+    }
+
+    public partial struct ecs_table_t
+    {
+    }
+
+    public partial struct ecs_term_t
+    {
+        public ulong id;
+
+        public ecs_term_ref_t src;
+
+        public ecs_term_ref_t first;
+
+        public ecs_term_ref_t second;
+
+        public ulong trav;
+
+        public short inout;
+
+        public short oper;
+
+        public byte field_index;
+
+        public ushort flags_;
+    }
+
+    public partial struct ecs_query_t
+    {
+        public ecs_header_t hdr;
+
+        public ecs_term_t* terms;
+
+        public int* sizes;
+
+        public ulong* ids;
+
+        public ulong bloom_filter;
+
+        public uint flags;
+
+        public byte var_count;
+
+        public byte term_count;
+
+        public byte field_count;
+
+        public uint fixed_fields;
+
+        public uint var_fields;
+
+        public uint static_id_fields;
+
+        public uint data_fields;
+
+        public uint write_fields;
+
+        public uint read_fields;
+
+        public uint row_fields;
+
+        public uint shared_readonly_fields;
+
+        public uint set_fields;
+
+        public ecs_query_cache_kind_t cache_kind;
+
+        public byte** vars;
+
+        public void* ctx;
+
+        public void* binding_ctx;
+
+        public ulong entity;
+
+        public ecs_world_t* real_world;
+
+        public ecs_world_t* world;
+
+        public int eval_count;
+    }
+
+    public partial struct ecs_observer_t
+    {
+        public ecs_header_t hdr;
+
+        public ecs_query_t* query;
+
+        public InlineArrays.ulong_8 events;
+
+        public int event_count;
+
+        public delegate* unmanaged<ecs_iter_t*, void> callback;
+
+        public delegate* unmanaged<ecs_iter_t*, void> run;
+
+        public void* ctx;
+
+        public void* callback_ctx;
+
+        public void* run_ctx;
+
+        public delegate* unmanaged<void*, void> ctx_free;
+
+        public delegate* unmanaged<void*, void> callback_ctx_free;
+
+        public delegate* unmanaged<void*, void> run_ctx_free;
+
+        public ecs_observable_t* observable;
+
+        public ecs_world_t* world;
+
+        public ulong entity;
+    }
+
+    public partial struct ecs_observable_t
+    {
+        public ecs_event_record_t on_add;
+
+        public ecs_event_record_t on_remove;
+
+        public ecs_event_record_t on_set;
+
+        public ecs_event_record_t on_wildcard;
+
+        public ecs_sparse_t events;
+
+        public ulong last_observer_id;
+    }
+
+    public partial struct ecs_iter_t
+    {
+        public ecs_world_t* world;
+
+        public ecs_world_t* real_world;
+
+        public int offset;
+
+        public int count;
+
+        public ulong* entities;
+
+        public void** ptrs;
+
+        public ecs_table_record_t** trs;
+
+        public int* sizes;
+
+        public ecs_table_t* table;
+
+        public ecs_table_t* other_table;
+
+        public ulong* ids;
+
+        public ulong* sources;
+
+        public ulong constrained_vars;
+
+        public uint set_fields;
+
+        public uint ref_fields;
+
+        public uint row_fields;
+
+        public uint up_fields;
+
+        public ulong system;
+
+        public ulong @event;
+
+        public ulong event_id;
+
+        public int event_cur;
+
+        public byte field_count;
+
+        public byte term_index;
+
+        public ecs_query_t* query;
+
+        public void* param;
+
+        public void* ctx;
+
+        public void* binding_ctx;
+
+        public void* callback_ctx;
+
+        public void* run_ctx;
+
+        public float delta_time;
+
+        public float delta_system_time;
+
+        public int frame_offset;
+
+        public uint flags;
+
+        public ulong interrupted_by;
+
+        public ecs_iter_private_t priv_;
+
+        public delegate* unmanaged<ecs_iter_t*, bool> next;
+
+        public delegate* unmanaged<ecs_iter_t*, void> callback;
+
+        public delegate* unmanaged<ecs_iter_t*, void> fini;
+
+        public ecs_iter_t* chain_it;
+    }
+
+    public partial struct ecs_ref_t
+    {
+        public ulong entity;
+
+        public ulong id;
+
+        public ulong table_id;
+
+        public uint table_version_fast;
+
+        public ushort table_version;
+
+        public ecs_record_t* record;
+
+        public void* ptr;
+    }
+
+    public partial struct ecs_type_hooks_t
+    {
+        public delegate* unmanaged<void*, int, ecs_type_info_t*, void> ctor;
+
+        public delegate* unmanaged<void*, int, ecs_type_info_t*, void> dtor;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> copy;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> copy_ctor;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move_ctor;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> ctor_move_dtor;
+
+        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move_dtor;
+
+        public delegate* unmanaged<void*, void*, ecs_type_info_t*, int> cmp;
+
+        public delegate* unmanaged<void*, void*, ecs_type_info_t*, bool> equals;
+
+        public uint flags;
+
+        public delegate* unmanaged<ecs_iter_t*, void> on_add;
+
+        public delegate* unmanaged<ecs_iter_t*, void> on_set;
+
+        public delegate* unmanaged<ecs_iter_t*, void> on_remove;
+
+        public delegate* unmanaged<ecs_iter_t*, void> on_replace;
+
+        public void* ctx;
+
+        public void* binding_ctx;
+
+        public void* lifecycle_ctx;
+
+        public delegate* unmanaged<void*, void> ctx_free;
+
+        public delegate* unmanaged<void*, void> binding_ctx_free;
+
+        public delegate* unmanaged<void*, void> lifecycle_ctx_free;
+    }
+
+    public partial struct ecs_type_info_t
+    {
+        public int size;
+
+        public int alignment;
+
+        public ecs_type_hooks_t hooks;
+
+        public ulong component;
+
+        public byte* name;
+    }
+
+    public partial struct ecs_record_t
+    {
+        public ecs_table_t* table;
+
+        public uint row;
+
+        public int dense;
+    }
+
+    public partial struct ecs_component_record_t
+    {
+    }
+
+    public partial struct ecs_mixins_t
+    {
+    }
+
+    public partial struct ecs_header_t
+    {
+        public int type;
+
+        public int refcount;
+
+        public ecs_mixins_t* mixins;
+    }
+
+    public partial struct ecs_table_record_t
+    {
+        public ecs_table_cache_hdr_t hdr;
+
+        public short index;
+
+        public short count;
+
+        public short column;
+    }
+
     public partial struct ecs_vec_t
     {
         public void* array;
@@ -2230,6 +2707,13 @@ public static unsafe partial class flecs
         public int count;
 
         public int size;
+    }
+
+    public partial struct ecs_sparse_page_t
+    {
+        public int* sparse;
+
+        public void* data;
     }
 
     public partial struct ecs_sparse_t
@@ -2251,17 +2735,17 @@ public static unsafe partial class flecs
 
     public partial struct ecs_block_allocator_t
     {
-        public ecs_block_allocator_chunk_header_t* head;
-
-        public ecs_block_allocator_block_t* block_head;
+        public int data_size;
 
         public int chunk_size;
-
-        public int data_size;
 
         public int chunks_per_block;
 
         public int block_size;
+
+        public ecs_block_allocator_chunk_header_t* head;
+
+        public ecs_block_allocator_block_t* block_head;
     }
 
     public partial struct ecs_map_t
@@ -2275,6 +2759,10 @@ public static unsafe partial class flecs
         public uint bucket_shift;
 
         public ecs_allocator_t* allocator;
+
+        public int change_count;
+
+        public ulong last_iterated;
     }
 
     public partial struct ecs_block_allocator_block_t
@@ -2347,34 +2835,8 @@ public static unsafe partial class flecs
         public ecs_bucket_entry_t* entry;
 
         public ulong* res;
-    }
 
-    public partial struct ecs_map_params_t
-    {
-        public ecs_allocator_t* allocator;
-
-        public ecs_block_allocator_t entry_allocator;
-    }
-
-    public partial struct ecs_switch_node_t
-    {
-        public uint next;
-
-        public uint prev;
-    }
-
-    public partial struct ecs_switch_page_t
-    {
-        public ecs_vec_t nodes;
-
-        public ecs_vec_t values;
-    }
-
-    public partial struct ecs_switch_t
-    {
-        public ecs_map_t hdrs;
-
-        public ecs_vec_t pages;
+        public int change_count;
     }
 
     public partial struct ecs_strbuf_list_elem
@@ -2495,357 +2957,6 @@ public static unsafe partial class flecs
         public void* log_out_;
     }
 
-    public partial struct ecs_type_t
-    {
-        public ulong* array;
-
-        public int count;
-    }
-
-    public partial struct ecs_world_t
-    {
-    }
-
-    public partial struct ecs_stage_t
-    {
-    }
-
-    public partial struct ecs_table_t
-    {
-    }
-
-    public partial struct ecs_term_t
-    {
-        public ulong id;
-
-        public ecs_term_ref_t src;
-
-        public ecs_term_ref_t first;
-
-        public ecs_term_ref_t second;
-
-        public ulong trav;
-
-        public short inout;
-
-        public short oper;
-
-        public byte field_index;
-
-        public ushort flags_;
-    }
-
-    public partial struct ecs_query_t
-    {
-        public ecs_header_t hdr;
-
-        public InlineArrays.ecs_term_t_32 terms;
-
-        public InlineArrays.int_32 sizes;
-
-        public InlineArrays.ulong_32 ids;
-
-        public uint flags;
-
-        public byte var_count;
-
-        public byte term_count;
-
-        public byte field_count;
-
-        public uint fixed_fields;
-
-        public uint var_fields;
-
-        public uint static_id_fields;
-
-        public uint data_fields;
-
-        public uint write_fields;
-
-        public uint read_fields;
-
-        public uint row_fields;
-
-        public uint shared_readonly_fields;
-
-        public uint set_fields;
-
-        public ecs_query_cache_kind_t cache_kind;
-
-        public byte** vars;
-
-        public void* ctx;
-
-        public void* binding_ctx;
-
-        public ulong entity;
-
-        public ecs_world_t* real_world;
-
-        public ecs_world_t* world;
-
-        public int eval_count;
-    }
-
-    public partial struct ecs_observer_t
-    {
-        public ecs_header_t hdr;
-
-        public ecs_query_t* query;
-
-        public InlineArrays.ulong_8 events;
-
-        public int event_count;
-
-        public delegate* unmanaged<ecs_iter_t*, void> callback;
-
-        public delegate* unmanaged<ecs_iter_t*, void> run;
-
-        public void* ctx;
-
-        public void* callback_ctx;
-
-        public void* run_ctx;
-
-        public delegate* unmanaged<void*, void> ctx_free;
-
-        public delegate* unmanaged<void*, void> callback_ctx_free;
-
-        public delegate* unmanaged<void*, void> run_ctx_free;
-
-        public ecs_observable_t* observable;
-
-        public ecs_world_t* world;
-
-        public ulong entity;
-    }
-
-    public partial struct ecs_observable_t
-    {
-        public ecs_event_record_t on_add;
-
-        public ecs_event_record_t on_remove;
-
-        public ecs_event_record_t on_set;
-
-        public ecs_event_record_t on_wildcard;
-
-        public ecs_sparse_t events;
-
-        public ulong last_observer_id;
-    }
-
-    public partial struct ecs_iter_t
-    {
-        public ecs_world_t* world;
-
-        public ecs_world_t* real_world;
-
-        public ulong* entities;
-
-        public int* sizes;
-
-        public ecs_table_t* table;
-
-        public ecs_table_t* other_table;
-
-        public ulong* ids;
-
-        public ecs_var_t* variables;
-
-        public ecs_table_record_t** trs;
-
-        public ulong* sources;
-
-        public ulong constrained_vars;
-
-        public ulong group_id;
-
-        public uint set_fields;
-
-        public uint ref_fields;
-
-        public uint row_fields;
-
-        public uint up_fields;
-
-        public ulong system;
-
-        public ulong @event;
-
-        public ulong event_id;
-
-        public int event_cur;
-
-        public byte field_count;
-
-        public byte term_index;
-
-        public byte variable_count;
-
-        public ecs_query_t* query;
-
-        public byte** variable_names;
-
-        public void* param;
-
-        public void* ctx;
-
-        public void* binding_ctx;
-
-        public void* callback_ctx;
-
-        public void* run_ctx;
-
-        public float delta_time;
-
-        public float delta_system_time;
-
-        public int frame_offset;
-
-        public int offset;
-
-        public int count;
-
-        public uint flags;
-
-        public ulong interrupted_by;
-
-        public ecs_iter_private_t priv_;
-
-        public delegate* unmanaged<ecs_iter_t*, bool> next;
-
-        public delegate* unmanaged<ecs_iter_t*, void> callback;
-
-        public delegate* unmanaged<ecs_iter_t*, void> fini;
-
-        public ecs_iter_t* chain_it;
-    }
-
-    public partial struct ecs_ref_t
-    {
-        public ulong entity;
-
-        public ulong id;
-
-        public ulong table_id;
-
-        public uint table_version;
-
-        public ecs_record_t* record;
-
-        public void* ptr;
-    }
-
-    public partial struct ecs_type_hooks_t
-    {
-        public delegate* unmanaged<void*, int, ecs_type_info_t*, void> ctor;
-
-        public delegate* unmanaged<void*, int, ecs_type_info_t*, void> dtor;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> copy;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> copy_ctor;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move_ctor;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> ctor_move_dtor;
-
-        public delegate* unmanaged<void*, void*, int, ecs_type_info_t*, void> move_dtor;
-
-        public uint flags;
-
-        public delegate* unmanaged<ecs_iter_t*, void> on_add;
-
-        public delegate* unmanaged<ecs_iter_t*, void> on_set;
-
-        public delegate* unmanaged<ecs_iter_t*, void> on_remove;
-
-        public void* ctx;
-
-        public void* binding_ctx;
-
-        public void* lifecycle_ctx;
-
-        public delegate* unmanaged<void*, void> ctx_free;
-
-        public delegate* unmanaged<void*, void> binding_ctx_free;
-
-        public delegate* unmanaged<void*, void> lifecycle_ctx_free;
-    }
-
-    public partial struct ecs_type_info_t
-    {
-        public int size;
-
-        public int alignment;
-
-        public ecs_type_hooks_t hooks;
-
-        public ulong component;
-
-        public byte* name;
-    }
-
-    public partial struct ecs_record_t
-    {
-        public ecs_id_record_t* idr;
-
-        public ecs_table_t* table;
-
-        public uint row;
-
-        public int dense;
-    }
-
-    public partial struct ecs_id_record_t
-    {
-    }
-
-    public partial struct ecs_mixins_t
-    {
-    }
-
-    public partial struct ecs_header_t
-    {
-        public int magic;
-
-        public int type;
-
-        public int refcount;
-
-        public ecs_mixins_t* mixins;
-    }
-
-    public partial struct ecs_table_cache_hdr_t
-    {
-        public ecs_table_cache_t* cache;
-
-        public ecs_table_t* table;
-
-        public ecs_table_cache_hdr_t* prev;
-
-        public ecs_table_cache_hdr_t* next;
-    }
-
-    public partial struct ecs_table_cache_t
-    {
-    }
-
-    public partial struct ecs_table_record_t
-    {
-        public ecs_table_cache_hdr_t hdr;
-
-        public short index;
-
-        public short count;
-
-        public short column;
-    }
-
     public partial struct ecs_term_ref_t
     {
         public ulong id;
@@ -2857,7 +2968,11 @@ public static unsafe partial class flecs
     {
     }
 
-    public partial struct ecs_query_cache_table_match_t
+    public partial struct ecs_query_cache_match_t
+    {
+    }
+
+    public partial struct ecs_query_cache_group_t
     {
     }
 
@@ -2921,6 +3036,17 @@ public static unsafe partial class flecs
         public bool iter_empty;
     }
 
+    public partial struct ecs_table_cache_hdr_t
+    {
+        public ecs_component_record_t* cr;
+
+        public ecs_table_t* table;
+
+        public ecs_table_cache_hdr_t* prev;
+
+        public ecs_table_cache_hdr_t* next;
+    }
+
     public partial struct ecs_each_iter_t
     {
         public ecs_table_cache_iter_t it;
@@ -2943,8 +3069,6 @@ public static unsafe partial class flecs
 
     public partial struct ecs_query_iter_t
     {
-        public ecs_query_t* query;
-
         public ecs_var_t* vars;
 
         public ecs_query_var_t* query_vars;
@@ -2953,21 +3077,25 @@ public static unsafe partial class flecs
 
         public ecs_query_op_ctx_t* op_ctx;
 
-        public ecs_query_cache_table_match_t* node;
-
-        public ecs_query_cache_table_match_t* prev;
-
-        public ecs_query_cache_table_match_t* last;
-
         public ulong* written;
 
-        public int skip_count;
+        public ecs_query_cache_group_t* group;
+
+        public ecs_vec_t* tables;
+
+        public ecs_vec_t* all_tables;
+
+        public ecs_query_cache_match_t* elem;
+
+        public int cur;
+
+        public int all_cur;
 
         public ecs_query_op_profile_t* profile;
 
         public short op;
 
-        public short sp;
+        public bool iter_single_group;
     }
 
     public partial struct ecs_query_var_t
@@ -2982,28 +3110,19 @@ public static unsafe partial class flecs
     {
     }
 
-    public partial struct ecs_iter_cache_t
-    {
-        public ecs_stack_cursor_t* stack_cursor;
-
-        public byte used;
-
-        public byte allocated;
-    }
-
     public partial struct ecs_iter_private_t
     {
-        public ecs_iter_private_t.AnonymousRecord_api_types_L153_C5 iter;
+        public ecs_iter_private_t.AnonymousRecord_api_types_L143_C5 iter;
 
         public void* entity_iter;
 
-        public ecs_iter_cache_t cache;
+        public ecs_stack_cursor_t* stack_cursor;
     }
 
     public partial struct ecs_iter_private_t
     {
         [StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
-        public partial struct AnonymousRecord_api_types_L153_C5
+        public partial struct AnonymousRecord_api_types_L143_C5
         {
             [System.Runtime.InteropServices.FieldOffset(0)]
             public ecs_query_iter_t query;
@@ -3066,10 +3185,6 @@ public static unsafe partial class flecs
 
         public int value_size;
 
-        public ecs_block_allocator_t* hashmap_allocator;
-
-        public ecs_block_allocator_t bucket_allocator;
-
         public ecs_map_t impl;
     }
 
@@ -3089,6 +3204,24 @@ public static unsafe partial class flecs
         public void* value;
 
         public ulong hash;
+    }
+
+    public partial struct ecs_table_diff_t
+    {
+        public ecs_type_t added;
+
+        public ecs_type_t removed;
+
+        public uint added_flags;
+
+        public uint removed_flags;
+    }
+
+    public partial struct ecs_table_records_t
+    {
+        public ecs_table_record_t* array;
+
+        public int count;
     }
 
     public partial struct ecs_value_t
@@ -3216,8 +3349,6 @@ public static unsafe partial class flecs
 
         public delegate* unmanaged<void*, void> run_ctx_free;
 
-        public void* observable;
-
         public int* last_event_id;
 
         public byte term_index_;
@@ -3255,6 +3386,8 @@ public static unsafe partial class flecs
         public byte* compiler;
 
         public byte** addons;
+
+        public byte** flags;
 
         public byte* version;
 
@@ -3319,9 +3452,11 @@ public static unsafe partial class flecs
 
         public long pipeline_build_count_total;
 
-        public long systems_ran_frame;
+        public long systems_ran_total;
 
-        public long observers_ran_frame;
+        public long observers_ran_total;
+
+        public long queries_ran_total;
 
         public int tag_id_count;
 
@@ -3331,14 +3466,16 @@ public static unsafe partial class flecs
 
         public int table_count;
 
-        public ecs_world_info_t.AnonymousRecord_flecs_L1468_C5 cmd;
+        public uint creation_time;
+
+        public ecs_world_info_t.AnonymousRecord_flecs_L1489_C5 cmd;
 
         public byte* name_prefix;
     }
 
     public partial struct ecs_world_info_t
     {
-        public partial struct AnonymousRecord_flecs_L1468_C5
+        public partial struct AnonymousRecord_flecs_L1489_C5
         {
             public long add_count;
 
@@ -3368,6 +3505,8 @@ public static unsafe partial class flecs
 
     public partial struct ecs_query_group_info_t
     {
+        public ulong id;
+
         public int match_count;
 
         public int table_count;
@@ -3430,8 +3569,6 @@ public static unsafe partial class flecs
         public int entities;
 
         public int tables;
-
-        public int empty_tables;
     }
 
     public partial struct ecs_app_desc_t
@@ -3528,13 +3665,26 @@ public static unsafe partial class flecs
         public double cache_purge_timeout;
     }
 
+    public partial struct ecs_rest_ctx_t
+    {
+        public ecs_world_t* world;
+
+        public ecs_http_server_t* srv;
+
+        public int rc;
+
+        public ecs_map_t cmd_captures;
+
+        public double last_time;
+    }
+
     public partial struct EcsRest
     {
         public ushort port;
 
         public byte* ipaddr;
 
-        public void* impl;
+        public ecs_rest_ctx_t* impl;
     }
 
     public partial struct EcsTimer
@@ -3622,8 +3772,6 @@ public static unsafe partial class flecs
 
         public ecs_query_t* query;
 
-        public ulong query_entity;
-
         public ulong tick_source;
 
         public bool multi_threaded;
@@ -3649,10 +3797,6 @@ public static unsafe partial class flecs
         public float time_passed;
 
         public long last_frame;
-
-        public ecs_world_t* world;
-
-        public ulong entity;
 
         public delegate* unmanaged<void*, void> dtor;
     }
@@ -3959,7 +4103,7 @@ public static unsafe partial class flecs
     {
         public EcsStatsHeader hdr;
 
-        public ecs_world_stats_t stats;
+        public ecs_world_stats_t* stats;
     }
 
     public partial struct EcsSystemStats
@@ -3982,23 +4126,230 @@ public static unsafe partial class flecs
 
         public double time_scale;
 
+        public double fps;
+
         public double frame_time_total;
 
         public double system_time_total;
 
         public double merge_time_total;
 
-        public double frame_time_last;
+        public long entity_count;
 
-        public double system_time_last;
-
-        public double merge_time_last;
+        public long table_count;
 
         public long frame_count;
 
         public long command_count;
 
+        public long merge_count;
+
+        public long systems_ran_total;
+
+        public long observers_ran_total;
+
+        public long queries_ran_total;
+
+        public int tag_count;
+
+        public int component_count;
+
+        public int pair_count;
+
+        public double frame_time_frame;
+
+        public double system_time_frame;
+
+        public double merge_time_frame;
+
+        public long merge_count_frame;
+
+        public long systems_ran_frame;
+
+        public long observers_ran_frame;
+
+        public long queries_ran_frame;
+
+        public long command_count_frame;
+
+        public double simulation_time;
+
+        public uint uptime;
+
         public ecs_build_info_t build_info;
+    }
+
+    public partial struct ecs_entities_memory_t
+    {
+        public int alive_count;
+
+        public int not_alive_count;
+
+        public int bytes_entity_index;
+
+        public int bytes_names;
+
+        public int bytes_doc_strings;
+    }
+
+    public partial struct ecs_component_memory_t
+    {
+        public int instances;
+
+        public int bytes_table_components;
+
+        public int bytes_table_components_unused;
+
+        public int bytes_toggle_bitsets;
+
+        public int bytes_sparse_components;
+    }
+
+    public partial struct ecs_component_index_memory_t
+    {
+        public int count;
+
+        public int bytes_component_record;
+
+        public int bytes_table_cache;
+
+        public int bytes_name_index;
+
+        public int bytes_ordered_children;
+
+        public int bytes_reachable_cache;
+    }
+
+    public partial struct ecs_query_memory_t
+    {
+        public int count;
+
+        public int cached_count;
+
+        public int bytes_query;
+
+        public int bytes_cache;
+
+        public int bytes_group_by;
+
+        public int bytes_order_by;
+
+        public int bytes_plan;
+
+        public int bytes_terms;
+
+        public int bytes_misc;
+    }
+
+    public partial struct ecs_table_memory_t
+    {
+        public int count;
+
+        public int empty_count;
+
+        public int column_count;
+
+        public int bytes_table;
+
+        public int bytes_type;
+
+        public int bytes_entities;
+
+        public int bytes_overrides;
+
+        public int bytes_columns;
+
+        public int bytes_table_records;
+
+        public int bytes_column_map;
+
+        public int bytes_component_map;
+
+        public int bytes_dirty_state;
+
+        public int bytes_edges;
+    }
+
+    public partial struct ecs_table_histogram_t
+    {
+        public InlineArrays.int_14 entity_counts;
+    }
+
+    public partial struct ecs_misc_memory_t
+    {
+        public int bytes_world;
+
+        public int bytes_observers;
+
+        public int bytes_systems;
+
+        public int bytes_pipelines;
+
+        public int bytes_table_lookup;
+
+        public int bytes_component_record_lookup;
+
+        public int bytes_locked_components;
+
+        public int bytes_type_info;
+
+        public int bytes_commands;
+
+        public int bytes_rematch_monitor;
+
+        public int bytes_component_ids;
+
+        public int bytes_reflection;
+
+        public int bytes_stats;
+
+        public int bytes_rest;
+    }
+
+    public partial struct ecs_allocator_memory_t
+    {
+        public int bytes_graph_edge;
+
+        public int bytes_component_record;
+
+        public int bytes_pair_record;
+
+        public int bytes_table_diff;
+
+        public int bytes_sparse_chunk;
+
+        public int bytes_allocator;
+
+        public int bytes_stack_allocator;
+
+        public int bytes_cmd_entry_chunk;
+
+        public int bytes_query_impl;
+
+        public int bytes_query_cache;
+
+        public int bytes_misc;
+    }
+
+    public partial struct EcsWorldMemory
+    {
+        public ecs_entities_memory_t entities;
+
+        public ecs_component_memory_t components;
+
+        public ecs_component_index_memory_t component_index;
+
+        public ecs_query_memory_t queries;
+
+        public ecs_table_memory_t tables;
+
+        public ecs_table_histogram_t table_histogram;
+
+        public ecs_misc_memory_t misc;
+
+        public ecs_allocator_memory_t allocators;
+
+        public double collection_time;
     }
 
     public partial struct EcsMetricValue
@@ -4118,6 +4469,8 @@ public static unsafe partial class flecs
         public ulong serialize_refs;
 
         public bool serialize_matches;
+
+        public delegate* unmanaged<ecs_world_t*, ulong, bool> component_filter;
     }
 
     public partial struct ecs_iter_to_json_desc_t
@@ -4155,6 +4508,8 @@ public static unsafe partial class flecs
         public ulong serialize_refs;
 
         public bool serialize_matches;
+
+        public delegate* unmanaged<ecs_world_t*, ulong, bool> component_filter;
 
         public void* query;
     }
@@ -4217,6 +4572,12 @@ public static unsafe partial class flecs
 
     public partial struct EcsScript
     {
+        public byte* filename;
+
+        public byte* code;
+
+        public byte* error;
+
         public ecs_script_t* script;
 
         public ecs_script_template_t* template_;
@@ -4274,6 +4635,11 @@ public static unsafe partial class flecs
         public ecs_script_runtime_t* runtime;
     }
 
+    public partial struct ecs_script_eval_result_t
+    {
+        public byte* error;
+    }
+
     public partial struct ecs_script_desc_t
     {
         public ulong entity;
@@ -4304,6 +4670,8 @@ public static unsafe partial class flecs
         public bool allow_unresolved_identifiers;
 
         public ecs_script_runtime_t* runtime;
+
+        public void* script_visitor;
     }
 
     public partial struct ecs_const_var_desc_t
@@ -4428,8 +4796,6 @@ public static unsafe partial class flecs
     public partial struct EcsEnum
     {
         public ulong underlying_type;
-
-        public ecs_map_t constants;
     }
 
     public partial struct ecs_bitmask_constant_t
@@ -4445,7 +4811,14 @@ public static unsafe partial class flecs
 
     public partial struct EcsBitmask
     {
-        public ecs_map_t constants;
+        public int dummy_;
+    }
+
+    public partial struct EcsConstants
+    {
+        public ecs_map_t* constants;
+
+        public ecs_vec_t ordered_constants;
     }
 
     public partial struct EcsArray
@@ -4476,6 +4849,10 @@ public static unsafe partial class flecs
         public ulong as_type;
 
         public delegate* unmanaged<ecs_serializer_t*, void*, int> serialize;
+
+        public delegate* unmanaged<ecs_serializer_t*, void*, byte*, int> serialize_member;
+
+        public delegate* unmanaged<ecs_serializer_t*, void*, ulong, int> serialize_element;
 
         public delegate* unmanaged<void*, bool, void> assign_bool;
 
@@ -4533,29 +4910,49 @@ public static unsafe partial class flecs
         public ecs_unit_translation_t translation;
     }
 
-    public partial struct ecs_meta_type_op_t
+    public partial struct ecs_meta_op_t
     {
-        public ecs_meta_type_op_kind_t kind;
+        public ecs_meta_op_kind_t kind;
+
+        public ecs_meta_op_kind_t underlying_kind;
 
         public int offset;
 
-        public int count;
-
         public byte* name;
 
-        public int op_count;
+        public int elem_size;
 
-        public int size;
+        public short op_count;
+
+        public short member_index;
 
         public ulong type;
 
-        public int member_index;
+        public ecs_type_info_t* type_info;
 
-        public ecs_hashmap_t* members;
+        public ecs_meta_op_t.AnonymousRecord_meta_L578_C5 @is;
+    }
+
+    public partial struct ecs_meta_op_t
+    {
+        [StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+        public partial struct AnonymousRecord_meta_L578_C5
+        {
+            [System.Runtime.InteropServices.FieldOffset(0)]
+            public ecs_hashmap_t* members;
+
+            [System.Runtime.InteropServices.FieldOffset(0)]
+            public ecs_map_t* constants;
+
+            [System.Runtime.InteropServices.FieldOffset(0)]
+            public delegate* unmanaged<ecs_serializer_t*, void*, int> opaque;
+        }
     }
 
     public partial struct EcsTypeSerializer
     {
+        public ecs_type_kind_t kind;
+
         public ecs_vec_t ops;
     }
 
@@ -4563,31 +4960,29 @@ public static unsafe partial class flecs
     {
         public ulong type;
 
-        public ecs_meta_type_op_t* ops;
+        public ecs_meta_op_t* ops;
 
-        public int op_count;
+        public short ops_count;
 
-        public int op_cur;
+        public short ops_cur;
 
-        public int elem_cur;
-
-        public int prev_depth;
+        public short prev_depth;
 
         public void* ptr;
 
-        public EcsComponent* comp;
-
         public EcsOpaque* opaque;
-
-        public ecs_vec_t* vector;
 
         public ecs_hashmap_t* members;
 
         public bool is_collection;
 
-        public bool is_inline_array;
-
         public bool is_empty_scope;
+
+        public bool is_moved_scope;
+
+        public int elem;
+
+        public int elem_count;
     }
 
     public partial struct ecs_meta_cursor_t
@@ -4596,7 +4991,7 @@ public static unsafe partial class flecs
 
         public InlineArrays.ecs_meta_scope_t_32 scope;
 
-        public int depth;
+        public short depth;
 
         public bool valid;
 
@@ -4686,6 +5081,13 @@ public static unsafe partial class flecs
         public ecs_unit_translation_t translation;
     }
 
+    public partial struct ecs_cpp_get_mut_t
+    {
+        public void* ptr;
+
+        public bool call_modified;
+    }
+
     public partial struct InlineArrays
     {
         [InlineArray(32)]
@@ -4701,33 +5103,6 @@ public static unsafe partial class flecs
         public partial struct byte_512
         {
             public byte Item0;
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        [InlineArray(32)]
-        public partial struct ecs_term_t_32
-        {
-            public ecs_term_t Item0;
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        [InlineArray(32)]
-        public partial struct int_32
-        {
-            public int Item0;
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        [InlineArray(32)]
-        public partial struct ulong_32
-        {
-            public ulong Item0;
         }
     }
 
@@ -4755,6 +5130,24 @@ public static unsafe partial class flecs
         public partial struct ecs_commands_t_2
         {
             public ecs_commands_t Item0;
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        [InlineArray(32)]
+        public partial struct ulong_32
+        {
+            public ulong Item0;
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        [InlineArray(32)]
+        public partial struct ecs_term_t_32
+        {
+            public ecs_term_t Item0;
         }
     }
 
@@ -4800,6 +5193,15 @@ public static unsafe partial class flecs
         public partial struct double_60
         {
             public double Item0;
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        [InlineArray(14)]
+        public partial struct int_14
+        {
+            public int Item0;
         }
     }
 
@@ -4907,8 +5309,6 @@ public static unsafe partial class flecs
 
     public const ulong ECS_ID_FLAGS_MASK = 17293822569102704640;
 
-    public const int ECS_ID_IN_USE = 12;
-
     public const int ECS_INCONSISTENT_COMPONENT_ACTION = 27;
 
     public const int ECS_INCONSISTENT_COMPONENT_ID = 26;
@@ -4957,8 +5357,6 @@ public static unsafe partial class flecs
 
     public const string ECS_NORMAL = "[0;49m";
 
-    public const int ECS_NOT_A_COMPONENT = 22;
-
     public const int ecs_observer_t_magic = 1701016418;
 
     public const int ECS_OPERATION_FAILED = 10;
@@ -4977,8 +5375,6 @@ public static unsafe partial class flecs
 
     public const uint ECS_ROW_MASK = 268435455;
 
-    public const int ECS_STACK_PAGE_SIZE = 4096;
-
     public const int ecs_stage_t_magic = 1701016435;
 
     public const int ECS_STAT_WINDOW = 60;
@@ -4987,41 +5383,53 @@ public static unsafe partial class flecs
 
     public const int ECS_STRBUF_SMALL_STRING_SIZE = 512;
 
-    public const int ECS_TYPE_HOOK_COPY = 4;
+    public const int ECS_TABLE_MEMORY_HISTOGRAM_BUCKET_COUNT = 14;
 
-    public const int ECS_TYPE_HOOK_COPY_CTOR = 16;
+    public const int ECS_TABLE_MEMORY_HISTOGRAM_MAX_COUNT = 16384;
 
-    public const int ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL = 4096;
+    public const uint ECS_TYPE_HOOK_CMP = 256;
 
-    public const int ECS_TYPE_HOOK_COPY_ILLEGAL = 1024;
+    public const uint ECS_TYPE_HOOK_CMP_ILLEGAL = 524288;
 
-    public const int ECS_TYPE_HOOK_CTOR = 1;
+    public const uint ECS_TYPE_HOOK_COPY = 4;
 
-    public const int ECS_TYPE_HOOK_CTOR_ILLEGAL = 256;
+    public const uint ECS_TYPE_HOOK_COPY_CTOR = 16;
 
-    public const int ECS_TYPE_HOOK_CTOR_MOVE_DTOR = 64;
+    public const uint ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL = 32768;
 
-    public const int ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL = 16384;
+    public const uint ECS_TYPE_HOOK_COPY_ILLEGAL = 8192;
 
-    public const int ECS_TYPE_HOOK_DTOR = 2;
+    public const uint ECS_TYPE_HOOK_CTOR = 1;
 
-    public const int ECS_TYPE_HOOK_DTOR_ILLEGAL = 512;
+    public const uint ECS_TYPE_HOOK_CTOR_ILLEGAL = 1024;
 
-    public const int ECS_TYPE_HOOK_MOVE = 8;
+    public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR = 64;
 
-    public const int ECS_TYPE_HOOK_MOVE_CTOR = 32;
+    public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL = 131072;
 
-    public const int ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL = 8192;
+    public const uint ECS_TYPE_HOOK_DTOR = 2;
 
-    public const int ECS_TYPE_HOOK_MOVE_DTOR = 128;
+    public const uint ECS_TYPE_HOOK_DTOR_ILLEGAL = 4096;
 
-    public const int ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL = 32768;
+    public const uint ECS_TYPE_HOOK_EQUALS = 512;
 
-    public const int ECS_TYPE_HOOK_MOVE_ILLEGAL = 2048;
+    public const uint ECS_TYPE_HOOK_EQUALS_ILLEGAL = 1048576;
 
-    public const int ECS_TYPE_HOOKS = 255;
+    public const uint ECS_TYPE_HOOK_MOVE = 8;
 
-    public const int ECS_TYPE_HOOKS_ILLEGAL = 65280;
+    public const uint ECS_TYPE_HOOK_MOVE_CTOR = 32;
+
+    public const uint ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL = 65536;
+
+    public const uint ECS_TYPE_HOOK_MOVE_DTOR = 128;
+
+    public const uint ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL = 262144;
+
+    public const uint ECS_TYPE_HOOK_MOVE_ILLEGAL = 16384;
+
+    public const uint ECS_TYPE_HOOKS = 1023;
+
+    public const uint ECS_TYPE_HOOKS_ILLEGAL = 2094080;
 
     public const int ECS_UNSUPPORTED = 6;
 
@@ -5039,6 +5447,8 @@ public static unsafe partial class flecs
 
     public const ulong EcsDesc = 576460752303423488;
 
+    public const uint EcsEntityHasDontFragment = 268435456;
+
     public const uint EcsEntityIsId = 2147483648;
 
     public const uint EcsEntityIsTarget = 1073741824;
@@ -5055,7 +5465,9 @@ public static unsafe partial class flecs
 
     public const uint EcsIdCanToggle = 8192;
 
-    public const uint EcsIdEventMask = 31916032;
+    public const uint EcsIdDontFragment = 4194304;
+
+    public const uint EcsIdEventMask = 20905984;
 
     public const uint EcsIdExclusive = 512;
 
@@ -5065,35 +5477,33 @@ public static unsafe partial class flecs
 
     public const uint EcsIdHasOnSet = 262144;
 
-    public const uint EcsIdHasOnTableCreate = 2097152;
+    public const uint EcsIdHasOnTableCreate = 524288;
 
-    public const uint EcsIdHasOnTableDelete = 4194304;
+    public const uint EcsIdHasOnTableDelete = 1048576;
 
-    public const uint EcsIdIsInheritable = 32768;
-
-    public const uint EcsIdIsSparse = 8388608;
+    public const uint EcsIdInheritable = 32768;
 
     public const uint EcsIdIsTransitive = 16384;
 
-    public const uint EcsIdIsUnion = 16777216;
-
     public const uint EcsIdMarkedForDelete = 1073741824;
+
+    public const uint EcsIdMatchDontFragment = 8388608;
 
     public const uint EcsIdOnDeleteDelete = 2;
 
     public const uint EcsIdOnDeleteMask = 7;
 
-    public const uint EcsIdOnDeleteObjectDelete = 16;
-
-    public const uint EcsIdOnDeleteObjectMask = 56;
-
-    public const uint EcsIdOnDeleteObjectPanic = 32;
-
-    public const uint EcsIdOnDeleteObjectRemove = 8;
-
     public const uint EcsIdOnDeletePanic = 4;
 
     public const uint EcsIdOnDeleteRemove = 1;
+
+    public const uint EcsIdOnDeleteTargetDelete = 16;
+
+    public const uint EcsIdOnDeleteTargetMask = 56;
+
+    public const uint EcsIdOnDeleteTargetPanic = 32;
+
+    public const uint EcsIdOnDeleteTargetRemove = 8;
 
     public const uint EcsIdOnInstantiateDontInherit = 256;
 
@@ -5103,7 +5513,13 @@ public static unsafe partial class flecs
 
     public const uint EcsIdOnInstantiateOverride = 64;
 
-    public const uint EcsIdTag = 2048;
+    public const uint EcsIdOrderedChildren = 16777216;
+
+    public const uint EcsIdPairIsTag = 2048;
+
+    public const uint EcsIdSingleton = 33554432;
+
+    public const uint EcsIdSparse = 2097152;
 
     public const uint EcsIdTraversable = 1024;
 
@@ -5115,7 +5531,7 @@ public static unsafe partial class flecs
 
     public const ulong EcsIsVariable = 288230376151711744;
 
-    public const uint EcsIterCacheSearch = 32768;
+    public const uint EcsIterCached = 32768;
 
     public const uint EcsIterCppEach = 524288;
 
@@ -5129,9 +5545,11 @@ public static unsafe partial class flecs
 
     public const uint EcsIterIsValid = 1;
 
+    public const uint EcsIterMatchEmptyTables = 8;
+
     public const uint EcsIterNoData = 2;
 
-    public const uint EcsIterNoResults = 8;
+    public const uint EcsIterNoResults = 4;
 
     public const uint EcsIterProfile = 128;
 
@@ -5141,23 +5559,37 @@ public static unsafe partial class flecs
 
     public const uint EcsIterTrivialCached = 16384;
 
+    public const uint EcsIterTrivialChangeDetection = 32;
+
     public const uint EcsIterTrivialSearch = 256;
 
     public const uint EcsIterTrivialTest = 2048;
 
-    public const uint EcsObserverBypassQuery = 32;
+    public const uint EcsNonTrivialIdInherit = 4;
 
-    public const uint EcsObserverIsDisabled = 8;
+    public const uint EcsNonTrivialIdNonFragmenting = 2;
 
-    public const uint EcsObserverIsMonitor = 4;
+    public const uint EcsNonTrivialIdSparse = 1;
 
-    public const uint EcsObserverIsMulti = 2;
+    public const uint EcsObserverBypassQuery = 128;
 
-    public const uint EcsObserverIsParentDisabled = 16;
+    public const uint EcsObserverIsDisabled = 32;
 
-    public const uint EcsObserverYieldOnCreate = 64;
+    public const uint EcsObserverIsMonitor = 16;
 
-    public const uint EcsObserverYieldOnDelete = 128;
+    public const uint EcsObserverIsMulti = 8;
+
+    public const uint EcsObserverIsParentDisabled = 64;
+
+    public const uint EcsObserverKeepAlive = 2048;
+
+    public const uint EcsObserverMatchDisabled = 4;
+
+    public const uint EcsObserverMatchPrefab = 2;
+
+    public const uint EcsObserverYieldOnCreate = 256;
+
+    public const uint EcsObserverYieldOnDelete = 512;
 
     public const uint EcsOsApiHighResolutionTimer = 1;
 
@@ -5171,11 +5603,13 @@ public static unsafe partial class flecs
 
     public const uint EcsQueryCacheYieldEmptyTables = 134217728;
 
+    public const uint EcsQueryDetectChanges = 256;
+
     public const uint EcsQueryHasCacheable = 16777216;
 
-    public const uint EcsQueryHasCondSet = 65536;
+    public const uint EcsQueryHasChangeDetection = 4194304;
 
-    public const uint EcsQueryHasMonitor = 4194304;
+    public const uint EcsQueryHasCondSet = 65536;
 
     public const uint EcsQueryHasNonThisOutTerms = 2097152;
 
@@ -5209,37 +5643,47 @@ public static unsafe partial class flecs
 
     public const uint EcsQueryMatchWildcards = 16384;
 
-    public const uint EcsQueryNested = 268435456;
+    public const uint EcsQueryNested = 536870912;
 
     public const uint EcsQueryTableOnly = 128;
 
+    public const uint EcsQueryTrivialCache = 268435456;
+
+    public const uint EcsQueryValid = 1073741824;
+
     public const ulong EcsSelf = 9223372036854775808;
 
-    public const uint EcsTableAddEdgeFlags = 25231360;
+    public const uint EcsTableAddEdgeFlags = 2162688;
 
-    public const uint EcsTableEdgeFlags = 25362432;
+    public const uint EcsTableEdgeFlags = 2293760;
 
-    public const uint EcsTableHasAddActions = 328712;
+    public const uint EcsTableEdgeReparent = 268435456;
+
+    public const uint EcsTableHasAddActions = 329736;
 
     public const uint EcsTableHasBuiltins = 2;
 
-    public const uint EcsTableHasChildOf = 16;
+    public const uint EcsTableHasChildOf = 32;
 
-    public const uint EcsTableHasCopy = 4096;
+    public const uint EcsTableHasCopy = 8192;
 
-    public const uint EcsTableHasCtors = 1024;
+    public const uint EcsTableHasCtors = 2048;
 
-    public const uint EcsTableHasDtors = 2048;
+    public const uint EcsTableHasDontFragment = 4194304;
+
+    public const uint EcsTableHasDtors = 4096;
 
     public const uint EcsTableHasIsA = 8;
 
-    public const uint EcsTableHasLifecycle = 3072;
+    public const uint EcsTableHasLifecycle = 6144;
 
-    public const uint EcsTableHasModule = 128;
+    public const uint EcsTableHasModule = 256;
 
-    public const uint EcsTableHasMove = 8192;
+    public const uint EcsTableHasMove = 16384;
 
-    public const uint EcsTableHasName = 32;
+    public const uint EcsTableHasMultiIsA = 16;
+
+    public const uint EcsTableHasName = 64;
 
     public const uint EcsTableHasOnAdd = 65536;
 
@@ -5247,39 +5691,39 @@ public static unsafe partial class flecs
 
     public const uint EcsTableHasOnSet = 262144;
 
-    public const uint EcsTableHasOnTableCreate = 2097152;
+    public const uint EcsTableHasOnTableCreate = 524288;
 
-    public const uint EcsTableHasOnTableDelete = 4194304;
+    public const uint EcsTableHasOnTableDelete = 1048576;
 
-    public const uint EcsTableHasOnTableEmpty = 1048576;
+    public const uint EcsTableHasOrderedChildren = 16777216;
 
-    public const uint EcsTableHasOnTableFill = 524288;
+    public const uint EcsTableHasOverrides = 33554432;
 
-    public const uint EcsTableHasOverrides = 32768;
+    public const uint EcsTableHasPairs = 128;
 
-    public const uint EcsTableHasPairs = 64;
+    public const uint EcsTableHasRemoveActions = 135176;
 
-    public const uint EcsTableHasRemoveActions = 133128;
+    public const uint EcsTableHasSparse = 2097152;
 
-    public const uint EcsTableHasSparse = 8388608;
+    public const uint EcsTableHasToggle = 32768;
 
-    public const uint EcsTableHasToggle = 16384;
+    public const uint EcsTableHasTraversable = 134217728;
 
-    public const uint EcsTableHasTraversable = 67108864;
+    public const uint EcsTableIsComplex = 2136064;
 
-    public const uint EcsTableHasUnion = 16777216;
-
-    public const uint EcsTableIsComplex = 8408064;
-
-    public const uint EcsTableIsDisabled = 256;
+    public const uint EcsTableIsDisabled = 512;
 
     public const uint EcsTableIsPrefab = 4;
 
-    public const uint EcsTableMarkedForDelete = 1073741824;
+    public const uint EcsTableMarkedForDelete = 536870912;
 
-    public const uint EcsTableNotQueryable = 512;
+    public const uint EcsTableNotQueryable = 1024;
 
-    public const uint EcsTableRemoveEdgeFlags = 25296896;
+    public const uint EcsTableOverrideDontFragment = 8388608;
+
+    public const uint EcsTableRemoveEdgeFlags = 19005440;
+
+    public const uint EcsTermDontFragment = 16384;
 
     public const uint EcsTermIdInherited = 16;
 
@@ -5287,7 +5731,7 @@ public static unsafe partial class flecs
 
     public const uint EcsTermIsMember = 512;
 
-    public const uint EcsTermIsOr = 16384;
+    public const uint EcsTermIsOr = 8192;
 
     public const uint EcsTermIsScope = 256;
 
@@ -5296,10 +5740,6 @@ public static unsafe partial class flecs
     public const uint EcsTermIsToggle = 1024;
 
     public const uint EcsTermIsTrivial = 32;
-
-    public const uint EcsTermIsUnion = 8192;
-
-    public const uint EcsTermKeepAlive = 2048;
 
     public const uint EcsTermMatchAny = 1;
 
@@ -5337,7 +5777,7 @@ public static unsafe partial class flecs
 
     public const int FLECS_DAG_DEPTH_MAX = 128;
 
-    public const int FLECS_ENTITY_PAGE_BITS = 12;
+    public const int FLECS_ENTITY_PAGE_BITS = 10;
 
     public const int FLECS_EVENT_DESC_MAX = 8;
 
@@ -5346,18 +5786,6 @@ public static unsafe partial class flecs
     public const int FLECS_HI_ID_RECORD_ID = 1024;
 
     public const int FLECS_ID_DESC_MAX = 32;
-
-    public const int flecs_iter_cache_all = 255;
-
-    public const uint flecs_iter_cache_ids = 1;
-
-    public const uint flecs_iter_cache_ptrs = 8;
-
-    public const uint flecs_iter_cache_sources = 4;
-
-    public const uint flecs_iter_cache_trs = 2;
-
-    public const uint flecs_iter_cache_variables = 16;
 
     public const int FLECS_QUERY_SCOPE_NESTING_MAX = 8;
 
@@ -5369,17 +5797,21 @@ public static unsafe partial class flecs
 
     public const int FLECS_SPARSE_PAGE_SIZE = 64;
 
+    public const int FLECS_STACK_PAGE_OFFSET = 32;
+
+    public const int FLECS_STACK_PAGE_SIZE = 992;
+
     public const int FLECS_TERM_ARG_COUNT_MAX = 16;
 
     public const int FLECS_TERM_COUNT_MAX = 32;
 
     public const int FLECS_VARIABLE_COUNT_MAX = 64;
 
-    public const string FLECS_VERSION = "4.0.4";
+    public const string FLECS_VERSION = "4.1.4";
 
     public const int FLECS_VERSION_MAJOR = 4;
 
-    public const int FLECS_VERSION_MINOR = 0;
+    public const int FLECS_VERSION_MINOR = 1;
 
     public const int FLECS_VERSION_PATCH = 4;
 
@@ -5589,6 +6021,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocUuid_BindgenGetExtern")]
     private static extern void* EcsDocUuid_BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontFragment_BindgenGetExtern")]
+    private static extern void* EcsDontFragment_BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontInherit_BindgenGetExtern")]
     private static extern void* EcsDontInherit_BindgenGetExtern();
@@ -5863,6 +6298,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnValidate_BindgenGetExtern")]
     private static extern void* EcsOnValidate_BindgenGetExtern();
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOrderedChildren_BindgenGetExtern")]
+    private static extern void* EcsOrderedChildren_BindgenGetExtern();
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOverride_BindgenGetExtern")]
     private static extern void* EcsOverride_BindgenGetExtern();
 
@@ -5980,6 +6418,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSeconds_BindgenGetExtern")]
     private static extern void* EcsSeconds_BindgenGetExtern();
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSingleton_BindgenGetExtern")]
+    private static extern void* EcsSingleton_BindgenGetExtern();
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSlotOf_BindgenGetExtern")]
     private static extern void* EcsSlotOf_BindgenGetExtern();
 
@@ -6024,9 +6465,6 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTraversable_BindgenGetExtern")]
     private static extern void* EcsTraversable_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUnion_BindgenGetExtern")]
-    private static extern void* EcsUnion_BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUnitPrefixes_BindgenGetExtern")]
     private static extern void* EcsUnitPrefixes_BindgenGetExtern();
@@ -6073,6 +6511,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZetta_BindgenGetExtern")]
     private static extern void* EcsZetta_BindgenGetExtern();
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_allocator_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_allocator_memory_tID__BindgenGetExtern();
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_bool_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_bool_tID__BindgenGetExtern();
 
@@ -6081,6 +6522,15 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_char_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_char_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_index_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_component_index_memory_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_component_memory_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entities_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_entities_memory_tID__BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entity_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_entity_tID__BindgenGetExtern();
@@ -6109,8 +6559,20 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_iptr_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_iptr_tID__BindgenGetExtern();
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_misc_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_misc_memory_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_query_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_query_memory_tID__BindgenGetExtern();
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_string_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_string_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_histogram_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_table_histogram_tID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_memory_tID__BindgenGetExtern")]
+    private static extern void* FLECS_IDecs_table_memory_tID__BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u16_tID__BindgenGetExtern")]
     private static extern void* FLECS_IDecs_u16_tID__BindgenGetExtern();
@@ -6159,6 +6621,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsComponentID__BindgenGetExtern")]
     private static extern void* FLECS_IDEcsComponentID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsConstantsID__BindgenGetExtern")]
+    private static extern void* FLECS_IDEcsConstantsID__BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterID__BindgenGetExtern")]
     private static extern void* FLECS_IDEcsCounterID__BindgenGetExtern();
@@ -6264,6 +6729,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsVectorID__BindgenGetExtern")]
     private static extern void* FLECS_IDEcsVectorID__BindgenGetExtern();
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldMemoryID__BindgenGetExtern")]
+    private static extern void* FLECS_IDEcsWorldMemoryID__BindgenGetExtern();
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldStatsID__BindgenGetExtern")]
     private static extern void* FLECS_IDEcsWorldStatsID__BindgenGetExtern();
@@ -6417,6 +6885,8 @@ public static unsafe partial class flecs
     private static void* EcsDocLink_Ptr;
 
     private static void* EcsDocUuid_Ptr;
+
+    private static void* EcsDontFragment_Ptr;
 
     private static void* EcsDontInherit_Ptr;
 
@@ -6600,6 +7070,8 @@ public static unsafe partial class flecs
 
     private static void* EcsOnValidate_Ptr;
 
+    private static void* EcsOrderedChildren_Ptr;
+
     private static void* EcsOverride_Ptr;
 
     private static void* EcsPairIsTag_Ptr;
@@ -6678,6 +7150,8 @@ public static unsafe partial class flecs
 
     private static void* EcsSeconds_Ptr;
 
+    private static void* EcsSingleton_Ptr;
+
     private static void* EcsSlotOf_Ptr;
 
     private static void* EcsSparse_Ptr;
@@ -6707,8 +7181,6 @@ public static unsafe partial class flecs
     private static void* EcsTransitive_Ptr;
 
     private static void* EcsTraversable_Ptr;
-
-    private static void* EcsUnion_Ptr;
 
     private static void* EcsUnitPrefixes_Ptr;
 
@@ -6740,11 +7212,19 @@ public static unsafe partial class flecs
 
     private static void* EcsZetta_Ptr;
 
+    private static void* FLECS_IDecs_allocator_memory_tID__Ptr;
+
     private static void* FLECS_IDecs_bool_tID__Ptr;
 
     private static void* FLECS_IDecs_byte_tID__Ptr;
 
     private static void* FLECS_IDecs_char_tID__Ptr;
+
+    private static void* FLECS_IDecs_component_index_memory_tID__Ptr;
+
+    private static void* FLECS_IDecs_component_memory_tID__Ptr;
+
+    private static void* FLECS_IDecs_entities_memory_tID__Ptr;
 
     private static void* FLECS_IDecs_entity_tID__Ptr;
 
@@ -6764,7 +7244,15 @@ public static unsafe partial class flecs
 
     private static void* FLECS_IDecs_iptr_tID__Ptr;
 
+    private static void* FLECS_IDecs_misc_memory_tID__Ptr;
+
+    private static void* FLECS_IDecs_query_memory_tID__Ptr;
+
     private static void* FLECS_IDecs_string_tID__Ptr;
+
+    private static void* FLECS_IDecs_table_histogram_tID__Ptr;
+
+    private static void* FLECS_IDecs_table_memory_tID__Ptr;
 
     private static void* FLECS_IDecs_u16_tID__Ptr;
 
@@ -6797,6 +7285,8 @@ public static unsafe partial class flecs
     private static void* FLECS_IDEcsBitmaskID__Ptr;
 
     private static void* FLECS_IDEcsComponentID__Ptr;
+
+    private static void* FLECS_IDEcsConstantsID__Ptr;
 
     private static void* FLECS_IDEcsCounterID__Ptr;
 
@@ -6867,6 +7357,8 @@ public static unsafe partial class flecs
     private static void* FLECS_IDEcsUnitPrefixID__Ptr;
 
     private static void* FLECS_IDEcsVectorID__Ptr;
+
+    private static void* FLECS_IDEcsWorldMemoryID__Ptr;
 
     private static void* FLECS_IDEcsWorldStatsID__Ptr;
 
@@ -7015,6 +7507,8 @@ public static unsafe partial class flecs
     public static ref ulong EcsDocLink => ref *(ulong*)(EcsDocLink_Ptr == null ? EcsDocLink_Ptr = EcsDocLink_BindgenGetExtern() : EcsDocLink_Ptr);
 
     public static ref ulong EcsDocUuid => ref *(ulong*)(EcsDocUuid_Ptr == null ? EcsDocUuid_Ptr = EcsDocUuid_BindgenGetExtern() : EcsDocUuid_Ptr);
+
+    public static ref ulong EcsDontFragment => ref *(ulong*)(EcsDontFragment_Ptr == null ? EcsDontFragment_Ptr = EcsDontFragment_BindgenGetExtern() : EcsDontFragment_Ptr);
 
     public static ref ulong EcsDontInherit => ref *(ulong*)(EcsDontInherit_Ptr == null ? EcsDontInherit_Ptr = EcsDontInherit_BindgenGetExtern() : EcsDontInherit_Ptr);
 
@@ -7198,6 +7692,8 @@ public static unsafe partial class flecs
 
     public static ref ulong EcsOnValidate => ref *(ulong*)(EcsOnValidate_Ptr == null ? EcsOnValidate_Ptr = EcsOnValidate_BindgenGetExtern() : EcsOnValidate_Ptr);
 
+    public static ref ulong EcsOrderedChildren => ref *(ulong*)(EcsOrderedChildren_Ptr == null ? EcsOrderedChildren_Ptr = EcsOrderedChildren_BindgenGetExtern() : EcsOrderedChildren_Ptr);
+
     public static ref ulong EcsOverride => ref *(ulong*)(EcsOverride_Ptr == null ? EcsOverride_Ptr = EcsOverride_BindgenGetExtern() : EcsOverride_Ptr);
 
     public static ref ulong EcsPairIsTag => ref *(ulong*)(EcsPairIsTag_Ptr == null ? EcsPairIsTag_Ptr = EcsPairIsTag_BindgenGetExtern() : EcsPairIsTag_Ptr);
@@ -7276,6 +7772,8 @@ public static unsafe partial class flecs
 
     public static ref ulong EcsSeconds => ref *(ulong*)(EcsSeconds_Ptr == null ? EcsSeconds_Ptr = EcsSeconds_BindgenGetExtern() : EcsSeconds_Ptr);
 
+    public static ref ulong EcsSingleton => ref *(ulong*)(EcsSingleton_Ptr == null ? EcsSingleton_Ptr = EcsSingleton_BindgenGetExtern() : EcsSingleton_Ptr);
+
     public static ref ulong EcsSlotOf => ref *(ulong*)(EcsSlotOf_Ptr == null ? EcsSlotOf_Ptr = EcsSlotOf_BindgenGetExtern() : EcsSlotOf_Ptr);
 
     public static ref ulong EcsSparse => ref *(ulong*)(EcsSparse_Ptr == null ? EcsSparse_Ptr = EcsSparse_BindgenGetExtern() : EcsSparse_Ptr);
@@ -7305,8 +7803,6 @@ public static unsafe partial class flecs
     public static ref ulong EcsTransitive => ref *(ulong*)(EcsTransitive_Ptr == null ? EcsTransitive_Ptr = EcsTransitive_BindgenGetExtern() : EcsTransitive_Ptr);
 
     public static ref ulong EcsTraversable => ref *(ulong*)(EcsTraversable_Ptr == null ? EcsTraversable_Ptr = EcsTraversable_BindgenGetExtern() : EcsTraversable_Ptr);
-
-    public static ref ulong EcsUnion => ref *(ulong*)(EcsUnion_Ptr == null ? EcsUnion_Ptr = EcsUnion_BindgenGetExtern() : EcsUnion_Ptr);
 
     public static ref ulong EcsUnitPrefixes => ref *(ulong*)(EcsUnitPrefixes_Ptr == null ? EcsUnitPrefixes_Ptr = EcsUnitPrefixes_BindgenGetExtern() : EcsUnitPrefixes_Ptr);
 
@@ -7338,11 +7834,19 @@ public static unsafe partial class flecs
 
     public static ref ulong EcsZetta => ref *(ulong*)(EcsZetta_Ptr == null ? EcsZetta_Ptr = EcsZetta_BindgenGetExtern() : EcsZetta_Ptr);
 
+    public static ref ulong FLECS_IDecs_allocator_memory_tID_ => ref *(ulong*)(FLECS_IDecs_allocator_memory_tID__Ptr == null ? FLECS_IDecs_allocator_memory_tID__Ptr = FLECS_IDecs_allocator_memory_tID__BindgenGetExtern() : FLECS_IDecs_allocator_memory_tID__Ptr);
+
     public static ref ulong FLECS_IDecs_bool_tID_ => ref *(ulong*)(FLECS_IDecs_bool_tID__Ptr == null ? FLECS_IDecs_bool_tID__Ptr = FLECS_IDecs_bool_tID__BindgenGetExtern() : FLECS_IDecs_bool_tID__Ptr);
 
     public static ref ulong FLECS_IDecs_byte_tID_ => ref *(ulong*)(FLECS_IDecs_byte_tID__Ptr == null ? FLECS_IDecs_byte_tID__Ptr = FLECS_IDecs_byte_tID__BindgenGetExtern() : FLECS_IDecs_byte_tID__Ptr);
 
     public static ref ulong FLECS_IDecs_char_tID_ => ref *(ulong*)(FLECS_IDecs_char_tID__Ptr == null ? FLECS_IDecs_char_tID__Ptr = FLECS_IDecs_char_tID__BindgenGetExtern() : FLECS_IDecs_char_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_component_index_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_index_memory_tID__Ptr == null ? FLECS_IDecs_component_index_memory_tID__Ptr = FLECS_IDecs_component_index_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_index_memory_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_component_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_memory_tID__Ptr == null ? FLECS_IDecs_component_memory_tID__Ptr = FLECS_IDecs_component_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_memory_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_entities_memory_tID_ => ref *(ulong*)(FLECS_IDecs_entities_memory_tID__Ptr == null ? FLECS_IDecs_entities_memory_tID__Ptr = FLECS_IDecs_entities_memory_tID__BindgenGetExtern() : FLECS_IDecs_entities_memory_tID__Ptr);
 
     public static ref ulong FLECS_IDecs_entity_tID_ => ref *(ulong*)(FLECS_IDecs_entity_tID__Ptr == null ? FLECS_IDecs_entity_tID__Ptr = FLECS_IDecs_entity_tID__BindgenGetExtern() : FLECS_IDecs_entity_tID__Ptr);
 
@@ -7362,7 +7866,15 @@ public static unsafe partial class flecs
 
     public static ref ulong FLECS_IDecs_iptr_tID_ => ref *(ulong*)(FLECS_IDecs_iptr_tID__Ptr == null ? FLECS_IDecs_iptr_tID__Ptr = FLECS_IDecs_iptr_tID__BindgenGetExtern() : FLECS_IDecs_iptr_tID__Ptr);
 
+    public static ref ulong FLECS_IDecs_misc_memory_tID_ => ref *(ulong*)(FLECS_IDecs_misc_memory_tID__Ptr == null ? FLECS_IDecs_misc_memory_tID__Ptr = FLECS_IDecs_misc_memory_tID__BindgenGetExtern() : FLECS_IDecs_misc_memory_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_query_memory_tID_ => ref *(ulong*)(FLECS_IDecs_query_memory_tID__Ptr == null ? FLECS_IDecs_query_memory_tID__Ptr = FLECS_IDecs_query_memory_tID__BindgenGetExtern() : FLECS_IDecs_query_memory_tID__Ptr);
+
     public static ref ulong FLECS_IDecs_string_tID_ => ref *(ulong*)(FLECS_IDecs_string_tID__Ptr == null ? FLECS_IDecs_string_tID__Ptr = FLECS_IDecs_string_tID__BindgenGetExtern() : FLECS_IDecs_string_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_table_histogram_tID_ => ref *(ulong*)(FLECS_IDecs_table_histogram_tID__Ptr == null ? FLECS_IDecs_table_histogram_tID__Ptr = FLECS_IDecs_table_histogram_tID__BindgenGetExtern() : FLECS_IDecs_table_histogram_tID__Ptr);
+
+    public static ref ulong FLECS_IDecs_table_memory_tID_ => ref *(ulong*)(FLECS_IDecs_table_memory_tID__Ptr == null ? FLECS_IDecs_table_memory_tID__Ptr = FLECS_IDecs_table_memory_tID__BindgenGetExtern() : FLECS_IDecs_table_memory_tID__Ptr);
 
     public static ref ulong FLECS_IDecs_u16_tID_ => ref *(ulong*)(FLECS_IDecs_u16_tID__Ptr == null ? FLECS_IDecs_u16_tID__Ptr = FLECS_IDecs_u16_tID__BindgenGetExtern() : FLECS_IDecs_u16_tID__Ptr);
 
@@ -7395,6 +7907,8 @@ public static unsafe partial class flecs
     public static ref ulong FLECS_IDEcsBitmaskID_ => ref *(ulong*)(FLECS_IDEcsBitmaskID__Ptr == null ? FLECS_IDEcsBitmaskID__Ptr = FLECS_IDEcsBitmaskID__BindgenGetExtern() : FLECS_IDEcsBitmaskID__Ptr);
 
     public static ref ulong FLECS_IDEcsComponentID_ => ref *(ulong*)(FLECS_IDEcsComponentID__Ptr == null ? FLECS_IDEcsComponentID__Ptr = FLECS_IDEcsComponentID__BindgenGetExtern() : FLECS_IDEcsComponentID__Ptr);
+
+    public static ref ulong FLECS_IDEcsConstantsID_ => ref *(ulong*)(FLECS_IDEcsConstantsID__Ptr == null ? FLECS_IDEcsConstantsID__Ptr = FLECS_IDEcsConstantsID__BindgenGetExtern() : FLECS_IDEcsConstantsID__Ptr);
 
     public static ref ulong FLECS_IDEcsCounterID_ => ref *(ulong*)(FLECS_IDEcsCounterID__Ptr == null ? FLECS_IDEcsCounterID__Ptr = FLECS_IDEcsCounterID__BindgenGetExtern() : FLECS_IDEcsCounterID__Ptr);
 
@@ -7466,6 +7980,8 @@ public static unsafe partial class flecs
 
     public static ref ulong FLECS_IDEcsVectorID_ => ref *(ulong*)(FLECS_IDEcsVectorID__Ptr == null ? FLECS_IDEcsVectorID__Ptr = FLECS_IDEcsVectorID__BindgenGetExtern() : FLECS_IDEcsVectorID__Ptr);
 
+    public static ref ulong FLECS_IDEcsWorldMemoryID_ => ref *(ulong*)(FLECS_IDEcsWorldMemoryID__Ptr == null ? FLECS_IDEcsWorldMemoryID__Ptr = FLECS_IDEcsWorldMemoryID__BindgenGetExtern() : FLECS_IDEcsWorldMemoryID__Ptr);
+
     public static ref ulong FLECS_IDEcsWorldStatsID_ => ref *(ulong*)(FLECS_IDEcsWorldStatsID__Ptr == null ? FLECS_IDEcsWorldStatsID__Ptr = FLECS_IDEcsWorldStatsID__BindgenGetExtern() : FLECS_IDEcsWorldStatsID__Ptr);
 
     public static ref ulong FLECS_IDEcsWorldSummaryID_ => ref *(ulong*)(FLECS_IDEcsWorldSummaryID__Ptr == null ? FLECS_IDEcsWorldSummaryID__Ptr = FLECS_IDEcsWorldSummaryID__BindgenGetExtern() : FLECS_IDEcsWorldSummaryID__Ptr);
@@ -7507,726 +8023,6 @@ public static unsafe partial class flecs
             {
                 HashCode hash = new();
                 hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_vec_t : IEquatable<ecs_vec_t>
-    {
-        public bool Equals(ecs_vec_t other)
-        {
-            fixed (ecs_vec_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_vec_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vec_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_vec_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_vec_t left, ecs_vec_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_vec_t left, ecs_vec_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_vec_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vec_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_sparse_t : IEquatable<ecs_sparse_t>
-    {
-        public bool Equals(ecs_sparse_t other)
-        {
-            fixed (ecs_sparse_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_sparse_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_sparse_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_sparse_t left, ecs_sparse_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_sparse_t left, ecs_sparse_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_sparse_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_t : IEquatable<ecs_block_allocator_t>
-    {
-        public bool Equals(ecs_block_allocator_t other)
-        {
-            fixed (ecs_block_allocator_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_t left, ecs_block_allocator_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_t left, ecs_block_allocator_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_map_t : IEquatable<ecs_map_t>
-    {
-        public bool Equals(ecs_map_t other)
-        {
-            fixed (ecs_map_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_map_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_map_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_map_t left, ecs_map_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_map_t left, ecs_map_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_map_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_block_t : IEquatable<ecs_block_allocator_block_t>
-    {
-        public bool Equals(ecs_block_allocator_block_t other)
-        {
-            fixed (ecs_block_allocator_block_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_block_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_block_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_block_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_chunk_header_t : IEquatable<ecs_block_allocator_chunk_header_t>
-    {
-        public bool Equals(ecs_block_allocator_chunk_header_t other)
-        {
-            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_chunk_header_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_chunk_header_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_page_t : IEquatable<ecs_stack_page_t>
-    {
-        public bool Equals(ecs_stack_page_t other)
-        {
-            fixed (ecs_stack_page_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_page_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_page_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_page_t left, ecs_stack_page_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_page_t left, ecs_stack_page_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_page_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_page_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_cursor_t : IEquatable<ecs_stack_cursor_t>
-    {
-        public bool Equals(ecs_stack_cursor_t other)
-        {
-            fixed (ecs_stack_cursor_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_cursor_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_cursor_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_cursor_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_cursor_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_t : IEquatable<ecs_stack_t>
-    {
-        public bool Equals(ecs_stack_t other)
-        {
-            fixed (ecs_stack_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_t left, ecs_stack_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_t left, ecs_stack_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bucket_entry_t : IEquatable<ecs_bucket_entry_t>
-    {
-        public bool Equals(ecs_bucket_entry_t other)
-        {
-            fixed (ecs_bucket_entry_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bucket_entry_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_entry_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bucket_entry_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bucket_entry_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_entry_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bucket_t : IEquatable<ecs_bucket_t>
-    {
-        public bool Equals(ecs_bucket_t other)
-        {
-            fixed (ecs_bucket_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bucket_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bucket_t left, ecs_bucket_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bucket_t left, ecs_bucket_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bucket_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_map_iter_t : IEquatable<ecs_map_iter_t>
-    {
-        public bool Equals(ecs_map_iter_t other)
-        {
-            fixed (ecs_map_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_map_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_map_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_map_iter_t left, ecs_map_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_map_iter_t left, ecs_map_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_map_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_map_params_t : IEquatable<ecs_map_params_t>
-    {
-        public bool Equals(ecs_map_params_t other)
-        {
-            fixed (ecs_map_params_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_map_params_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_params_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_map_params_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_map_params_t left, ecs_map_params_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_map_params_t left, ecs_map_params_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_map_params_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_params_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_switch_node_t : IEquatable<ecs_switch_node_t>
-    {
-        public bool Equals(ecs_switch_node_t other)
-        {
-            fixed (ecs_switch_node_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_switch_node_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_switch_node_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_switch_node_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_switch_node_t left, ecs_switch_node_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_switch_node_t left, ecs_switch_node_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_switch_node_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_switch_node_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_switch_page_t : IEquatable<ecs_switch_page_t>
-    {
-        public bool Equals(ecs_switch_page_t other)
-        {
-            fixed (ecs_switch_page_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_switch_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_switch_page_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_switch_page_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_switch_page_t left, ecs_switch_page_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_switch_page_t left, ecs_switch_page_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_switch_page_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_switch_page_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_switch_t : IEquatable<ecs_switch_t>
-    {
-        public bool Equals(ecs_switch_t other)
-        {
-            fixed (ecs_switch_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_switch_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_switch_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_switch_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_switch_t left, ecs_switch_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_switch_t left, ecs_switch_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_switch_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_switch_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_strbuf_list_elem : IEquatable<ecs_strbuf_list_elem>
-    {
-        public bool Equals(ecs_strbuf_list_elem other)
-        {
-            fixed (ecs_strbuf_list_elem* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_strbuf_list_elem other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_strbuf_list_elem* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_strbuf_t : IEquatable<ecs_strbuf_t>
-    {
-        public bool Equals(ecs_strbuf_t other)
-        {
-            fixed (ecs_strbuf_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_strbuf_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_strbuf_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_strbuf_t left, ecs_strbuf_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_strbuf_t left, ecs_strbuf_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_strbuf_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_time_t : IEquatable<ecs_time_t>
-    {
-        public bool Equals(ecs_time_t other)
-        {
-            fixed (ecs_time_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_time_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_time_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_time_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_time_t left, ecs_time_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_time_t left, ecs_time_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_time_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_time_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_os_api_t : IEquatable<ecs_os_api_t>
-    {
-        public bool Equals(ecs_os_api_t other)
-        {
-            fixed (ecs_os_api_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_os_api_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_os_api_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_os_api_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_os_api_t left, ecs_os_api_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_os_api_t left, ecs_os_api_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_os_api_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_os_api_t)));
                 return hash.ToHashCode();
             }
         }
@@ -8700,37 +8496,37 @@ public static unsafe partial class flecs
         }
     }
 
-    public partial struct ecs_id_record_t : IEquatable<ecs_id_record_t>
+    public partial struct ecs_component_record_t : IEquatable<ecs_component_record_t>
     {
-        public bool Equals(ecs_id_record_t other)
+        public bool Equals(ecs_component_record_t other)
         {
-            fixed (ecs_id_record_t* __self = &this)
+            fixed (ecs_component_record_t* __self = &this)
             {
-                return new Span<byte>(__self, sizeof(ecs_id_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_id_record_t)));
+                return new Span<byte>(__self, sizeof(ecs_component_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_record_t)));
             }
         }
 
         public override bool Equals(object? obj)
         {
-            return obj is ecs_id_record_t other && Equals(other);
+            return obj is ecs_component_record_t other && Equals(other);
         }
 
-        public static bool operator ==(ecs_id_record_t left, ecs_id_record_t right)
+        public static bool operator ==(ecs_component_record_t left, ecs_component_record_t right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(ecs_id_record_t left, ecs_id_record_t right)
+        public static bool operator !=(ecs_component_record_t left, ecs_component_record_t right)
         {
             return !(left == right);
         }
 
         public override int GetHashCode()
         {
-            fixed (ecs_id_record_t* __self = &this)
+            fixed (ecs_component_record_t* __self = &this)
             {
                 HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_id_record_t)));
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_record_t)));
                 return hash.ToHashCode();
             }
         }
@@ -8808,78 +8604,6 @@ public static unsafe partial class flecs
         }
     }
 
-    public partial struct ecs_table_cache_hdr_t : IEquatable<ecs_table_cache_hdr_t>
-    {
-        public bool Equals(ecs_table_cache_hdr_t other)
-        {
-            fixed (ecs_table_cache_hdr_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_hdr_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_cache_hdr_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_cache_hdr_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_cache_t : IEquatable<ecs_table_cache_t>
-    {
-        public bool Equals(ecs_table_cache_t other)
-        {
-            fixed (ecs_table_cache_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_cache_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_cache_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_cache_t left, ecs_table_cache_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_cache_t left, ecs_table_cache_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_cache_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
     public partial struct ecs_table_record_t : IEquatable<ecs_table_record_t>
     {
         public bool Equals(ecs_table_record_t other)
@@ -8911,6 +8635,618 @@ public static unsafe partial class flecs
             {
                 HashCode hash = new();
                 hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_record_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_vec_t : IEquatable<ecs_vec_t>
+    {
+        public bool Equals(ecs_vec_t other)
+        {
+            fixed (ecs_vec_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_vec_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vec_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_vec_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_vec_t left, ecs_vec_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_vec_t left, ecs_vec_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_vec_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vec_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_sparse_page_t : IEquatable<ecs_sparse_page_t>
+    {
+        public bool Equals(ecs_sparse_page_t other)
+        {
+            fixed (ecs_sparse_page_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_sparse_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_page_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_sparse_page_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_sparse_page_t left, ecs_sparse_page_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_sparse_page_t left, ecs_sparse_page_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_sparse_page_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_page_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_sparse_t : IEquatable<ecs_sparse_t>
+    {
+        public bool Equals(ecs_sparse_t other)
+        {
+            fixed (ecs_sparse_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_sparse_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_sparse_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_sparse_t left, ecs_sparse_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_sparse_t left, ecs_sparse_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_sparse_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_block_allocator_t : IEquatable<ecs_block_allocator_t>
+    {
+        public bool Equals(ecs_block_allocator_t other)
+        {
+            fixed (ecs_block_allocator_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_block_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_block_allocator_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_block_allocator_t left, ecs_block_allocator_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_block_allocator_t left, ecs_block_allocator_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_block_allocator_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_map_t : IEquatable<ecs_map_t>
+    {
+        public bool Equals(ecs_map_t other)
+        {
+            fixed (ecs_map_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_map_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_map_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_map_t left, ecs_map_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_map_t left, ecs_map_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_map_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_block_allocator_block_t : IEquatable<ecs_block_allocator_block_t>
+    {
+        public bool Equals(ecs_block_allocator_block_t other)
+        {
+            fixed (ecs_block_allocator_block_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_block_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_block_allocator_block_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_block_allocator_block_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_block_allocator_chunk_header_t : IEquatable<ecs_block_allocator_chunk_header_t>
+    {
+        public bool Equals(ecs_block_allocator_chunk_header_t other)
+        {
+            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_chunk_header_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_block_allocator_chunk_header_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_stack_page_t : IEquatable<ecs_stack_page_t>
+    {
+        public bool Equals(ecs_stack_page_t other)
+        {
+            fixed (ecs_stack_page_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_stack_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_page_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_stack_page_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_stack_page_t left, ecs_stack_page_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_stack_page_t left, ecs_stack_page_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_stack_page_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_page_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_stack_cursor_t : IEquatable<ecs_stack_cursor_t>
+    {
+        public bool Equals(ecs_stack_cursor_t other)
+        {
+            fixed (ecs_stack_cursor_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_stack_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_cursor_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_stack_cursor_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_stack_cursor_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_cursor_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_stack_t : IEquatable<ecs_stack_t>
+    {
+        public bool Equals(ecs_stack_t other)
+        {
+            fixed (ecs_stack_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_stack_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_stack_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_stack_t left, ecs_stack_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_stack_t left, ecs_stack_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_stack_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_bucket_entry_t : IEquatable<ecs_bucket_entry_t>
+    {
+        public bool Equals(ecs_bucket_entry_t other)
+        {
+            fixed (ecs_bucket_entry_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_bucket_entry_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_entry_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_bucket_entry_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_bucket_entry_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_entry_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_bucket_t : IEquatable<ecs_bucket_t>
+    {
+        public bool Equals(ecs_bucket_t other)
+        {
+            fixed (ecs_bucket_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_bucket_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_bucket_t left, ecs_bucket_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_bucket_t left, ecs_bucket_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_bucket_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_map_iter_t : IEquatable<ecs_map_iter_t>
+    {
+        public bool Equals(ecs_map_iter_t other)
+        {
+            fixed (ecs_map_iter_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_map_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_iter_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_map_iter_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_map_iter_t left, ecs_map_iter_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_map_iter_t left, ecs_map_iter_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_map_iter_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_iter_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_strbuf_list_elem : IEquatable<ecs_strbuf_list_elem>
+    {
+        public bool Equals(ecs_strbuf_list_elem other)
+        {
+            fixed (ecs_strbuf_list_elem* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_strbuf_list_elem other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_strbuf_list_elem* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_strbuf_t : IEquatable<ecs_strbuf_t>
+    {
+        public bool Equals(ecs_strbuf_t other)
+        {
+            fixed (ecs_strbuf_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_strbuf_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_strbuf_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_strbuf_t left, ecs_strbuf_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_strbuf_t left, ecs_strbuf_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_strbuf_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_time_t : IEquatable<ecs_time_t>
+    {
+        public bool Equals(ecs_time_t other)
+        {
+            fixed (ecs_time_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_time_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_time_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_time_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_time_t left, ecs_time_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_time_t left, ecs_time_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_time_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_time_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_os_api_t : IEquatable<ecs_os_api_t>
+    {
+        public bool Equals(ecs_os_api_t other)
+        {
+            fixed (ecs_os_api_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_os_api_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_os_api_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_os_api_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_os_api_t left, ecs_os_api_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_os_api_t left, ecs_os_api_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_os_api_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_os_api_t)));
                 return hash.ToHashCode();
             }
         }
@@ -8988,37 +9324,73 @@ public static unsafe partial class flecs
         }
     }
 
-    public partial struct ecs_query_cache_table_match_t : IEquatable<ecs_query_cache_table_match_t>
+    public partial struct ecs_query_cache_match_t : IEquatable<ecs_query_cache_match_t>
     {
-        public bool Equals(ecs_query_cache_table_match_t other)
+        public bool Equals(ecs_query_cache_match_t other)
         {
-            fixed (ecs_query_cache_table_match_t* __self = &this)
+            fixed (ecs_query_cache_match_t* __self = &this)
             {
-                return new Span<byte>(__self, sizeof(ecs_query_cache_table_match_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_table_match_t)));
+                return new Span<byte>(__self, sizeof(ecs_query_cache_match_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_match_t)));
             }
         }
 
         public override bool Equals(object? obj)
         {
-            return obj is ecs_query_cache_table_match_t other && Equals(other);
+            return obj is ecs_query_cache_match_t other && Equals(other);
         }
 
-        public static bool operator ==(ecs_query_cache_table_match_t left, ecs_query_cache_table_match_t right)
+        public static bool operator ==(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(ecs_query_cache_table_match_t left, ecs_query_cache_table_match_t right)
+        public static bool operator !=(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
         {
             return !(left == right);
         }
 
         public override int GetHashCode()
         {
-            fixed (ecs_query_cache_table_match_t* __self = &this)
+            fixed (ecs_query_cache_match_t* __self = &this)
             {
                 HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_table_match_t)));
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_match_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_query_cache_group_t : IEquatable<ecs_query_cache_group_t>
+    {
+        public bool Equals(ecs_query_cache_group_t other)
+        {
+            fixed (ecs_query_cache_group_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_query_cache_group_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_group_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_query_cache_group_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_query_cache_group_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_group_t)));
                 return hash.ToHashCode();
             }
         }
@@ -9276,6 +9648,42 @@ public static unsafe partial class flecs
         }
     }
 
+    public partial struct ecs_table_cache_hdr_t : IEquatable<ecs_table_cache_hdr_t>
+    {
+        public bool Equals(ecs_table_cache_hdr_t other)
+        {
+            fixed (ecs_table_cache_hdr_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_hdr_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_table_cache_hdr_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_table_cache_hdr_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
     public partial struct ecs_each_iter_t : IEquatable<ecs_each_iter_t>
     {
         public bool Equals(ecs_each_iter_t other)
@@ -9492,42 +9900,6 @@ public static unsafe partial class flecs
         }
     }
 
-    public partial struct ecs_iter_cache_t : IEquatable<ecs_iter_cache_t>
-    {
-        public bool Equals(ecs_iter_cache_t other)
-        {
-            fixed (ecs_iter_cache_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_iter_cache_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_cache_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_iter_cache_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_iter_cache_t left, ecs_iter_cache_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_iter_cache_t left, ecs_iter_cache_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_iter_cache_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_cache_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
     public partial struct ecs_iter_private_t : IEquatable<ecs_iter_private_t>
     {
         public bool Equals(ecs_iter_private_t other)
@@ -9566,37 +9938,37 @@ public static unsafe partial class flecs
 
     public partial struct ecs_iter_private_t
     {
-        public partial struct AnonymousRecord_api_types_L153_C5 : IEquatable<AnonymousRecord_api_types_L153_C5>
+        public partial struct AnonymousRecord_api_types_L143_C5 : IEquatable<AnonymousRecord_api_types_L143_C5>
         {
-            public bool Equals(AnonymousRecord_api_types_L153_C5 other)
+            public bool Equals(AnonymousRecord_api_types_L143_C5 other)
             {
-                fixed (AnonymousRecord_api_types_L153_C5* __self = &this)
+                fixed (AnonymousRecord_api_types_L143_C5* __self = &this)
                 {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L153_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_api_types_L153_C5)));
+                    return new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L143_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_api_types_L143_C5)));
                 }
             }
 
             public override bool Equals(object? obj)
             {
-                return obj is AnonymousRecord_api_types_L153_C5 other && Equals(other);
+                return obj is AnonymousRecord_api_types_L143_C5 other && Equals(other);
             }
 
-            public static bool operator ==(AnonymousRecord_api_types_L153_C5 left, AnonymousRecord_api_types_L153_C5 right)
+            public static bool operator ==(AnonymousRecord_api_types_L143_C5 left, AnonymousRecord_api_types_L143_C5 right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator !=(AnonymousRecord_api_types_L153_C5 left, AnonymousRecord_api_types_L153_C5 right)
+            public static bool operator !=(AnonymousRecord_api_types_L143_C5 left, AnonymousRecord_api_types_L143_C5 right)
             {
                 return !(left == right);
             }
 
             public override int GetHashCode()
             {
-                fixed (AnonymousRecord_api_types_L153_C5* __self = &this)
+                fixed (AnonymousRecord_api_types_L143_C5* __self = &this)
                 {
                     HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L153_C5)));
+                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L143_C5)));
                     return hash.ToHashCode();
                 }
             }
@@ -9814,6 +10186,78 @@ public static unsafe partial class flecs
             {
                 HashCode hash = new();
                 hash.AddBytes(new Span<byte>(__self, sizeof(flecs_hashmap_result_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_table_diff_t : IEquatable<ecs_table_diff_t>
+    {
+        public bool Equals(ecs_table_diff_t other)
+        {
+            fixed (ecs_table_diff_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_table_diff_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_diff_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_table_diff_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_table_diff_t left, ecs_table_diff_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_table_diff_t left, ecs_table_diff_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_table_diff_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_diff_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_table_records_t : IEquatable<ecs_table_records_t>
+    {
+        public bool Equals(ecs_table_records_t other)
+        {
+            fixed (ecs_table_records_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_table_records_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_records_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_table_records_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_table_records_t left, ecs_table_records_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_table_records_t left, ecs_table_records_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_table_records_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_records_t)));
                 return hash.ToHashCode();
             }
         }
@@ -10145,37 +10589,37 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_info_t
     {
-        public partial struct AnonymousRecord_flecs_L1468_C5 : IEquatable<AnonymousRecord_flecs_L1468_C5>
+        public partial struct AnonymousRecord_flecs_L1489_C5 : IEquatable<AnonymousRecord_flecs_L1489_C5>
         {
-            public bool Equals(AnonymousRecord_flecs_L1468_C5 other)
+            public bool Equals(AnonymousRecord_flecs_L1489_C5 other)
             {
-                fixed (AnonymousRecord_flecs_L1468_C5* __self = &this)
+                fixed (AnonymousRecord_flecs_L1489_C5* __self = &this)
                 {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1468_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_flecs_L1468_C5)));
+                    return new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1489_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_flecs_L1489_C5)));
                 }
             }
 
             public override bool Equals(object? obj)
             {
-                return obj is AnonymousRecord_flecs_L1468_C5 other && Equals(other);
+                return obj is AnonymousRecord_flecs_L1489_C5 other && Equals(other);
             }
 
-            public static bool operator ==(AnonymousRecord_flecs_L1468_C5 left, AnonymousRecord_flecs_L1468_C5 right)
+            public static bool operator ==(AnonymousRecord_flecs_L1489_C5 left, AnonymousRecord_flecs_L1489_C5 right)
             {
                 return left.Equals(right);
             }
 
-            public static bool operator !=(AnonymousRecord_flecs_L1468_C5 left, AnonymousRecord_flecs_L1468_C5 right)
+            public static bool operator !=(AnonymousRecord_flecs_L1489_C5 left, AnonymousRecord_flecs_L1489_C5 right)
             {
                 return !(left == right);
             }
 
             public override int GetHashCode()
             {
-                fixed (AnonymousRecord_flecs_L1468_C5* __self = &this)
+                fixed (AnonymousRecord_flecs_L1489_C5* __self = &this)
                 {
                     HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1468_C5)));
+                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1489_C5)));
                     return hash.ToHashCode();
                 }
             }
@@ -10717,6 +11161,42 @@ public static unsafe partial class flecs
             {
                 HashCode hash = new();
                 hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_server_desc_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_rest_ctx_t : IEquatable<ecs_rest_ctx_t>
+    {
+        public bool Equals(ecs_rest_ctx_t other)
+        {
+            fixed (ecs_rest_ctx_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_rest_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_rest_ctx_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_rest_ctx_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_rest_ctx_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_rest_ctx_t)));
                 return hash.ToHashCode();
             }
         }
@@ -11793,6 +12273,330 @@ public static unsafe partial class flecs
         }
     }
 
+    public partial struct ecs_entities_memory_t : IEquatable<ecs_entities_memory_t>
+    {
+        public bool Equals(ecs_entities_memory_t other)
+        {
+            fixed (ecs_entities_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_entities_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entities_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_entities_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_entities_memory_t left, ecs_entities_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_entities_memory_t left, ecs_entities_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_entities_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entities_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_component_memory_t : IEquatable<ecs_component_memory_t>
+    {
+        public bool Equals(ecs_component_memory_t other)
+        {
+            fixed (ecs_component_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_component_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_component_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_component_memory_t left, ecs_component_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_component_memory_t left, ecs_component_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_component_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_component_index_memory_t : IEquatable<ecs_component_index_memory_t>
+    {
+        public bool Equals(ecs_component_index_memory_t other)
+        {
+            fixed (ecs_component_index_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_component_index_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_index_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_component_index_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_component_index_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_index_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_query_memory_t : IEquatable<ecs_query_memory_t>
+    {
+        public bool Equals(ecs_query_memory_t other)
+        {
+            fixed (ecs_query_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_query_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_query_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_query_memory_t left, ecs_query_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_query_memory_t left, ecs_query_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_query_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_table_memory_t : IEquatable<ecs_table_memory_t>
+    {
+        public bool Equals(ecs_table_memory_t other)
+        {
+            fixed (ecs_table_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_table_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_table_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_table_memory_t left, ecs_table_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_table_memory_t left, ecs_table_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_table_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_table_histogram_t : IEquatable<ecs_table_histogram_t>
+    {
+        public bool Equals(ecs_table_histogram_t other)
+        {
+            fixed (ecs_table_histogram_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_table_histogram_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_histogram_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_table_histogram_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_table_histogram_t left, ecs_table_histogram_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_table_histogram_t left, ecs_table_histogram_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_table_histogram_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_histogram_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_misc_memory_t : IEquatable<ecs_misc_memory_t>
+    {
+        public bool Equals(ecs_misc_memory_t other)
+        {
+            fixed (ecs_misc_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_misc_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_misc_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_misc_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_misc_memory_t left, ecs_misc_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_misc_memory_t left, ecs_misc_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_misc_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_misc_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_allocator_memory_t : IEquatable<ecs_allocator_memory_t>
+    {
+        public bool Equals(ecs_allocator_memory_t other)
+        {
+            fixed (ecs_allocator_memory_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_allocator_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_allocator_memory_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_allocator_memory_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_allocator_memory_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_memory_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct EcsWorldMemory : IEquatable<EcsWorldMemory>
+    {
+        public bool Equals(EcsWorldMemory other)
+        {
+            fixed (EcsWorldMemory* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(EcsWorldMemory)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldMemory)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is EcsWorldMemory other && Equals(other);
+        }
+
+        public static bool operator ==(EcsWorldMemory left, EcsWorldMemory right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(EcsWorldMemory left, EcsWorldMemory right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (EcsWorldMemory* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldMemory)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
     public partial struct EcsMetricValue : IEquatable<EcsMetricValue>
     {
         public bool Equals(EcsMetricValue other)
@@ -12621,6 +13425,42 @@ public static unsafe partial class flecs
         }
     }
 
+    public partial struct ecs_script_eval_result_t : IEquatable<ecs_script_eval_result_t>
+    {
+        public bool Equals(ecs_script_eval_result_t other)
+        {
+            fixed (ecs_script_eval_result_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_script_eval_result_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_eval_result_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_script_eval_result_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_script_eval_result_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_eval_result_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
     public partial struct ecs_script_desc_t : IEquatable<ecs_script_desc_t>
     {
         public bool Equals(ecs_script_desc_t other)
@@ -13233,6 +14073,42 @@ public static unsafe partial class flecs
         }
     }
 
+    public partial struct EcsConstants : IEquatable<EcsConstants>
+    {
+        public bool Equals(EcsConstants other)
+        {
+            fixed (EcsConstants* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(EcsConstants)).SequenceEqual(new Span<byte>(&other, sizeof(EcsConstants)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is EcsConstants other && Equals(other);
+        }
+
+        public static bool operator ==(EcsConstants left, EcsConstants right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(EcsConstants left, EcsConstants right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (EcsConstants* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(EcsConstants)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
     public partial struct EcsArray : IEquatable<EcsArray>
     {
         public bool Equals(EcsArray other)
@@ -13485,38 +14361,77 @@ public static unsafe partial class flecs
         }
     }
 
-    public partial struct ecs_meta_type_op_t : IEquatable<ecs_meta_type_op_t>
+    public partial struct ecs_meta_op_t : IEquatable<ecs_meta_op_t>
     {
-        public bool Equals(ecs_meta_type_op_t other)
+        public bool Equals(ecs_meta_op_t other)
         {
-            fixed (ecs_meta_type_op_t* __self = &this)
+            fixed (ecs_meta_op_t* __self = &this)
             {
-                return new Span<byte>(__self, sizeof(ecs_meta_type_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_type_op_t)));
+                return new Span<byte>(__self, sizeof(ecs_meta_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_op_t)));
             }
         }
 
         public override bool Equals(object? obj)
         {
-            return obj is ecs_meta_type_op_t other && Equals(other);
+            return obj is ecs_meta_op_t other && Equals(other);
         }
 
-        public static bool operator ==(ecs_meta_type_op_t left, ecs_meta_type_op_t right)
+        public static bool operator ==(ecs_meta_op_t left, ecs_meta_op_t right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(ecs_meta_type_op_t left, ecs_meta_type_op_t right)
+        public static bool operator !=(ecs_meta_op_t left, ecs_meta_op_t right)
         {
             return !(left == right);
         }
 
         public override int GetHashCode()
         {
-            fixed (ecs_meta_type_op_t* __self = &this)
+            fixed (ecs_meta_op_t* __self = &this)
             {
                 HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_type_op_t)));
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_op_t)));
                 return hash.ToHashCode();
+            }
+        }
+    }
+
+    public partial struct ecs_meta_op_t
+    {
+        public partial struct AnonymousRecord_meta_L578_C5 : IEquatable<AnonymousRecord_meta_L578_C5>
+        {
+            public bool Equals(AnonymousRecord_meta_L578_C5 other)
+            {
+                fixed (AnonymousRecord_meta_L578_C5* __self = &this)
+                {
+                    return new Span<byte>(__self, sizeof(AnonymousRecord_meta_L578_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_meta_L578_C5)));
+                }
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is AnonymousRecord_meta_L578_C5 other && Equals(other);
+            }
+
+            public static bool operator ==(AnonymousRecord_meta_L578_C5 left, AnonymousRecord_meta_L578_C5 right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(AnonymousRecord_meta_L578_C5 left, AnonymousRecord_meta_L578_C5 right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                fixed (AnonymousRecord_meta_L578_C5* __self = &this)
+                {
+                    HashCode hash = new();
+                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_meta_L578_C5)));
+                    return hash.ToHashCode();
+                }
             }
         }
     }
@@ -13953,6 +14868,42 @@ public static unsafe partial class flecs
         }
     }
 
+    public partial struct ecs_cpp_get_mut_t : IEquatable<ecs_cpp_get_mut_t>
+    {
+        public bool Equals(ecs_cpp_get_mut_t other)
+        {
+            fixed (ecs_cpp_get_mut_t* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_cpp_get_mut_t)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_cpp_get_mut_t other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_cpp_get_mut_t* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+
     public partial struct InlineArrays
     {
         public partial struct ecs_strbuf_list_elem_32 : IEquatable<ecs_strbuf_list_elem_32>
@@ -14025,123 +14976,6 @@ public static unsafe partial class flecs
                 {
                     HashCode hash = new();
                     hash.AddBytes(new Span<byte>(__self, sizeof(byte_512)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        public partial struct ecs_term_t_32 : IEquatable<ecs_term_t_32>
-        {
-            public bool Equals(ecs_term_t_32 other)
-            {
-                fixed (ecs_term_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_term_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t_32)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_term_t_32 other && Equals(other);
-            }
-
-            public static bool operator ==(ecs_term_t_32 left, ecs_term_t_32 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(ecs_term_t_32 left, ecs_term_t_32 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (ecs_term_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        public partial struct int_32 : IEquatable<int_32>
-        {
-            public bool Equals(int_32 other)
-            {
-                fixed (int_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(int_32)).SequenceEqual(new Span<byte>(&other, sizeof(int_32)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is int_32 other && Equals(other);
-            }
-
-            public static bool operator ==(int_32 left, int_32 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(int_32 left, int_32 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (int_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(int_32)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        public partial struct ulong_32 : IEquatable<ulong_32>
-        {
-            public bool Equals(ulong_32 other)
-            {
-                fixed (ulong_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ulong_32)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_32)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ulong_32 other && Equals(other);
-            }
-
-            public static bool operator ==(ulong_32 left, ulong_32 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(ulong_32 left, ulong_32 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (ulong_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ulong_32)));
                     return hash.ToHashCode();
                 }
             }
@@ -14259,6 +15093,84 @@ public static unsafe partial class flecs
                 {
                     HashCode hash = new();
                     hash.AddBytes(new Span<byte>(__self, sizeof(ecs_commands_t_2)));
+                    return hash.ToHashCode();
+                }
+            }
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        public partial struct ulong_32 : IEquatable<ulong_32>
+        {
+            public bool Equals(ulong_32 other)
+            {
+                fixed (ulong_32* __self = &this)
+                {
+                    return new Span<byte>(__self, sizeof(ulong_32)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_32)));
+                }
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is ulong_32 other && Equals(other);
+            }
+
+            public static bool operator ==(ulong_32 left, ulong_32 right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(ulong_32 left, ulong_32 right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                fixed (ulong_32* __self = &this)
+                {
+                    HashCode hash = new();
+                    hash.AddBytes(new Span<byte>(__self, sizeof(ulong_32)));
+                    return hash.ToHashCode();
+                }
+            }
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        public partial struct ecs_term_t_32 : IEquatable<ecs_term_t_32>
+        {
+            public bool Equals(ecs_term_t_32 other)
+            {
+                fixed (ecs_term_t_32* __self = &this)
+                {
+                    return new Span<byte>(__self, sizeof(ecs_term_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t_32)));
+                }
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is ecs_term_t_32 other && Equals(other);
+            }
+
+            public static bool operator ==(ecs_term_t_32 left, ecs_term_t_32 right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(ecs_term_t_32 left, ecs_term_t_32 right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                fixed (ecs_term_t_32* __self = &this)
+                {
+                    HashCode hash = new();
+                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t_32)));
                     return hash.ToHashCode();
                 }
             }
@@ -14454,6 +15366,45 @@ public static unsafe partial class flecs
                 {
                     HashCode hash = new();
                     hash.AddBytes(new Span<byte>(__self, sizeof(double_60)));
+                    return hash.ToHashCode();
+                }
+            }
+        }
+    }
+
+    public partial struct InlineArrays
+    {
+        public partial struct int_14 : IEquatable<int_14>
+        {
+            public bool Equals(int_14 other)
+            {
+                fixed (int_14* __self = &this)
+                {
+                    return new Span<byte>(__self, sizeof(int_14)).SequenceEqual(new Span<byte>(&other, sizeof(int_14)));
+                }
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is int_14 other && Equals(other);
+            }
+
+            public static bool operator ==(int_14 left, int_14 right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(int_14 left, int_14 right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                fixed (int_14* __self = &this)
+                {
+                    HashCode hash = new();
+                    hash.AddBytes(new Span<byte>(__self, sizeof(int_14)));
                     return hash.ToHashCode();
                 }
             }

@@ -3211,7 +3211,7 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
         using NativeString nativeName = (NativeString)name;
         using NativeString nativeStr = (NativeString)str;
 
-        return ecs_script_run(Handle, nativeName, nativeStr);
+        return ecs_script_run(Handle, nativeName, nativeStr, null);
     }
 
     /// <summary>

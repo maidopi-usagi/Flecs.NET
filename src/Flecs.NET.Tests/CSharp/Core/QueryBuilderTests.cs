@@ -1,12 +1,22 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using Flecs.NET.Bindings;
 using Flecs.NET.Core;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Flecs.NET.Tests.CSharp.Core;
 
 [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
 public class QueryBuilderTests
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public QueryBuilderTests(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     private void GroupBy()
     {
@@ -126,17 +136,25 @@ public class QueryBuilderTests
                 .TermAt<Position>(0)
                 .Build();
         });
+    }
+    
+    [Fact]
+    private void TermAt_PairIsTag()
+    {
+        using World world = World.Create();
+        world.Component<Tag>();
+        world.Component<Position>();
 
         Assert.Throws<Ecs.AssertionException>(() =>
         {
             world.Component<Tag>().Add(Ecs.PairIsTag);
-
+        
             world.QueryBuilder()
                 .Cached()
                 .With<Tag, Position>()
                 .TermAt<Position>(0)
                 .Build();
-
+            
             world.Component<Tag>().Remove(Ecs.PairIsTag);
         });
     }

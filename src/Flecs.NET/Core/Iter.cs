@@ -408,7 +408,7 @@ public unsafe partial struct Iter : IEnumerable<int>, IEquatable<Iter>, IDisposa
     /// <returns></returns>
     public ulong GroupId()
     {
-        return Handle->group_id;
+        return ecs_iter_get_group(Handle);
     }
 
     /// <summary>
@@ -539,7 +539,7 @@ public unsafe partial struct Iter : IEnumerable<int>, IEquatable<Iter>, IDisposa
     internal UntypedField GetUntypedField(int index)
     {
         return new UntypedField(
-            ecs_field_w_size(Handle, 0, (byte)index),
+            ecs_field_w_size(Handle, (int)ecs_field_size(Handle, (byte)index), (byte)index),
             (int)ecs_field_size(Handle, (byte)index),
             ecs_field_is_self(Handle, (byte)index) ? Handle->count : 1
         );
@@ -549,7 +549,7 @@ public unsafe partial struct Iter : IEnumerable<int>, IEquatable<Iter>, IDisposa
     internal UntypedField GetUntypedFieldAt(int index, int row)
     {
         return new UntypedField(
-            ecs_field_at_w_size(Handle, 0, (byte)index, row),
+            ecs_field_at_w_size(Handle, (int)ecs_field_size(Handle, (byte)index), (byte)index, row),
             (int)ecs_field_size(Handle, (byte)index),
             1
         );

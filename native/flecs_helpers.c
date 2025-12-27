@@ -72,6 +72,7 @@ extern void* EcsDocColor;
 extern void* EcsDocDetail;
 extern void* EcsDocLink;
 extern void* EcsDocUuid;
+extern void* EcsDontFragment;
 extern void* EcsDontInherit;
 extern void* EcsDuration;
 extern void* EcsElectricCurrent;
@@ -163,6 +164,7 @@ extern void* EcsOnTableCreate;
 extern void* EcsOnTableDelete;
 extern void* EcsOnUpdate;
 extern void* EcsOnValidate;
+extern void* EcsOrderedChildren;
 extern void* EcsOverride;
 extern void* EcsPairIsTag;
 extern void* EcsPanic;
@@ -202,6 +204,7 @@ extern void* EcsScopeClose;
 extern void* EcsScopeOpen;
 extern void* EcsScriptTemplate;
 extern void* EcsSeconds;
+extern void* EcsSingleton;
 extern void* EcsSlotOf;
 extern void* EcsSparse;
 extern void* EcsSpeed;
@@ -217,7 +220,6 @@ extern void* EcsTime;
 extern void* EcsTrait;
 extern void* EcsTransitive;
 extern void* EcsTraversable;
-extern void* EcsUnion;
 extern void* EcsUnitPrefixes;
 extern void* EcsUri;
 extern void* EcsUriFile;
@@ -233,9 +235,13 @@ extern void* EcsYotta;
 extern void* EcsZebi;
 extern void* EcsZepto;
 extern void* EcsZetta;
+extern void* FLECS_IDecs_allocator_memory_tID_;
 extern void* FLECS_IDecs_bool_tID_;
 extern void* FLECS_IDecs_byte_tID_;
 extern void* FLECS_IDecs_char_tID_;
+extern void* FLECS_IDecs_component_index_memory_tID_;
+extern void* FLECS_IDecs_component_memory_tID_;
+extern void* FLECS_IDecs_entities_memory_tID_;
 extern void* FLECS_IDecs_entity_tID_;
 extern void* FLECS_IDecs_f32_tID_;
 extern void* FLECS_IDecs_f64_tID_;
@@ -245,7 +251,11 @@ extern void* FLECS_IDecs_i64_tID_;
 extern void* FLECS_IDecs_i8_tID_;
 extern void* FLECS_IDecs_id_tID_;
 extern void* FLECS_IDecs_iptr_tID_;
+extern void* FLECS_IDecs_misc_memory_tID_;
+extern void* FLECS_IDecs_query_memory_tID_;
 extern void* FLECS_IDecs_string_tID_;
+extern void* FLECS_IDecs_table_histogram_tID_;
+extern void* FLECS_IDecs_table_memory_tID_;
 extern void* FLECS_IDecs_u16_tID_;
 extern void* FLECS_IDecs_u32_tID_;
 extern void* FLECS_IDecs_u64_tID_;
@@ -262,6 +272,7 @@ extern void* FLECS_IDEcsAlertWarningID_;
 extern void* FLECS_IDEcsArrayID_;
 extern void* FLECS_IDEcsBitmaskID_;
 extern void* FLECS_IDEcsComponentID_;
+extern void* FLECS_IDEcsConstantsID_;
 extern void* FLECS_IDEcsCounterID_;
 extern void* FLECS_IDEcsCounterIdID_;
 extern void* FLECS_IDEcsCounterIncrementID_;
@@ -297,6 +308,7 @@ extern void* FLECS_IDEcsTypeSerializerID_;
 extern void* FLECS_IDEcsUnitID_;
 extern void* FLECS_IDEcsUnitPrefixID_;
 extern void* FLECS_IDEcsVectorID_;
+extern void* FLECS_IDEcsWorldMemoryID_;
 extern void* FLECS_IDEcsWorldStatsID_;
 extern void* FLECS_IDEcsWorldSummaryID_;
 extern void* FLECS_IDFlecsAlertsID_;
@@ -508,6 +520,9 @@ BINDGEN_API void* EcsDocLink_BindgenGetExtern() {
 }
 BINDGEN_API void* EcsDocUuid_BindgenGetExtern() {
     return &EcsDocUuid;
+}
+BINDGEN_API void* EcsDontFragment_BindgenGetExtern() {
+    return &EcsDontFragment;
 }
 BINDGEN_API void* EcsDontInherit_BindgenGetExtern() {
     return &EcsDontInherit;
@@ -782,6 +797,9 @@ BINDGEN_API void* EcsOnUpdate_BindgenGetExtern() {
 BINDGEN_API void* EcsOnValidate_BindgenGetExtern() {
     return &EcsOnValidate;
 }
+BINDGEN_API void* EcsOrderedChildren_BindgenGetExtern() {
+    return &EcsOrderedChildren;
+}
 BINDGEN_API void* EcsOverride_BindgenGetExtern() {
     return &EcsOverride;
 }
@@ -899,6 +917,9 @@ BINDGEN_API void* EcsScriptTemplate_BindgenGetExtern() {
 BINDGEN_API void* EcsSeconds_BindgenGetExtern() {
     return &EcsSeconds;
 }
+BINDGEN_API void* EcsSingleton_BindgenGetExtern() {
+    return &EcsSingleton;
+}
 BINDGEN_API void* EcsSlotOf_BindgenGetExtern() {
     return &EcsSlotOf;
 }
@@ -943,9 +964,6 @@ BINDGEN_API void* EcsTransitive_BindgenGetExtern() {
 }
 BINDGEN_API void* EcsTraversable_BindgenGetExtern() {
     return &EcsTraversable;
-}
-BINDGEN_API void* EcsUnion_BindgenGetExtern() {
-    return &EcsUnion;
 }
 BINDGEN_API void* EcsUnitPrefixes_BindgenGetExtern() {
     return &EcsUnitPrefixes;
@@ -992,6 +1010,9 @@ BINDGEN_API void* EcsZepto_BindgenGetExtern() {
 BINDGEN_API void* EcsZetta_BindgenGetExtern() {
     return &EcsZetta;
 }
+BINDGEN_API void* FLECS_IDecs_allocator_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_allocator_memory_tID_;
+}
 BINDGEN_API void* FLECS_IDecs_bool_tID__BindgenGetExtern() {
     return &FLECS_IDecs_bool_tID_;
 }
@@ -1000,6 +1021,15 @@ BINDGEN_API void* FLECS_IDecs_byte_tID__BindgenGetExtern() {
 }
 BINDGEN_API void* FLECS_IDecs_char_tID__BindgenGetExtern() {
     return &FLECS_IDecs_char_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_component_index_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_component_index_memory_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_component_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_component_memory_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_entities_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_entities_memory_tID_;
 }
 BINDGEN_API void* FLECS_IDecs_entity_tID__BindgenGetExtern() {
     return &FLECS_IDecs_entity_tID_;
@@ -1028,8 +1058,20 @@ BINDGEN_API void* FLECS_IDecs_id_tID__BindgenGetExtern() {
 BINDGEN_API void* FLECS_IDecs_iptr_tID__BindgenGetExtern() {
     return &FLECS_IDecs_iptr_tID_;
 }
+BINDGEN_API void* FLECS_IDecs_misc_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_misc_memory_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_query_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_query_memory_tID_;
+}
 BINDGEN_API void* FLECS_IDecs_string_tID__BindgenGetExtern() {
     return &FLECS_IDecs_string_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_table_histogram_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_table_histogram_tID_;
+}
+BINDGEN_API void* FLECS_IDecs_table_memory_tID__BindgenGetExtern() {
+    return &FLECS_IDecs_table_memory_tID_;
 }
 BINDGEN_API void* FLECS_IDecs_u16_tID__BindgenGetExtern() {
     return &FLECS_IDecs_u16_tID_;
@@ -1078,6 +1120,9 @@ BINDGEN_API void* FLECS_IDEcsBitmaskID__BindgenGetExtern() {
 }
 BINDGEN_API void* FLECS_IDEcsComponentID__BindgenGetExtern() {
     return &FLECS_IDEcsComponentID_;
+}
+BINDGEN_API void* FLECS_IDEcsConstantsID__BindgenGetExtern() {
+    return &FLECS_IDEcsConstantsID_;
 }
 BINDGEN_API void* FLECS_IDEcsCounterID__BindgenGetExtern() {
     return &FLECS_IDEcsCounterID_;
@@ -1183,6 +1228,9 @@ BINDGEN_API void* FLECS_IDEcsUnitPrefixID__BindgenGetExtern() {
 }
 BINDGEN_API void* FLECS_IDEcsVectorID__BindgenGetExtern() {
     return &FLECS_IDEcsVectorID_;
+}
+BINDGEN_API void* FLECS_IDEcsWorldMemoryID__BindgenGetExtern() {
+    return &FLECS_IDEcsWorldMemoryID_;
 }
 BINDGEN_API void* FLECS_IDEcsWorldStatsID__BindgenGetExtern() {
     return &FLECS_IDEcsWorldStatsID_;

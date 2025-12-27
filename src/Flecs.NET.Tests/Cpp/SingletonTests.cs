@@ -122,7 +122,7 @@ public unsafe class SingletonTests
         world.Set(new Position(10, 20));
 
         world.System()
-            .Expr("[inout] Position($)")
+            .Expr("[inout] Position")
             .Run((Iter it) =>
             {
                 while (it.Next())
