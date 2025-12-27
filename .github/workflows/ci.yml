@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13, windows-latest]
+        os: [ubuntu-latest, macos-15, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
           fi
 
       - name: Setup IOS SDK
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         shell: bash
         run: |
           IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)
@@ -67,20 +67,20 @@ jobs:
           echo "IOS_SIMULATOR_SDK=$IOS_SIMULATOR_SDK" >> $GITHUB_ENV
 
       - name: Setup Emscripten SDK
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         uses: mymindstorm/setup-emsdk@v14
         with:
           actions-cache-folder: 'emsdk-cache'
           
       - name: Setup Android NDK
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
           link-to-sdk: true
           
       - name: Set Android NDK variables
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         shell: bash
         run: |
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
@@ -101,7 +101,7 @@ jobs:
 
       - name: Build Natives
         shell: bash
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         working-directory: src/Flecs.NET.Native
         run: |
           dotnet build -c Debug -r linux-x64
@@ -148,7 +148,7 @@ jobs:
           fi
 
       - name: Upload Artifacts
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15'
         uses: actions/upload-artifact@v4
         with:
           name: Nuget Packages
@@ -158,7 +158,7 @@ jobs:
 
       - name: Push NuGet Packages
         if: >
-          matrix.os == 'macos-13' &&
+          matrix.os == 'macos-15' &&
           github.repository_owner == 'BeanCheeseBurrito' &&
           (
             (github.event_name == 'workflow_dispatch' && github.event.inputs.push-packages == 'true') ||
