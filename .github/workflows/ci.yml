@@ -47,7 +47,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - name: Set Version Suffix
         shell: bash
@@ -159,7 +159,6 @@ jobs:
       - name: Push NuGet Packages
         if: >
           matrix.os == 'macos-15' &&
-          github.repository_owner == 'BeanCheeseBurrito' &&
           (
             (github.event_name == 'workflow_dispatch' && github.event.inputs.push-packages == 'true') ||
             (github.event_name == 'push' && github.ref == 'refs/heads/main')
