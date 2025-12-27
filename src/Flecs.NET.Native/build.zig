@@ -189,6 +189,7 @@ pub fn compileFlecs(b: *Build, options: BuildOptions) void {
     switch (options.target.result.os.tag) {
         .windows => {
             lib.linkSystemLibrary("ws2_32");
+            lib.linkSystemLibrary("dbghelp");
 
             // Temporary fix to get rid of undefined symbol errors when statically linking in Native AOT.
             if (options.library_type == LibraryType.Static) {
