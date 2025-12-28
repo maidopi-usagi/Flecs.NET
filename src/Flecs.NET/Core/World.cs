@@ -4321,4 +4321,12 @@ public unsafe partial struct World
         fixed (ecs_delete_empty_tables_desc_t* ptr = &desc.Desc)
             return ecs_delete_empty_tables(Handle, ptr);
     }
+
+    /// <summary>
+    /// Frees memory where possible by reclaiming memory from arrays, cleaning up unused tables and more.
+    /// </summary>
+    public void Shrink()
+    {
+        ecs_shrink(Handle);
+    }
 }
