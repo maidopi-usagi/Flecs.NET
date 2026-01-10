@@ -178,6 +178,9 @@ pub fn compileFlecs(b: *Build, options: BuildOptions) void {
     };
 
     lib.defineCMacro(if (options.optimize == .Debug) "FLECS_DEBUG" else "FLECS_NDEBUG", null);
+    if (options.optimize == .Debug) {
+        lib.defineCMacro("FLECS_PERF_TRACE", "1");
+    }
     lib.defineCMacro(if (options.library_type == LibraryType.Shared) "flecs_EXPORTS" else "flecs_STATIC", null);
 
     lib.addIncludePath(b.path("../../native/flecs/include"));
