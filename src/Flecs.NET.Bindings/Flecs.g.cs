@@ -110,7 +110,7 @@ public static unsafe partial class flecs
     public static extern ecs_cpp_get_mut_t ecs_cpp_assign(ecs_world_t* world, ulong entity, ulong component, void* new_ptr, nint size);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_component_register")]
-    public static extern ulong ecs_cpp_component_register(ecs_world_t* world, ulong id, int ids_index, byte* name, byte* cpp_name, byte* cpp_symbol, nint size, nint alignment, bool is_component, bool explicit_registration, bool* registered_out, bool* existing_out);
+    public static extern ulong ecs_cpp_component_register(ecs_world_t* world, ecs_cpp_component_desc_t* desc);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_enum_constant_register")]
     public static extern ulong ecs_cpp_enum_constant_register(ecs_world_t* world, ulong parent, ulong id, byte* name, void* value, ulong value_type, nint value_size);
@@ -129,6 +129,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_last_member")]
     public static extern ecs_member_t* ecs_cpp_last_member(ecs_world_t* world, ulong type);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_new")]
+    public static extern ulong ecs_cpp_new(ecs_world_t* world, ulong parent, byte* name, byte* sep, byte* root_sep);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_cpp_set")]
     public static extern ecs_cpp_get_mut_t ecs_cpp_set(ecs_world_t* world, ulong entity, ulong component, void* new_ptr, nint size);
@@ -856,6 +859,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_new_w_id")]
     public static extern ulong ecs_new_w_id(ecs_world_t* world, ulong component);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_new_w_parent")]
+    public static extern ulong ecs_new_w_parent(ecs_world_t* world, ulong parent, byte* name);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_new_w_table")]
     public static extern ulong ecs_new_w_table(ecs_world_t* world, ecs_table_t* table);
 
@@ -1054,6 +1060,9 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_get_group_info")]
     public static extern ecs_query_group_info_t* ecs_query_get_group_info(ecs_query_t* query, ulong group_id);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_get_groups")]
+    public static extern ecs_map_t* ecs_query_get_groups(ecs_query_t* query);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_has")]
     public static extern bool ecs_query_has(ecs_query_t* query, ulong entity, ecs_iter_t* it);
 
@@ -1086,6 +1095,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_plan_w_profile")]
     public static extern byte* ecs_query_plan_w_profile(ecs_query_t* query, ecs_iter_t* it);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_plans")]
+    public static extern byte* ecs_query_plans(ecs_query_t* query);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_query_stats_get")]
     public static extern void ecs_query_stats_get(ecs_world_t* world, ecs_query_t* query, ecs_query_stats_t* stats);
@@ -1256,7 +1268,10 @@ public static unsafe partial class flecs
     public static extern int ecs_search_offset(ecs_world_t* world, ecs_table_t* table, int offset, ulong component, ulong* component_out);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_search_relation")]
-    public static extern int ecs_search_relation(ecs_world_t* world, ecs_table_t* table, int offset, ulong component, ulong rel, ulong flags, ulong* subject_out, ulong* component_out, ecs_table_record_t** tr_out);
+    public static extern int ecs_search_relation(ecs_world_t* world, ecs_table_t* table, int offset, ulong component, ulong rel, ulong flags, ulong* tgt_out, ulong* component_out, ecs_table_record_t** tr_out);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_search_relation_for_entity")]
+    public static extern int ecs_search_relation_for_entity(ecs_world_t* world, ulong entity, ulong id, ulong rel, bool self, ecs_component_record_t* cr, ulong* tgt_out, ulong* id_out, ecs_table_record_t** tr_out);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_set_alias")]
     public static extern void ecs_set_alias(ecs_world_t* world, ulong entity, byte* alias);
@@ -1450,6 +1465,15 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_strip_generation")]
     public static extern ulong ecs_strip_generation(ulong e);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_struct_add_member")]
+    public static extern int ecs_struct_add_member(ecs_world_t* world, ulong type, ecs_member_t* member);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_struct_get_member")]
+    public static extern ecs_member_t* ecs_struct_get_member(ecs_world_t* world, ulong type, byte* name);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_struct_get_nth_member")]
+    public static extern ecs_member_t* ecs_struct_get_nth_member(ecs_world_t* world, ulong type, int i);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_struct_init")]
     public static extern ulong ecs_struct_init(ecs_world_t* world, ecs_struct_desc_t* desc);
 
@@ -1458,6 +1482,9 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_system_init")]
     public static extern ulong ecs_system_init(ecs_world_t* world, ecs_system_desc_t* desc);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_system_set_group")]
+    public static extern void ecs_system_set_group(ecs_world_t* world, ulong system, ulong group_id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_system_stats_copy_last")]
     public static extern void ecs_system_stats_copy_last(ecs_system_stats_t* dst, ecs_system_stats_t* src);
@@ -1837,14 +1864,23 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_chrparse")]
     public static extern byte* flecs_chrparse(byte* @in, byte* @out);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_childof_depth")]
+    public static extern int flecs_component_get_childof_depth(ecs_component_record_t* cr);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_flags")]
     public static extern uint flecs_component_get_flags(ecs_world_t* world, ulong id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_id")]
     public static extern ulong flecs_component_get_id(ecs_component_record_t* cr);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_parent_record")]
+    public static extern ecs_parent_record_t* flecs_component_get_parent_record(ecs_component_record_t* cr, ecs_table_t* table);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_table")]
     public static extern ecs_table_record_t* flecs_component_get_table(ecs_component_record_t* cr, ecs_table_t* table);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_get_type_info")]
+    public static extern ecs_type_info_t* flecs_component_get_type_info(ecs_component_record_t* cr);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_ids_get")]
     public static extern ulong flecs_component_ids_get(ecs_world_t* world, int index);
@@ -1864,11 +1900,17 @@ public static unsafe partial class flecs
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_component_next")]
     public static extern ecs_table_record_t* flecs_component_next(ecs_table_cache_iter_t* iter);
 
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_components_ensure")]
+    public static extern ecs_component_record_t* flecs_components_ensure(ecs_world_t* world, ulong id);
+
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_components_get")]
     public static extern ecs_component_record_t* flecs_components_get(ecs_world_t* world, ulong id);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_default_ctor")]
     public static extern void flecs_default_ctor(void* ptr, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_defer_end")]
+    public static extern bool flecs_defer_end(ecs_world_t* world, ecs_stage_t* stage);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_dump_backtrace")]
     public static extern void flecs_dump_backtrace(void* stream);
@@ -2046,6 +2088,36 @@ public static unsafe partial class flecs
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_to_snake_case")]
     public static extern byte* flecs_to_snake_case(byte* str);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_cmp")]
+    public static extern int flecs_type_info_cmp(void* a, void* b, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_copy")]
+    public static extern void flecs_type_info_copy(void* dst, void* src, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_copy_ctor")]
+    public static extern void flecs_type_info_copy_ctor(void* dst, void* src, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_ctor")]
+    public static extern bool flecs_type_info_ctor(void* ptr, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_ctor_move_dtor")]
+    public static extern void flecs_type_info_ctor_move_dtor(void* dst, void* src, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_dtor")]
+    public static extern bool flecs_type_info_dtor(void* ptr, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_equals")]
+    public static extern bool flecs_type_info_equals(void* a, void* b, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_move")]
+    public static extern void flecs_type_info_move(void* dst, void* src, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_move_ctor")]
+    public static extern void flecs_type_info_move_ctor(void* dst, void* src, int count, ecs_type_info_t* type_info);
+
+    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_type_info_move_dtor")]
+    public static extern void flecs_type_info_move_dtor(void* dst, void* src, int count, ecs_type_info_t* type_info);
 
     [DllImport(BindgenInternal.DllImportPath, EntryPoint = "flecs_vasprintf")]
     public static extern byte* flecs_vasprintf(byte* fmt, void* args);
@@ -2503,6 +2575,8 @@ public static unsafe partial class flecs
         public ecs_event_record_t on_wildcard;
 
         public ecs_sparse_t events;
+
+        public ecs_vec_t global_observers;
 
         public ulong last_observer_id;
     }
@@ -3112,7 +3186,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_iter_private_t
     {
-        public ecs_iter_private_t.AnonymousRecord_api_types_L143_C5 iter;
+        public ecs_iter_private_t.AnonymousRecord_api_types_L144_C5 iter;
 
         public void* entity_iter;
 
@@ -3122,7 +3196,7 @@ public static unsafe partial class flecs
     public partial struct ecs_iter_private_t
     {
         [StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
-        public partial struct AnonymousRecord_api_types_L143_C5
+        public partial struct AnonymousRecord_api_types_L144_C5
         {
             [System.Runtime.InteropServices.FieldOffset(0)]
             public ecs_query_iter_t query;
@@ -3215,6 +3289,13 @@ public static unsafe partial class flecs
         public uint added_flags;
 
         public uint removed_flags;
+    }
+
+    public partial struct ecs_parent_record_t
+    {
+        public uint entity;
+
+        public int count;
     }
 
     public partial struct ecs_table_records_t
@@ -3332,6 +3413,8 @@ public static unsafe partial class flecs
         public InlineArrays.ulong_8 events;
 
         public bool yield_existing;
+
+        public bool global_observer;
 
         public delegate* unmanaged<ecs_iter_t*, void> callback;
 
@@ -3468,14 +3551,14 @@ public static unsafe partial class flecs
 
         public uint creation_time;
 
-        public ecs_world_info_t.AnonymousRecord_flecs_L1489_C5 cmd;
+        public ecs_world_info_t.AnonymousRecord_flecs_L1518_C5 cmd;
 
         public byte* name_prefix;
     }
 
     public partial struct ecs_world_info_t
     {
-        public partial struct AnonymousRecord_flecs_L1489_C5
+        public partial struct AnonymousRecord_flecs_L1518_C5
         {
             public long add_count;
 
@@ -3542,6 +3625,32 @@ public static unsafe partial class flecs
     public partial struct EcsDefaultChildComponent
     {
         public ulong component;
+    }
+
+    public partial struct EcsParent
+    {
+        public ulong value;
+    }
+
+    public partial struct ecs_tree_spawner_child_t
+    {
+        public byte* child_name;
+
+        public ecs_table_t* table;
+
+        public uint child;
+
+        public int parent_index;
+    }
+
+    public partial struct ecs_tree_spawner_t
+    {
+        public ecs_vec_t children;
+    }
+
+    public partial struct EcsTreeSpawner
+    {
+        public InlineArrays.ecs_tree_spawner_t_6 data;
     }
 
     public partial struct ecs_entities_t
@@ -3735,6 +3844,8 @@ public static unsafe partial class flecs
 
         public ecs_query_desc_t query;
 
+        public ulong phase;
+
         public delegate* unmanaged<ecs_iter_t*, void> callback;
 
         public delegate* unmanaged<ecs_iter_t*, void> run;
@@ -3771,6 +3882,10 @@ public static unsafe partial class flecs
         public delegate* unmanaged<ecs_iter_t*, void> action;
 
         public ecs_query_t* query;
+
+        public ulong group_id;
+
+        public bool group_id_set;
 
         public ulong tick_source;
 
@@ -3831,23 +3946,23 @@ public static unsafe partial class flecs
     {
         public long first_;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L65_C5 entities;
+        public ecs_world_stats_t.AnonymousRecord_stats_L67_C5 entities;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L71_C5 components;
+        public ecs_world_stats_t.AnonymousRecord_stats_L73_C5 components;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L81_C5 tables;
+        public ecs_world_stats_t.AnonymousRecord_stats_L83_C5 tables;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L89_C5 queries;
+        public ecs_world_stats_t.AnonymousRecord_stats_L91_C5 queries;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L96_C5 commands;
+        public ecs_world_stats_t.AnonymousRecord_stats_L98_C5 commands;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L111_C5 frame;
+        public ecs_world_stats_t.AnonymousRecord_stats_L113_C5 frame;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L122_C5 performance;
+        public ecs_world_stats_t.AnonymousRecord_stats_L124_C5 performance;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L134_C5 memory;
+        public ecs_world_stats_t.AnonymousRecord_stats_L136_C5 memory;
 
-        public ecs_world_stats_t.AnonymousRecord_stats_L151_C5 http;
+        public ecs_world_stats_t.AnonymousRecord_stats_L153_C5 http;
 
         public long last_;
 
@@ -3856,7 +3971,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L65_C5
+        public partial struct AnonymousRecord_stats_L67_C5
         {
             public ecs_metric_t count;
 
@@ -3866,7 +3981,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L71_C5
+        public partial struct AnonymousRecord_stats_L73_C5
         {
             public ecs_metric_t tag_count;
 
@@ -3884,7 +3999,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L81_C5
+        public partial struct AnonymousRecord_stats_L83_C5
         {
             public ecs_metric_t count;
 
@@ -3898,7 +4013,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L89_C5
+        public partial struct AnonymousRecord_stats_L91_C5
         {
             public ecs_metric_t query_count;
 
@@ -3910,7 +4025,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L96_C5
+        public partial struct AnonymousRecord_stats_L98_C5
         {
             public ecs_metric_t add_count;
 
@@ -3938,7 +4053,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L111_C5
+        public partial struct AnonymousRecord_stats_L113_C5
         {
             public ecs_metric_t frame_count;
 
@@ -3958,7 +4073,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L122_C5
+        public partial struct AnonymousRecord_stats_L124_C5
         {
             public ecs_metric_t world_time_raw;
 
@@ -3982,7 +4097,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L134_C5
+        public partial struct AnonymousRecord_stats_L136_C5
         {
             public ecs_metric_t alloc_count;
 
@@ -4008,7 +4123,7 @@ public static unsafe partial class flecs
 
     public partial struct ecs_world_stats_t
     {
-        public partial struct AnonymousRecord_stats_L151_C5
+        public partial struct AnonymousRecord_stats_L153_C5
         {
             public ecs_metric_t request_received_count;
 
@@ -4217,6 +4332,8 @@ public static unsafe partial class flecs
 
         public int bytes_ordered_children;
 
+        public int bytes_children_table_map;
+
         public int bytes_reachable_cache;
     }
 
@@ -4257,10 +4374,6 @@ public static unsafe partial class flecs
 
         public int bytes_overrides;
 
-        public int bytes_columns;
-
-        public int bytes_table_records;
-
         public int bytes_column_map;
 
         public int bytes_component_map;
@@ -4300,6 +4413,10 @@ public static unsafe partial class flecs
         public int bytes_component_ids;
 
         public int bytes_reflection;
+
+        public int bytes_tree_spawner;
+
+        public int bytes_prefab_child_indices;
 
         public int bytes_stats;
 
@@ -4509,6 +4626,8 @@ public static unsafe partial class flecs
 
         public bool serialize_matches;
 
+        public bool serialize_parents_before_children;
+
         public delegate* unmanaged<ecs_world_t*, ulong, bool> component_filter;
 
         public void* query;
@@ -4606,7 +4725,7 @@ public static unsafe partial class flecs
         public ecs_type_info_t* type_info;
     }
 
-    public partial struct EcsScriptFunction
+    public partial struct ecs_script_function_t
     {
         public ulong return_type;
 
@@ -4614,18 +4733,9 @@ public static unsafe partial class flecs
 
         public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, void> callback;
 
-        public void* ctx;
-    }
+        public InlineArrays.ecs_vector_function_callback_t_18 vector_callbacks ;
 
-    public partial struct EcsScriptMethod
-    {
-        public ulong return_type;
-
-        public ecs_vec_t @params;
-
-        public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, void> callback;
-
-        public void* ctx;
+public void* ctx;
     }
 
     public partial struct ecs_script_eval_desc_t
@@ -4685,6 +4795,13 @@ public static unsafe partial class flecs
         public void* value;
     }
 
+    public partial struct ecs_vector_fn_callbacks_t
+    {
+        public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, int, void> i8;
+
+        public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, int, void> i32;
+    }
+
     public partial struct ecs_function_desc_t
     {
         public byte* name;
@@ -4697,7 +4814,9 @@ public static unsafe partial class flecs
 
         public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, void> callback;
 
-        public void* ctx;
+        public InlineArrays.ecs_vector_function_callback_t_18 vector_callbacks ;
+
+public void* ctx;
     }
 
     public partial struct ecs_expr_node_t
@@ -4930,13 +5049,13 @@ public static unsafe partial class flecs
 
         public ecs_type_info_t* type_info;
 
-        public ecs_meta_op_t.AnonymousRecord_meta_L578_C5 @is;
+        public ecs_meta_op_t.AnonymousRecord_meta_L579_C5 @is;
     }
 
     public partial struct ecs_meta_op_t
     {
         [StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
-        public partial struct AnonymousRecord_meta_L578_C5
+        public partial struct AnonymousRecord_meta_L579_C5
         {
             [System.Runtime.InteropServices.FieldOffset(0)]
             public ecs_hashmap_t* members;
@@ -5046,6 +5165,8 @@ public static unsafe partial class flecs
         public ulong entity;
 
         public InlineArrays.ecs_member_t_32 members;
+
+        public bool create_member_entities;
     }
 
     public partial struct ecs_opaque_desc_t
@@ -5081,8 +5202,37 @@ public static unsafe partial class flecs
         public ecs_unit_translation_t translation;
     }
 
+    public partial struct ecs_cpp_component_desc_t
+    {
+        public ulong id;
+
+        public int ids_index;
+
+        public byte* name;
+
+        public byte* cpp_name;
+
+        public byte* cpp_symbol;
+
+        public nint size;
+
+        public nint alignment;
+
+        public delegate* unmanaged<ecs_world_t*, ulong, void> lifecycle_action;
+
+        public delegate* unmanaged<ecs_world_t*, ulong, void> enum_action;
+
+        public bool is_component;
+
+        public bool explicit_registration;
+    }
+
     public partial struct ecs_cpp_get_mut_t
     {
+        public ecs_world_t* world;
+
+        public ecs_stage_t* stage;
+
         public void* ptr;
 
         public bool call_modified;
@@ -5153,6 +5303,15 @@ public static unsafe partial class flecs
 
     public partial struct InlineArrays
     {
+        [InlineArray(6)]
+        public partial struct ecs_tree_spawner_t_6
+        {
+            public ecs_tree_spawner_t Item0;
+        }
+    }
+
+    public partial struct InlineArrays
+    {
         [InlineArray(128)]
         public partial struct byte_128
         {
@@ -5216,10434 +5375,9560 @@ public static unsafe partial class flecs
 
     public partial struct InlineArrays
     {
-        [InlineArray(16)]
-        public partial struct ecs_script_parameter_t_16
+        [InlineArray(18)]
+        public partial struct ecs_vector_function_callback_t_18
+        {
+
+public delegate* unmanaged<ecs_function_ctx_t*, int, ecs_value_t*, ecs_value_t*, int, void> Item0;
+    }
+}
+
+public partial struct InlineArrays
+{
+    [InlineArray(16)]
+    public partial struct ecs_script_parameter_t_16
+    {
+        public ecs_script_parameter_t Item0;
+    }
+}
+
+public partial struct InlineArrays
+{
+    [InlineArray(32)]
+    public partial struct ecs_meta_scope_t_32
+    {
+        public ecs_meta_scope_t Item0;
+    }
+}
+
+public partial struct InlineArrays
+{
+    [InlineArray(32)]
+    public partial struct ecs_enum_constant_t_32
+    {
+        public ecs_enum_constant_t Item0;
+    }
+}
+
+public partial struct InlineArrays
+{
+    [InlineArray(32)]
+    public partial struct ecs_bitmask_constant_t_32
+    {
+        public ecs_bitmask_constant_t Item0;
+    }
+}
+
+public partial struct InlineArrays
+{
+    [InlineArray(32)]
+    public partial struct ecs_member_t_32
+    {
+        public ecs_member_t Item0;
+    }
+}
+
+public const int ECS_ACCESS_VIOLATION = 40;
+public const int ECS_ALERT_MAX_SEVERITY_FILTERS = 4;
+public const int ECS_ALREADY_DEFINED = 8;
+public const int ECS_ALREADY_IN_USE = 30;
+public const string ECS_BLACK = "[1;30m";
+public const string ECS_BLUE = "[0;34m";
+public const string ECS_BOLD = "[1;49m";
+public const int ECS_CLANG_VERSION = 16;
+public const int ECS_COLUMN_INDEX_OUT_OF_RANGE = 41;
+public const int ECS_COLUMN_IS_NOT_SHARED = 42;
+public const int ECS_COLUMN_IS_SHARED = 43;
+public const int ECS_COLUMN_TYPE_MISMATCH = 45;
+public const ulong ECS_COMPONENT_MASK = 1152921504606846975;
+public const int ECS_COMPONENT_NOT_REGISTERED = 25;
+public const int ECS_CONSTRAINT_VIOLATED = 3;
+public const string ECS_CYAN = "[0;36m";
+public const int ECS_CYCLE_DETECTED = 13;
+public const int ECS_DOUBLE_FREE = 15;
+public const ulong ECS_ENTITY_MASK = 4294967295;
+public const ulong ECS_GENERATION_MASK = 281470681743360;
+public const string ECS_GREEN = "[0;32m";
+public const string ECS_GREY = "[0;37m";
+public const int ECS_HTTP_HEADER_COUNT_MAX = 32;
+public const int ECS_HTTP_QUERY_PARAM_COUNT_MAX = 32;
+public const ulong ECS_ID_FLAGS_MASK = 17293822569102704640;
+public const int ECS_INCONSISTENT_COMPONENT_ACTION = 27;
+public const int ECS_INCONSISTENT_COMPONENT_ID = 26;
+public const int ECS_INCONSISTENT_NAME = 20;
+public const int ECS_INTERNAL_ERROR = 7;
+public const int ECS_INVALID_COMPONENT_ALIGNMENT = 24;
+public const int ECS_INVALID_COMPONENT_SIZE = 23;
+public const int ECS_INVALID_CONVERSION = 11;
+public const int ECS_INVALID_FROM_WORKER = 72;
+public const int ECS_INVALID_OPERATION = 1;
+public const int ECS_INVALID_PARAMETER = 2;
+public const int ECS_INVALID_WHILE_READONLY = 70;
+public const int ECS_LEAK_DETECTED = 14;
+public const int ECS_LOCKED_STORAGE = 71;
+public const string ECS_MAGENTA = "[0;35m";
+public const uint ECS_MAX_COMPONENT_ID = 268435455;
+public const int ECS_MAX_RECURSION = 512;
+public const int ECS_MAX_TOKEN_SIZE = 256;
+public const int ECS_MEMBER_DESC_CACHE_SIZE = 32;
+public const int ECS_META_MAX_SCOPE_DEPTH = 32;
+public const int ECS_MISSING_OS_API = 9;
+public const int ECS_MISSING_SYMBOL = 29;
+public const int ECS_MODULE_UNDEFINED = 28;
+public const int ECS_NAME_IN_USE = 21;
+public const string ECS_NORMAL = "[0;49m";
+public const int ecs_observer_t_magic = 1701016418;
+public const int ECS_OPERATION_FAILED = 10;
+public const int ECS_OUT_OF_MEMORY = 4;
+public const int ECS_OUT_OF_RANGE = 5;
+public const int ecs_query_t_magic = 1701016437;
+public const string ECS_RED = "[0;31m";
+public const int ECS_REST_DEFAULT_PORT = 27750;
+public const uint ECS_ROW_FLAGS_MASK = 4026531840;
+public const uint ECS_ROW_MASK = 268435455;
+public const int ecs_stage_t_magic = 1701016435;
+public const int ECS_STAT_WINDOW = 60;
+public const int ECS_STRBUF_MAX_LIST_DEPTH = 32;
+public const int ECS_STRBUF_SMALL_STRING_SIZE = 512;
+public const int ECS_TABLE_MEMORY_HISTOGRAM_BUCKET_COUNT = 14;
+public const int ECS_TABLE_MEMORY_HISTOGRAM_MAX_COUNT = 16384;
+public const uint ECS_TYPE_HOOK_CMP = 256;
+public const uint ECS_TYPE_HOOK_CMP_ILLEGAL = 524288;
+public const uint ECS_TYPE_HOOK_COPY = 4;
+public const uint ECS_TYPE_HOOK_COPY_CTOR = 16;
+public const uint ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL = 32768;
+public const uint ECS_TYPE_HOOK_COPY_ILLEGAL = 8192;
+public const uint ECS_TYPE_HOOK_CTOR = 1;
+public const uint ECS_TYPE_HOOK_CTOR_ILLEGAL = 1024;
+public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR = 64;
+public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL = 131072;
+public const uint ECS_TYPE_HOOK_DTOR = 2;
+public const uint ECS_TYPE_HOOK_DTOR_ILLEGAL = 4096;
+public const uint ECS_TYPE_HOOK_EQUALS = 512;
+public const uint ECS_TYPE_HOOK_EQUALS_ILLEGAL = 1048576;
+public const uint ECS_TYPE_HOOK_IN_USE = 2097152;
+public const uint ECS_TYPE_HOOK_MOVE = 8;
+public const uint ECS_TYPE_HOOK_MOVE_CTOR = 32;
+public const uint ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL = 65536;
+public const uint ECS_TYPE_HOOK_MOVE_DTOR = 128;
+public const uint ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL = 262144;
+public const uint ECS_TYPE_HOOK_MOVE_ILLEGAL = 16384;
+public const uint ECS_TYPE_HOOKS = 1023;
+public const uint ECS_TYPE_HOOKS_ILLEGAL = 2094080;
+public const int ECS_UNSUPPORTED = 6;
+public const string ECS_WHITE = "[1;37m";
+public const int ecs_world_t_magic = 1701016439;
+public const string ECS_YELLOW = "[0;33m";
+public const uint EcsAperiodicComponentMonitors = 4;
+public const uint EcsAperiodicEmptyQueries = 16;
+public const ulong EcsCascade = 1152921504606846976;
+public const ulong EcsDesc = 576460752303423488;
+public const uint EcsEntityHasDontFragment = 268435456;
+public const uint EcsEntityIsId = 2147483648;
+public const uint EcsEntityIsTarget = 1073741824;
+public const uint EcsEntityIsTraversable = 536870912;
+public const uint EcsEventNoOnSet = 65536;
+public const uint EcsEventTableOnly = 1048576;
+public const int EcsFirstUserComponentId = 8;
+public const int EcsFirstUserEntityId = 384;
+public const uint EcsIdCanToggle = 8192;
+public const uint EcsIdDontFragment = 4194304;
+public const uint EcsIdEventMask = 20905984;
+public const uint EcsIdExclusive = 512;
+public const uint EcsIdHasOnAdd = 65536;
+public const uint EcsIdHasOnRemove = 131072;
+public const uint EcsIdHasOnSet = 262144;
+public const uint EcsIdHasOnTableCreate = 524288;
+public const uint EcsIdHasOnTableDelete = 1048576;
+public const uint EcsIdInheritable = 32768;
+public const uint EcsIdIsTransitive = 16384;
+public const uint EcsIdMarkedForDelete = 1073741824;
+public const uint EcsIdMatchDontFragment = 8388608;
+public const uint EcsIdOnDeleteDelete = 2;
+public const uint EcsIdOnDeleteMask = 7;
+public const uint EcsIdOnDeletePanic = 4;
+public const uint EcsIdOnDeleteRemove = 1;
+public const uint EcsIdOnDeleteTargetDelete = 16;
+public const uint EcsIdOnDeleteTargetMask = 56;
+public const uint EcsIdOnDeleteTargetPanic = 32;
+public const uint EcsIdOnDeleteTargetRemove = 8;
+public const uint EcsIdOnInstantiateDontInherit = 256;
+public const uint EcsIdOnInstantiateInherit = 128;
+public const uint EcsIdOnInstantiateMask = 448;
+public const uint EcsIdOnInstantiateOverride = 64;
+public const uint EcsIdOrderedChildren = 16777216;
+public const uint EcsIdPairIsTag = 2048;
+public const uint EcsIdPrefabChildren = 67108864;
+public const uint EcsIdSingleton = 33554432;
+public const uint EcsIdSparse = 2097152;
+public const uint EcsIdTraversable = 1024;
+public const uint EcsIdWith = 4096;
+public const ulong EcsIsEntity = 144115188075855872;
+public const ulong EcsIsName = 72057594037927936;
+public const ulong EcsIsVariable = 288230376151711744;
+public const uint EcsIterCached = 32768;
+public const uint EcsIterCppEach = 524288;
+public const uint EcsIterFixedInChangeComputed = 65536;
+public const uint EcsIterFixedInChanged = 131072;
+public const uint EcsIterHasCondSet = 64;
+public const uint EcsIterIgnoreThis = 16;
+public const uint EcsIterImmutableCacheData = 2097152;
+public const uint EcsIterIsValid = 1;
+public const uint EcsIterMatchEmptyTables = 8;
+public const uint EcsIterNoData = 2;
+public const uint EcsIterNoResults = 4;
+public const uint EcsIterProfile = 128;
+public const uint EcsIterSkip = 262144;
+public const uint EcsIterTableOnly = 1048576;
+public const uint EcsIterTrivialCached = 16384;
+public const uint EcsIterTrivialChangeDetection = 32;
+public const uint EcsIterTrivialSearch = 256;
+public const uint EcsIterTrivialTest = 2048;
+public const uint EcsNonTrivialIdInherit = 4;
+public const uint EcsNonTrivialIdNonFragmenting = 2;
+public const uint EcsNonTrivialIdSparse = 1;
+public const uint EcsObserverBypassQuery = 128;
+public const uint EcsObserverIsDisabled = 32;
+public const uint EcsObserverIsMonitor = 16;
+public const uint EcsObserverIsMulti = 8;
+public const uint EcsObserverIsParentDisabled = 64;
+public const uint EcsObserverKeepAlive = 2048;
+public const uint EcsObserverMatchDisabled = 4;
+public const uint EcsObserverMatchPrefab = 2;
+public const uint EcsObserverYieldOnCreate = 256;
+public const uint EcsObserverYieldOnDelete = 512;
+public const uint EcsOsApiHighResolutionTimer = 1;
+public const uint EcsOsApiLogWithColors = 2;
+public const uint EcsOsApiLogWithTimeDelta = 8;
+public const uint EcsOsApiLogWithTimeStamp = 4;
+public const uint EcsQueryAllowUnresolvedByName = 64;
+public const uint EcsQueryCacheWithFilter = 1073741824;
+public const uint EcsQueryCacheYieldEmptyTables = 134217728;
+public const uint EcsQueryDetectChanges = 256;
+public const uint EcsQueryHasCacheable = 16777216;
+public const uint EcsQueryHasChangeDetection = 4194304;
+public const uint EcsQueryHasCondSet = 65536;
+public const uint EcsQueryHasNonThisOutTerms = 2097152;
+public const uint EcsQueryHasOutTerms = 1048576;
+public const uint EcsQueryHasPred = 131072;
+public const uint EcsQueryHasRefs = 524288;
+public const uint EcsQueryHasScopes = 262144;
+public const uint EcsQueryHasTableThisVar = 67108864;
+public const uint EcsQueryIsCacheable = 33554432;
+public const uint EcsQueryIsTrivial = 8388608;
+public const uint EcsQueryMatchDisabled = 4;
+public const uint EcsQueryMatchEmptyTables = 8;
+public const uint EcsQueryMatchNothing = 32768;
+public const uint EcsQueryMatchOnlySelf = 8192;
+public const uint EcsQueryMatchOnlyThis = 4096;
+public const uint EcsQueryMatchPrefab = 2;
+public const uint EcsQueryMatchThis = 2048;
+public const uint EcsQueryMatchWildcards = 16384;
+public const uint EcsQueryNested = 536870912;
+public const uint EcsQueryTableOnly = 128;
+public const uint EcsQueryTrivialCache = 268435456;
+public const uint EcsQueryValid = 2147483648;
+public const ulong EcsSelf = 9223372036854775808;
+public const uint EcsTableAddEdgeFlags = 2162688;
+public const uint EcsTableEdgeFlags = 2293760;
+public const uint EcsTableEdgeReparent = 268435456;
+public const uint EcsTableHasAddActions = 329732;
+public const uint EcsTableHasBuiltins = 1;
+public const uint EcsTableHasChildOf = 16;
+public const uint EcsTableHasCopy = 8192;
+public const uint EcsTableHasCtors = 2048;
+public const uint EcsTableHasDontFragment = 4194304;
+public const uint EcsTableHasDtors = 4096;
+public const uint EcsTableHasIsA = 4;
+public const uint EcsTableHasLifecycle = 6144;
+public const uint EcsTableHasModule = 256;
+public const uint EcsTableHasMove = 16384;
+public const uint EcsTableHasMultiIsA = 8;
+public const uint EcsTableHasName = 64;
+public const uint EcsTableHasOnAdd = 65536;
+public const uint EcsTableHasOnRemove = 131072;
+public const uint EcsTableHasOnSet = 262144;
+public const uint EcsTableHasOnTableCreate = 524288;
+public const uint EcsTableHasOnTableDelete = 1048576;
+public const uint EcsTableHasOrderedChildren = 16777216;
+public const uint EcsTableHasOverrides = 33554432;
+public const uint EcsTableHasPairs = 128;
+public const uint EcsTableHasParent = 32;
+public const uint EcsTableHasRemoveActions = 135172;
+public const uint EcsTableHasSparse = 2097152;
+public const uint EcsTableHasToggle = 32768;
+public const uint EcsTableHasTraversable = 134217728;
+public const uint EcsTableIsComplex = 2136064;
+public const uint EcsTableIsDisabled = 512;
+public const uint EcsTableIsPrefab = 2;
+public const uint EcsTableMarkedForDelete = 536870912;
+public const uint EcsTableNotQueryable = 1024;
+public const uint EcsTableOverrideDontFragment = 8388608;
+public const uint EcsTableRemoveEdgeFlags = 19005440;
+public const uint EcsTermDontFragment = 4096;
+public const uint EcsTermIdInherited = 16;
+public const uint EcsTermIsCacheable = 64;
+public const uint EcsTermIsMember = 256;
+public const uint EcsTermIsOr = 2048;
+public const uint EcsTermIsScope = 128;
+public const uint EcsTermIsSparse = 1024;
+public const uint EcsTermIsToggle = 512;
+public const uint EcsTermIsTrivial = 32;
+public const uint EcsTermMatchAny = 1;
+public const uint EcsTermMatchAnySrc = 2;
+public const uint EcsTermNonFragmentingChildOf = 8192;
+public const ulong EcsTermRefFlags = 18374686479671623680;
+public const uint EcsTermReflexive = 8;
+public const uint EcsTermTransitive = 4;
+public const ulong EcsTrav = 2305843009213693952;
+public const ulong EcsTraverseFlags = 17870283321406128128;
+public const ulong EcsUp = 4611686018427387904;
+public const uint EcsWorldFini = 16;
+public const uint EcsWorldFrameInProgress = 256;
+public const uint EcsWorldInit = 4;
+public const uint EcsWorldMeasureFrameTime = 32;
+public const uint EcsWorldMeasureSystemTime = 64;
+public const uint EcsWorldMultiThreaded = 128;
+public const uint EcsWorldQuit = 8;
+public const uint EcsWorldQuitWorkers = 1;
+public const uint EcsWorldReadonly = 2;
+public const int FLECS_DAG_DEPTH_MAX = 128;
+public const int FLECS_ENTITY_PAGE_BITS = 10;
+public const int FLECS_EVENT_DESC_MAX = 8;
+public const int FLECS_HI_COMPONENT_ID = 256;
+public const int FLECS_HI_ID_RECORD_ID = 1024;
+public const int FLECS_ID_DESC_MAX = 32;
+public const int FLECS_QUERY_SCOPE_NESTING_MAX = 8;
+public const int FLECS_QUERY_VARIABLE_COUNT_MAX = 64;
+public const int FLECS_SCRIPT_FUNCTION_ARGS_MAX = 16;
+public const int FLECS_SCRIPT_VECTOR_FUNCTION_COUNT = 18;
+public const int FLECS_SPARSE_PAGE_BITS = 6;
+public const int FLECS_SPARSE_PAGE_SIZE = 64;
+public const int FLECS_STACK_PAGE_OFFSET = 32;
+public const int FLECS_STACK_PAGE_SIZE = 992;
+public const int FLECS_TERM_ARG_COUNT_MAX = 16;
+public const int FLECS_TERM_COUNT_MAX = 32;
+public const int FLECS_TREE_SPAWNER_DEPTH_CACHE_SIZE = 6;
+public const int FLECS_VARIABLE_COUNT_MAX = 64;
+public const string FLECS_VERSION = "4.1.5";
+public const int FLECS_VERSION_MAJOR = 4;
+public const int FLECS_VERSION_MINOR = 1;
+public const int FLECS_VERSION_PATCH = 5;
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_AUTO_OVERRIDE_BindgenGetExtern")]
+private static extern void* ECS_AUTO_OVERRIDE_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_block_allocator_alloc_count_BindgenGetExtern")]
+private static extern void* ecs_block_allocator_alloc_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_block_allocator_free_count_BindgenGetExtern")]
+private static extern void* ecs_block_allocator_free_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_busy_count_BindgenGetExtern")]
+private static extern void* ecs_http_busy_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_handled_error_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_handled_error_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_handled_ok_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_handled_ok_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_invalid_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_invalid_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_not_handled_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_not_handled_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_preflight_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_preflight_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_received_count_BindgenGetExtern")]
+private static extern void* ecs_http_request_received_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_send_error_count_BindgenGetExtern")]
+private static extern void* ecs_http_send_error_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_send_ok_count_BindgenGetExtern")]
+private static extern void* ecs_http_send_ok_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_BindgenGetExtern")]
+private static extern void* ecs_os_api_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_calloc_count_BindgenGetExtern")]
+private static extern void* ecs_os_api_calloc_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_free_count_BindgenGetExtern")]
+private static extern void* ecs_os_api_free_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_malloc_count_BindgenGetExtern")]
+private static extern void* ecs_os_api_malloc_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_realloc_count_BindgenGetExtern")]
+private static extern void* ecs_os_api_realloc_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_PAIR_BindgenGetExtern")]
+private static extern void* ECS_PAIR_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_stack_allocator_alloc_count_BindgenGetExtern")]
+private static extern void* ecs_stack_allocator_alloc_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_stack_allocator_free_count_BindgenGetExtern")]
+private static extern void* ecs_stack_allocator_free_count_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_TOGGLE_BindgenGetExtern")]
+private static extern void* ECS_TOGGLE_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_VALUE_PAIR_BindgenGetExtern")]
+private static extern void* ECS_VALUE_PAIR_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAcceleration_BindgenGetExtern")]
+private static extern void* EcsAcceleration_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAcyclic_BindgenGetExtern")]
+private static extern void* EcsAcyclic_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertCritical_BindgenGetExtern")]
+private static extern void* EcsAlertCritical_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertError_BindgenGetExtern")]
+private static extern void* EcsAlertError_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertInfo_BindgenGetExtern")]
+private static extern void* EcsAlertInfo_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertWarning_BindgenGetExtern")]
+private static extern void* EcsAlertWarning_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlias_BindgenGetExtern")]
+private static extern void* EcsAlias_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAmount_BindgenGetExtern")]
+private static extern void* EcsAmount_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAmpere_BindgenGetExtern")]
+private static extern void* EcsAmpere_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAngle_BindgenGetExtern")]
+private static extern void* EcsAngle_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAny_BindgenGetExtern")]
+private static extern void* EcsAny_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAtto_BindgenGetExtern")]
+private static extern void* EcsAtto_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBar_BindgenGetExtern")]
+private static extern void* EcsBar_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBel_BindgenGetExtern")]
+private static extern void* EcsBel_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBits_BindgenGetExtern")]
+private static extern void* EcsBits_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBitsPerSecond_BindgenGetExtern")]
+private static extern void* EcsBitsPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBytes_BindgenGetExtern")]
+private static extern void* EcsBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBytesPerSecond_BindgenGetExtern")]
+private static extern void* EcsBytesPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCandela_BindgenGetExtern")]
+private static extern void* EcsCandela_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCanToggle_BindgenGetExtern")]
+private static extern void* EcsCanToggle_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCelsius_BindgenGetExtern")]
+private static extern void* EcsCelsius_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCenti_BindgenGetExtern")]
+private static extern void* EcsCenti_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCentiMeters_BindgenGetExtern")]
+private static extern void* EcsCentiMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsChildOf_BindgenGetExtern")]
+private static extern void* EcsChildOf_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColor_BindgenGetExtern")]
+private static extern void* EcsColor_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorCss_BindgenGetExtern")]
+private static extern void* EcsColorCss_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorHsl_BindgenGetExtern")]
+private static extern void* EcsColorHsl_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorRgb_BindgenGetExtern")]
+private static extern void* EcsColorRgb_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsConstant_BindgenGetExtern")]
+private static extern void* EcsConstant_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounter_BindgenGetExtern")]
+private static extern void* EcsCounter_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounterId_BindgenGetExtern")]
+private static extern void* EcsCounterId_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounterIncrement_BindgenGetExtern")]
+private static extern void* EcsCounterIncrement_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsData_BindgenGetExtern")]
+private static extern void* EcsData_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDataRate_BindgenGetExtern")]
+private static extern void* EcsDataRate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDate_BindgenGetExtern")]
+private static extern void* EcsDate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDays_BindgenGetExtern")]
+private static extern void* EcsDays_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeca_BindgenGetExtern")]
+private static extern void* EcsDeca_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeci_BindgenGetExtern")]
+private static extern void* EcsDeci_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeciBel_BindgenGetExtern")]
+private static extern void* EcsDeciBel_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDegrees_BindgenGetExtern")]
+private static extern void* EcsDegrees_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDelete_BindgenGetExtern")]
+private static extern void* EcsDelete_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDependsOn_BindgenGetExtern")]
+private static extern void* EcsDependsOn_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDisabled_BindgenGetExtern")]
+private static extern void* EcsDisabled_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocBrief_BindgenGetExtern")]
+private static extern void* EcsDocBrief_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocColor_BindgenGetExtern")]
+private static extern void* EcsDocColor_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocDetail_BindgenGetExtern")]
+private static extern void* EcsDocDetail_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocLink_BindgenGetExtern")]
+private static extern void* EcsDocLink_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocUuid_BindgenGetExtern")]
+private static extern void* EcsDocUuid_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontFragment_BindgenGetExtern")]
+private static extern void* EcsDontFragment_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontInherit_BindgenGetExtern")]
+private static extern void* EcsDontInherit_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDuration_BindgenGetExtern")]
+private static extern void* EcsDuration_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsElectricCurrent_BindgenGetExtern")]
+private static extern void* EcsElectricCurrent_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsEmpty_BindgenGetExtern")]
+private static extern void* EcsEmpty_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExa_BindgenGetExtern")]
+private static extern void* EcsExa_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExbi_BindgenGetExtern")]
+private static extern void* EcsExbi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExclusive_BindgenGetExtern")]
+private static extern void* EcsExclusive_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFahrenheit_BindgenGetExtern")]
+private static extern void* EcsFahrenheit_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFemto_BindgenGetExtern")]
+private static extern void* EcsFemto_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFinal_BindgenGetExtern")]
+private static extern void* EcsFinal_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFlecs_BindgenGetExtern")]
+private static extern void* EcsFlecs_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFlecsCore_BindgenGetExtern")]
+private static extern void* EcsFlecsCore_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsForce_BindgenGetExtern")]
+private static extern void* EcsForce_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFrequency_BindgenGetExtern")]
+private static extern void* EcsFrequency_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGauge_BindgenGetExtern")]
+private static extern void* EcsGauge_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGibi_BindgenGetExtern")]
+private static extern void* EcsGibi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGibiBytes_BindgenGetExtern")]
+private static extern void* EcsGibiBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGiga_BindgenGetExtern")]
+private static extern void* EcsGiga_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBits_BindgenGetExtern")]
+private static extern void* EcsGigaBits_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBitsPerSecond_BindgenGetExtern")]
+private static extern void* EcsGigaBitsPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBytes_BindgenGetExtern")]
+private static extern void* EcsGigaBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBytesPerSecond_BindgenGetExtern")]
+private static extern void* EcsGigaBytesPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaHertz_BindgenGetExtern")]
+private static extern void* EcsGigaHertz_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGrams_BindgenGetExtern")]
+private static extern void* EcsGrams_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHecto_BindgenGetExtern")]
+private static extern void* EcsHecto_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHertz_BindgenGetExtern")]
+private static extern void* EcsHertz_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHours_BindgenGetExtern")]
+private static extern void* EcsHours_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsInherit_BindgenGetExtern")]
+private static extern void* EcsInherit_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsInheritable_BindgenGetExtern")]
+private static extern void* EcsInheritable_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsIsA_BindgenGetExtern")]
+private static extern void* EcsIsA_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKelvin_BindgenGetExtern")]
+private static extern void* EcsKelvin_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKibi_BindgenGetExtern")]
+private static extern void* EcsKibi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKibiBytes_BindgenGetExtern")]
+private static extern void* EcsKibiBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKilo_BindgenGetExtern")]
+private static extern void* EcsKilo_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBits_BindgenGetExtern")]
+private static extern void* EcsKiloBits_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBitsPerSecond_BindgenGetExtern")]
+private static extern void* EcsKiloBitsPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBytes_BindgenGetExtern")]
+private static extern void* EcsKiloBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBytesPerSecond_BindgenGetExtern")]
+private static extern void* EcsKiloBytesPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloGrams_BindgenGetExtern")]
+private static extern void* EcsKiloGrams_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloHertz_BindgenGetExtern")]
+private static extern void* EcsKiloHertz_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMeters_BindgenGetExtern")]
+private static extern void* EcsKiloMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMetersPerHour_BindgenGetExtern")]
+private static extern void* EcsKiloMetersPerHour_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMetersPerSecond_BindgenGetExtern")]
+private static extern void* EcsKiloMetersPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsLength_BindgenGetExtern")]
+private static extern void* EcsLength_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsLuminousIntensity_BindgenGetExtern")]
+private static extern void* EcsLuminousIntensity_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMass_BindgenGetExtern")]
+private static extern void* EcsMass_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMebi_BindgenGetExtern")]
+private static extern void* EcsMebi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMebiBytes_BindgenGetExtern")]
+private static extern void* EcsMebiBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMega_BindgenGetExtern")]
+private static extern void* EcsMega_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBits_BindgenGetExtern")]
+private static extern void* EcsMegaBits_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBitsPerSecond_BindgenGetExtern")]
+private static extern void* EcsMegaBitsPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBytes_BindgenGetExtern")]
+private static extern void* EcsMegaBytes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBytesPerSecond_BindgenGetExtern")]
+private static extern void* EcsMegaBytesPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaHertz_BindgenGetExtern")]
+private static extern void* EcsMegaHertz_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMeters_BindgenGetExtern")]
+private static extern void* EcsMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetersPerSecond_BindgenGetExtern")]
+private static extern void* EcsMetersPerSecond_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetric_BindgenGetExtern")]
+private static extern void* EcsMetric_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetricInstance_BindgenGetExtern")]
+private static extern void* EcsMetricInstance_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicro_BindgenGetExtern")]
+private static extern void* EcsMicro_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicroMeters_BindgenGetExtern")]
+private static extern void* EcsMicroMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicroSeconds_BindgenGetExtern")]
+private static extern void* EcsMicroSeconds_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMiles_BindgenGetExtern")]
+private static extern void* EcsMiles_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilesPerHour_BindgenGetExtern")]
+private static extern void* EcsMilesPerHour_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilli_BindgenGetExtern")]
+private static extern void* EcsMilli_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilliMeters_BindgenGetExtern")]
+private static extern void* EcsMilliMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilliSeconds_BindgenGetExtern")]
+private static extern void* EcsMilliSeconds_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMinutes_BindgenGetExtern")]
+private static extern void* EcsMinutes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsModule_BindgenGetExtern")]
+private static extern void* EcsModule_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMole_BindgenGetExtern")]
+private static extern void* EcsMole_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMonitor_BindgenGetExtern")]
+private static extern void* EcsMonitor_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsName_BindgenGetExtern")]
+private static extern void* EcsName_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNano_BindgenGetExtern")]
+private static extern void* EcsNano_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNanoMeters_BindgenGetExtern")]
+private static extern void* EcsNanoMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNanoSeconds_BindgenGetExtern")]
+private static extern void* EcsNanoSeconds_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNewton_BindgenGetExtern")]
+private static extern void* EcsNewton_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNotQueryable_BindgenGetExtern")]
+private static extern void* EcsNotQueryable_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsObserver_BindgenGetExtern")]
+private static extern void* EcsObserver_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnAdd_BindgenGetExtern")]
+private static extern void* EcsOnAdd_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnDelete_BindgenGetExtern")]
+private static extern void* EcsOnDelete_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnDeleteTarget_BindgenGetExtern")]
+private static extern void* EcsOnDeleteTarget_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOneOf_BindgenGetExtern")]
+private static extern void* EcsOneOf_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnInstantiate_BindgenGetExtern")]
+private static extern void* EcsOnInstantiate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnLoad_BindgenGetExtern")]
+private static extern void* EcsOnLoad_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnRemove_BindgenGetExtern")]
+private static extern void* EcsOnRemove_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnSet_BindgenGetExtern")]
+private static extern void* EcsOnSet_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnStart_BindgenGetExtern")]
+private static extern void* EcsOnStart_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnStore_BindgenGetExtern")]
+private static extern void* EcsOnStore_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnTableCreate_BindgenGetExtern")]
+private static extern void* EcsOnTableCreate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnTableDelete_BindgenGetExtern")]
+private static extern void* EcsOnTableDelete_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnUpdate_BindgenGetExtern")]
+private static extern void* EcsOnUpdate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnValidate_BindgenGetExtern")]
+private static extern void* EcsOnValidate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOrderedChildren_BindgenGetExtern")]
+private static extern void* EcsOrderedChildren_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOverride_BindgenGetExtern")]
+private static extern void* EcsOverride_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPairIsTag_BindgenGetExtern")]
+private static extern void* EcsPairIsTag_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPanic_BindgenGetExtern")]
+private static extern void* EcsPanic_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsParentDepth_BindgenGetExtern")]
+private static extern void* EcsParentDepth_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPascal_BindgenGetExtern")]
+private static extern void* EcsPascal_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPebi_BindgenGetExtern")]
+private static extern void* EcsPebi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPercentage_BindgenGetExtern")]
+private static extern void* EcsPercentage_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1d_BindgenGetExtern")]
+private static extern void* EcsPeriod1d_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1h_BindgenGetExtern")]
+private static extern void* EcsPeriod1h_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1m_BindgenGetExtern")]
+private static extern void* EcsPeriod1m_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1s_BindgenGetExtern")]
+private static extern void* EcsPeriod1s_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1w_BindgenGetExtern")]
+private static extern void* EcsPeriod1w_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeta_BindgenGetExtern")]
+private static extern void* EcsPeta_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPhase_BindgenGetExtern")]
+private static extern void* EcsPhase_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPico_BindgenGetExtern")]
+private static extern void* EcsPico_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPicoMeters_BindgenGetExtern")]
+private static extern void* EcsPicoMeters_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPicoSeconds_BindgenGetExtern")]
+private static extern void* EcsPicoSeconds_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPixels_BindgenGetExtern")]
+private static extern void* EcsPixels_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostFrame_BindgenGetExtern")]
+private static extern void* EcsPostFrame_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostLoad_BindgenGetExtern")]
+private static extern void* EcsPostLoad_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostUpdate_BindgenGetExtern")]
+private static extern void* EcsPostUpdate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredEq_BindgenGetExtern")]
+private static extern void* EcsPredEq_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredLookup_BindgenGetExtern")]
+private static extern void* EcsPredLookup_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredMatch_BindgenGetExtern")]
+private static extern void* EcsPredMatch_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPrefab_BindgenGetExtern")]
+private static extern void* EcsPrefab_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreFrame_BindgenGetExtern")]
+private static extern void* EcsPreFrame_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPressure_BindgenGetExtern")]
+private static extern void* EcsPressure_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreStore_BindgenGetExtern")]
+private static extern void* EcsPreStore_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreUpdate_BindgenGetExtern")]
+private static extern void* EcsPreUpdate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsQuantity_BindgenGetExtern")]
+private static extern void* EcsQuantity_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsQuery_BindgenGetExtern")]
+private static extern void* EcsQuery_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRadians_BindgenGetExtern")]
+private static extern void* EcsRadians_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsReflexive_BindgenGetExtern")]
+private static extern void* EcsReflexive_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRelationship_BindgenGetExtern")]
+private static extern void* EcsRelationship_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRemove_BindgenGetExtern")]
+private static extern void* EcsRemove_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScopeClose_BindgenGetExtern")]
+private static extern void* EcsScopeClose_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScopeOpen_BindgenGetExtern")]
+private static extern void* EcsScopeOpen_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScriptTemplate_BindgenGetExtern")]
+private static extern void* EcsScriptTemplate_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScriptVectorType_BindgenGetExtern")]
+private static extern void* EcsScriptVectorType_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSeconds_BindgenGetExtern")]
+private static extern void* EcsSeconds_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSingleton_BindgenGetExtern")]
+private static extern void* EcsSingleton_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSlotOf_BindgenGetExtern")]
+private static extern void* EcsSlotOf_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSparse_BindgenGetExtern")]
+private static extern void* EcsSparse_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSpeed_BindgenGetExtern")]
+private static extern void* EcsSpeed_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSymbol_BindgenGetExtern")]
+private static extern void* EcsSymbol_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSymmetric_BindgenGetExtern")]
+private static extern void* EcsSymmetric_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSystem_BindgenGetExtern")]
+private static extern void* EcsSystem_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTarget_BindgenGetExtern")]
+private static extern void* EcsTarget_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTebi_BindgenGetExtern")]
+private static extern void* EcsTebi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTemperature_BindgenGetExtern")]
+private static extern void* EcsTemperature_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTera_BindgenGetExtern")]
+private static extern void* EcsTera_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsThis_BindgenGetExtern")]
+private static extern void* EcsThis_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTime_BindgenGetExtern")]
+private static extern void* EcsTime_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTrait_BindgenGetExtern")]
+private static extern void* EcsTrait_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTransitive_BindgenGetExtern")]
+private static extern void* EcsTransitive_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTraversable_BindgenGetExtern")]
+private static extern void* EcsTraversable_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUnitPrefixes_BindgenGetExtern")]
+private static extern void* EcsUnitPrefixes_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUri_BindgenGetExtern")]
+private static extern void* EcsUri_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriFile_BindgenGetExtern")]
+private static extern void* EcsUriFile_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriHyperlink_BindgenGetExtern")]
+private static extern void* EcsUriHyperlink_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriImage_BindgenGetExtern")]
+private static extern void* EcsUriImage_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsVariable_BindgenGetExtern")]
+private static extern void* EcsVariable_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWildcard_BindgenGetExtern")]
+private static extern void* EcsWildcard_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWith_BindgenGetExtern")]
+private static extern void* EcsWith_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWorld_BindgenGetExtern")]
+private static extern void* EcsWorld_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYobi_BindgenGetExtern")]
+private static extern void* EcsYobi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYocto_BindgenGetExtern")]
+private static extern void* EcsYocto_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYotta_BindgenGetExtern")]
+private static extern void* EcsYotta_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZebi_BindgenGetExtern")]
+private static extern void* EcsZebi_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZepto_BindgenGetExtern")]
+private static extern void* EcsZepto_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZetta_BindgenGetExtern")]
+private static extern void* EcsZetta_BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_allocator_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_allocator_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_bool_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_bool_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_byte_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_byte_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_char_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_char_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_index_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_component_index_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_component_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entities_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_entities_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entity_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_entity_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_f32_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_f32_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_f64_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_f64_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i16_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_i16_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i32_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_i32_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i64_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_i64_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i8_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_i8_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_id_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_id_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_iptr_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_iptr_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_misc_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_misc_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_query_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_query_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_string_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_string_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_histogram_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_table_histogram_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_memory_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_table_memory_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u16_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_u16_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u32_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_u32_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u64_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_u64_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u8_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_u8_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_uptr_tID__BindgenGetExtern")]
+private static extern void* FLECS_IDecs_uptr_tID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertCriticalID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertCriticalID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertErrorID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertErrorID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertInfoID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertInfoID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertInstanceID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertInstanceID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertsActiveID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertsActiveID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertTimeoutID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertTimeoutID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertWarningID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsAlertWarningID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsArrayID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsArrayID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsBitmaskID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsBitmaskID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsComponentID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsComponentID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsConstantsID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsConstantsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsCounterID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterIdID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsCounterIdID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterIncrementID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsCounterIncrementID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsDocDescriptionID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsDocDescriptionID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsEnumID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsEnumID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsGaugeID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsGaugeID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsIdentifierID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsIdentifierID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMemberID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMemberID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMemberRangesID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMemberRangesID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMetricID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricInstanceID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMetricInstanceID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricSourceID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMetricSourceID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricValueID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsMetricValueID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsOpaqueID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsOpaqueID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsParentID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsParentID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPipelineID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsPipelineID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPipelineStatsID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsPipelineStatsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPolyID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsPolyID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPrimitiveID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsPrimitiveID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsRateFilterID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsRateFilterID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsRestID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsRestID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptConstVarID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptConstVarID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptFunctionID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptFunctionID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptMethodID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptMethodID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptTemplateID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptTemplateID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptVectorTypeID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsScriptVectorTypeID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsStructID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsStructID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsSystemStatsID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsSystemStatsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTickSourceID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsTickSourceID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTimerID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsTimerID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTreeSpawnerID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsTreeSpawnerID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTypeID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsTypeID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTypeSerializerID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsTypeSerializerID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsUnitID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsUnitID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsUnitPrefixID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsUnitPrefixID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsVectorID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsVectorID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldMemoryID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsWorldMemoryID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldStatsID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsWorldStatsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldSummaryID__BindgenGetExtern")]
+private static extern void* FLECS_IDEcsWorldSummaryID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsAlertsID__BindgenGetExtern")]
+private static extern void* FLECS_IDFlecsAlertsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsMetricsID__BindgenGetExtern")]
+private static extern void* FLECS_IDFlecsMetricsID__BindgenGetExtern();
+[DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsStatsID__BindgenGetExtern")]
+private static extern void* FLECS_IDFlecsStatsID__BindgenGetExtern();
+private static void* ECS_AUTO_OVERRIDE_Ptr;
+private static void* ecs_block_allocator_alloc_count_Ptr;
+private static void* ecs_block_allocator_free_count_Ptr;
+private static void* ecs_http_busy_count_Ptr;
+private static void* ecs_http_request_handled_error_count_Ptr;
+private static void* ecs_http_request_handled_ok_count_Ptr;
+private static void* ecs_http_request_invalid_count_Ptr;
+private static void* ecs_http_request_not_handled_count_Ptr;
+private static void* ecs_http_request_preflight_count_Ptr;
+private static void* ecs_http_request_received_count_Ptr;
+private static void* ecs_http_send_error_count_Ptr;
+private static void* ecs_http_send_ok_count_Ptr;
+private static void* ecs_os_api_Ptr;
+private static void* ecs_os_api_calloc_count_Ptr;
+private static void* ecs_os_api_free_count_Ptr;
+private static void* ecs_os_api_malloc_count_Ptr;
+private static void* ecs_os_api_realloc_count_Ptr;
+private static void* ECS_PAIR_Ptr;
+private static void* ecs_stack_allocator_alloc_count_Ptr;
+private static void* ecs_stack_allocator_free_count_Ptr;
+private static void* ECS_TOGGLE_Ptr;
+private static void* ECS_VALUE_PAIR_Ptr;
+private static void* EcsAcceleration_Ptr;
+private static void* EcsAcyclic_Ptr;
+private static void* EcsAlertCritical_Ptr;
+private static void* EcsAlertError_Ptr;
+private static void* EcsAlertInfo_Ptr;
+private static void* EcsAlertWarning_Ptr;
+private static void* EcsAlias_Ptr;
+private static void* EcsAmount_Ptr;
+private static void* EcsAmpere_Ptr;
+private static void* EcsAngle_Ptr;
+private static void* EcsAny_Ptr;
+private static void* EcsAtto_Ptr;
+private static void* EcsBar_Ptr;
+private static void* EcsBel_Ptr;
+private static void* EcsBits_Ptr;
+private static void* EcsBitsPerSecond_Ptr;
+private static void* EcsBytes_Ptr;
+private static void* EcsBytesPerSecond_Ptr;
+private static void* EcsCandela_Ptr;
+private static void* EcsCanToggle_Ptr;
+private static void* EcsCelsius_Ptr;
+private static void* EcsCenti_Ptr;
+private static void* EcsCentiMeters_Ptr;
+private static void* EcsChildOf_Ptr;
+private static void* EcsColor_Ptr;
+private static void* EcsColorCss_Ptr;
+private static void* EcsColorHsl_Ptr;
+private static void* EcsColorRgb_Ptr;
+private static void* EcsConstant_Ptr;
+private static void* EcsCounter_Ptr;
+private static void* EcsCounterId_Ptr;
+private static void* EcsCounterIncrement_Ptr;
+private static void* EcsData_Ptr;
+private static void* EcsDataRate_Ptr;
+private static void* EcsDate_Ptr;
+private static void* EcsDays_Ptr;
+private static void* EcsDeca_Ptr;
+private static void* EcsDeci_Ptr;
+private static void* EcsDeciBel_Ptr;
+private static void* EcsDegrees_Ptr;
+private static void* EcsDelete_Ptr;
+private static void* EcsDependsOn_Ptr;
+private static void* EcsDisabled_Ptr;
+private static void* EcsDocBrief_Ptr;
+private static void* EcsDocColor_Ptr;
+private static void* EcsDocDetail_Ptr;
+private static void* EcsDocLink_Ptr;
+private static void* EcsDocUuid_Ptr;
+private static void* EcsDontFragment_Ptr;
+private static void* EcsDontInherit_Ptr;
+private static void* EcsDuration_Ptr;
+private static void* EcsElectricCurrent_Ptr;
+private static void* EcsEmpty_Ptr;
+private static void* EcsExa_Ptr;
+private static void* EcsExbi_Ptr;
+private static void* EcsExclusive_Ptr;
+private static void* EcsFahrenheit_Ptr;
+private static void* EcsFemto_Ptr;
+private static void* EcsFinal_Ptr;
+private static void* EcsFlecs_Ptr;
+private static void* EcsFlecsCore_Ptr;
+private static void* EcsForce_Ptr;
+private static void* EcsFrequency_Ptr;
+private static void* EcsGauge_Ptr;
+private static void* EcsGibi_Ptr;
+private static void* EcsGibiBytes_Ptr;
+private static void* EcsGiga_Ptr;
+private static void* EcsGigaBits_Ptr;
+private static void* EcsGigaBitsPerSecond_Ptr;
+private static void* EcsGigaBytes_Ptr;
+private static void* EcsGigaBytesPerSecond_Ptr;
+private static void* EcsGigaHertz_Ptr;
+private static void* EcsGrams_Ptr;
+private static void* EcsHecto_Ptr;
+private static void* EcsHertz_Ptr;
+private static void* EcsHours_Ptr;
+private static void* EcsInherit_Ptr;
+private static void* EcsInheritable_Ptr;
+private static void* EcsIsA_Ptr;
+private static void* EcsKelvin_Ptr;
+private static void* EcsKibi_Ptr;
+private static void* EcsKibiBytes_Ptr;
+private static void* EcsKilo_Ptr;
+private static void* EcsKiloBits_Ptr;
+private static void* EcsKiloBitsPerSecond_Ptr;
+private static void* EcsKiloBytes_Ptr;
+private static void* EcsKiloBytesPerSecond_Ptr;
+private static void* EcsKiloGrams_Ptr;
+private static void* EcsKiloHertz_Ptr;
+private static void* EcsKiloMeters_Ptr;
+private static void* EcsKiloMetersPerHour_Ptr;
+private static void* EcsKiloMetersPerSecond_Ptr;
+private static void* EcsLength_Ptr;
+private static void* EcsLuminousIntensity_Ptr;
+private static void* EcsMass_Ptr;
+private static void* EcsMebi_Ptr;
+private static void* EcsMebiBytes_Ptr;
+private static void* EcsMega_Ptr;
+private static void* EcsMegaBits_Ptr;
+private static void* EcsMegaBitsPerSecond_Ptr;
+private static void* EcsMegaBytes_Ptr;
+private static void* EcsMegaBytesPerSecond_Ptr;
+private static void* EcsMegaHertz_Ptr;
+private static void* EcsMeters_Ptr;
+private static void* EcsMetersPerSecond_Ptr;
+private static void* EcsMetric_Ptr;
+private static void* EcsMetricInstance_Ptr;
+private static void* EcsMicro_Ptr;
+private static void* EcsMicroMeters_Ptr;
+private static void* EcsMicroSeconds_Ptr;
+private static void* EcsMiles_Ptr;
+private static void* EcsMilesPerHour_Ptr;
+private static void* EcsMilli_Ptr;
+private static void* EcsMilliMeters_Ptr;
+private static void* EcsMilliSeconds_Ptr;
+private static void* EcsMinutes_Ptr;
+private static void* EcsModule_Ptr;
+private static void* EcsMole_Ptr;
+private static void* EcsMonitor_Ptr;
+private static void* EcsName_Ptr;
+private static void* EcsNano_Ptr;
+private static void* EcsNanoMeters_Ptr;
+private static void* EcsNanoSeconds_Ptr;
+private static void* EcsNewton_Ptr;
+private static void* EcsNotQueryable_Ptr;
+private static void* EcsObserver_Ptr;
+private static void* EcsOnAdd_Ptr;
+private static void* EcsOnDelete_Ptr;
+private static void* EcsOnDeleteTarget_Ptr;
+private static void* EcsOneOf_Ptr;
+private static void* EcsOnInstantiate_Ptr;
+private static void* EcsOnLoad_Ptr;
+private static void* EcsOnRemove_Ptr;
+private static void* EcsOnSet_Ptr;
+private static void* EcsOnStart_Ptr;
+private static void* EcsOnStore_Ptr;
+private static void* EcsOnTableCreate_Ptr;
+private static void* EcsOnTableDelete_Ptr;
+private static void* EcsOnUpdate_Ptr;
+private static void* EcsOnValidate_Ptr;
+private static void* EcsOrderedChildren_Ptr;
+private static void* EcsOverride_Ptr;
+private static void* EcsPairIsTag_Ptr;
+private static void* EcsPanic_Ptr;
+private static void* EcsParentDepth_Ptr;
+private static void* EcsPascal_Ptr;
+private static void* EcsPebi_Ptr;
+private static void* EcsPercentage_Ptr;
+private static void* EcsPeriod1d_Ptr;
+private static void* EcsPeriod1h_Ptr;
+private static void* EcsPeriod1m_Ptr;
+private static void* EcsPeriod1s_Ptr;
+private static void* EcsPeriod1w_Ptr;
+private static void* EcsPeta_Ptr;
+private static void* EcsPhase_Ptr;
+private static void* EcsPico_Ptr;
+private static void* EcsPicoMeters_Ptr;
+private static void* EcsPicoSeconds_Ptr;
+private static void* EcsPixels_Ptr;
+private static void* EcsPostFrame_Ptr;
+private static void* EcsPostLoad_Ptr;
+private static void* EcsPostUpdate_Ptr;
+private static void* EcsPredEq_Ptr;
+private static void* EcsPredLookup_Ptr;
+private static void* EcsPredMatch_Ptr;
+private static void* EcsPrefab_Ptr;
+private static void* EcsPreFrame_Ptr;
+private static void* EcsPressure_Ptr;
+private static void* EcsPreStore_Ptr;
+private static void* EcsPreUpdate_Ptr;
+private static void* EcsQuantity_Ptr;
+private static void* EcsQuery_Ptr;
+private static void* EcsRadians_Ptr;
+private static void* EcsReflexive_Ptr;
+private static void* EcsRelationship_Ptr;
+private static void* EcsRemove_Ptr;
+private static void* EcsScopeClose_Ptr;
+private static void* EcsScopeOpen_Ptr;
+private static void* EcsScriptTemplate_Ptr;
+private static void* EcsScriptVectorType_Ptr;
+private static void* EcsSeconds_Ptr;
+private static void* EcsSingleton_Ptr;
+private static void* EcsSlotOf_Ptr;
+private static void* EcsSparse_Ptr;
+private static void* EcsSpeed_Ptr;
+private static void* EcsSymbol_Ptr;
+private static void* EcsSymmetric_Ptr;
+private static void* EcsSystem_Ptr;
+private static void* EcsTarget_Ptr;
+private static void* EcsTebi_Ptr;
+private static void* EcsTemperature_Ptr;
+private static void* EcsTera_Ptr;
+private static void* EcsThis_Ptr;
+private static void* EcsTime_Ptr;
+private static void* EcsTrait_Ptr;
+private static void* EcsTransitive_Ptr;
+private static void* EcsTraversable_Ptr;
+private static void* EcsUnitPrefixes_Ptr;
+private static void* EcsUri_Ptr;
+private static void* EcsUriFile_Ptr;
+private static void* EcsUriHyperlink_Ptr;
+private static void* EcsUriImage_Ptr;
+private static void* EcsVariable_Ptr;
+private static void* EcsWildcard_Ptr;
+private static void* EcsWith_Ptr;
+private static void* EcsWorld_Ptr;
+private static void* EcsYobi_Ptr;
+private static void* EcsYocto_Ptr;
+private static void* EcsYotta_Ptr;
+private static void* EcsZebi_Ptr;
+private static void* EcsZepto_Ptr;
+private static void* EcsZetta_Ptr;
+private static void* FLECS_IDecs_allocator_memory_tID__Ptr;
+private static void* FLECS_IDecs_bool_tID__Ptr;
+private static void* FLECS_IDecs_byte_tID__Ptr;
+private static void* FLECS_IDecs_char_tID__Ptr;
+private static void* FLECS_IDecs_component_index_memory_tID__Ptr;
+private static void* FLECS_IDecs_component_memory_tID__Ptr;
+private static void* FLECS_IDecs_entities_memory_tID__Ptr;
+private static void* FLECS_IDecs_entity_tID__Ptr;
+private static void* FLECS_IDecs_f32_tID__Ptr;
+private static void* FLECS_IDecs_f64_tID__Ptr;
+private static void* FLECS_IDecs_i16_tID__Ptr;
+private static void* FLECS_IDecs_i32_tID__Ptr;
+private static void* FLECS_IDecs_i64_tID__Ptr;
+private static void* FLECS_IDecs_i8_tID__Ptr;
+private static void* FLECS_IDecs_id_tID__Ptr;
+private static void* FLECS_IDecs_iptr_tID__Ptr;
+private static void* FLECS_IDecs_misc_memory_tID__Ptr;
+private static void* FLECS_IDecs_query_memory_tID__Ptr;
+private static void* FLECS_IDecs_string_tID__Ptr;
+private static void* FLECS_IDecs_table_histogram_tID__Ptr;
+private static void* FLECS_IDecs_table_memory_tID__Ptr;
+private static void* FLECS_IDecs_u16_tID__Ptr;
+private static void* FLECS_IDecs_u32_tID__Ptr;
+private static void* FLECS_IDecs_u64_tID__Ptr;
+private static void* FLECS_IDecs_u8_tID__Ptr;
+private static void* FLECS_IDecs_uptr_tID__Ptr;
+private static void* FLECS_IDEcsAlertCriticalID__Ptr;
+private static void* FLECS_IDEcsAlertErrorID__Ptr;
+private static void* FLECS_IDEcsAlertID__Ptr;
+private static void* FLECS_IDEcsAlertInfoID__Ptr;
+private static void* FLECS_IDEcsAlertInstanceID__Ptr;
+private static void* FLECS_IDEcsAlertsActiveID__Ptr;
+private static void* FLECS_IDEcsAlertTimeoutID__Ptr;
+private static void* FLECS_IDEcsAlertWarningID__Ptr;
+private static void* FLECS_IDEcsArrayID__Ptr;
+private static void* FLECS_IDEcsBitmaskID__Ptr;
+private static void* FLECS_IDEcsComponentID__Ptr;
+private static void* FLECS_IDEcsConstantsID__Ptr;
+private static void* FLECS_IDEcsCounterID__Ptr;
+private static void* FLECS_IDEcsCounterIdID__Ptr;
+private static void* FLECS_IDEcsCounterIncrementID__Ptr;
+private static void* FLECS_IDEcsDefaultChildComponentID__Ptr;
+private static void* FLECS_IDEcsDocDescriptionID__Ptr;
+private static void* FLECS_IDEcsEnumID__Ptr;
+private static void* FLECS_IDEcsGaugeID__Ptr;
+private static void* FLECS_IDEcsIdentifierID__Ptr;
+private static void* FLECS_IDEcsMemberID__Ptr;
+private static void* FLECS_IDEcsMemberRangesID__Ptr;
+private static void* FLECS_IDEcsMetricID__Ptr;
+private static void* FLECS_IDEcsMetricInstanceID__Ptr;
+private static void* FLECS_IDEcsMetricSourceID__Ptr;
+private static void* FLECS_IDEcsMetricValueID__Ptr;
+private static void* FLECS_IDEcsOpaqueID__Ptr;
+private static void* FLECS_IDEcsParentID__Ptr;
+private static void* FLECS_IDEcsPipelineID__Ptr;
+private static void* FLECS_IDEcsPipelineStatsID__Ptr;
+private static void* FLECS_IDEcsPolyID__Ptr;
+private static void* FLECS_IDEcsPrimitiveID__Ptr;
+private static void* FLECS_IDEcsRateFilterID__Ptr;
+private static void* FLECS_IDEcsRestID__Ptr;
+private static void* FLECS_IDEcsScriptConstVarID__Ptr;
+private static void* FLECS_IDEcsScriptFunctionID__Ptr;
+private static void* FLECS_IDEcsScriptID__Ptr;
+private static void* FLECS_IDEcsScriptMethodID__Ptr;
+private static void* FLECS_IDEcsScriptTemplateID__Ptr;
+private static void* FLECS_IDEcsScriptVectorTypeID__Ptr;
+private static void* FLECS_IDEcsStructID__Ptr;
+private static void* FLECS_IDEcsSystemStatsID__Ptr;
+private static void* FLECS_IDEcsTickSourceID__Ptr;
+private static void* FLECS_IDEcsTimerID__Ptr;
+private static void* FLECS_IDEcsTreeSpawnerID__Ptr;
+private static void* FLECS_IDEcsTypeID__Ptr;
+private static void* FLECS_IDEcsTypeSerializerID__Ptr;
+private static void* FLECS_IDEcsUnitID__Ptr;
+private static void* FLECS_IDEcsUnitPrefixID__Ptr;
+private static void* FLECS_IDEcsVectorID__Ptr;
+private static void* FLECS_IDEcsWorldMemoryID__Ptr;
+private static void* FLECS_IDEcsWorldStatsID__Ptr;
+private static void* FLECS_IDEcsWorldSummaryID__Ptr;
+private static void* FLECS_IDFlecsAlertsID__Ptr;
+private static void* FLECS_IDFlecsMetricsID__Ptr;
+private static void* FLECS_IDFlecsStatsID__Ptr;
+public static ref ulong ECS_AUTO_OVERRIDE => ref *(ulong*)(ECS_AUTO_OVERRIDE_Ptr == null ? ECS_AUTO_OVERRIDE_Ptr = ECS_AUTO_OVERRIDE_BindgenGetExtern() : ECS_AUTO_OVERRIDE_Ptr);
+public static ref long ecs_block_allocator_alloc_count => ref *(long*)(ecs_block_allocator_alloc_count_Ptr == null ? ecs_block_allocator_alloc_count_Ptr = ecs_block_allocator_alloc_count_BindgenGetExtern() : ecs_block_allocator_alloc_count_Ptr);
+public static ref long ecs_block_allocator_free_count => ref *(long*)(ecs_block_allocator_free_count_Ptr == null ? ecs_block_allocator_free_count_Ptr = ecs_block_allocator_free_count_BindgenGetExtern() : ecs_block_allocator_free_count_Ptr);
+public static ref long ecs_http_busy_count => ref *(long*)(ecs_http_busy_count_Ptr == null ? ecs_http_busy_count_Ptr = ecs_http_busy_count_BindgenGetExtern() : ecs_http_busy_count_Ptr);
+public static ref long ecs_http_request_handled_error_count => ref *(long*)(ecs_http_request_handled_error_count_Ptr == null ? ecs_http_request_handled_error_count_Ptr = ecs_http_request_handled_error_count_BindgenGetExtern() : ecs_http_request_handled_error_count_Ptr);
+public static ref long ecs_http_request_handled_ok_count => ref *(long*)(ecs_http_request_handled_ok_count_Ptr == null ? ecs_http_request_handled_ok_count_Ptr = ecs_http_request_handled_ok_count_BindgenGetExtern() : ecs_http_request_handled_ok_count_Ptr);
+public static ref long ecs_http_request_invalid_count => ref *(long*)(ecs_http_request_invalid_count_Ptr == null ? ecs_http_request_invalid_count_Ptr = ecs_http_request_invalid_count_BindgenGetExtern() : ecs_http_request_invalid_count_Ptr);
+public static ref long ecs_http_request_not_handled_count => ref *(long*)(ecs_http_request_not_handled_count_Ptr == null ? ecs_http_request_not_handled_count_Ptr = ecs_http_request_not_handled_count_BindgenGetExtern() : ecs_http_request_not_handled_count_Ptr);
+public static ref long ecs_http_request_preflight_count => ref *(long*)(ecs_http_request_preflight_count_Ptr == null ? ecs_http_request_preflight_count_Ptr = ecs_http_request_preflight_count_BindgenGetExtern() : ecs_http_request_preflight_count_Ptr);
+public static ref long ecs_http_request_received_count => ref *(long*)(ecs_http_request_received_count_Ptr == null ? ecs_http_request_received_count_Ptr = ecs_http_request_received_count_BindgenGetExtern() : ecs_http_request_received_count_Ptr);
+public static ref long ecs_http_send_error_count => ref *(long*)(ecs_http_send_error_count_Ptr == null ? ecs_http_send_error_count_Ptr = ecs_http_send_error_count_BindgenGetExtern() : ecs_http_send_error_count_Ptr);
+public static ref long ecs_http_send_ok_count => ref *(long*)(ecs_http_send_ok_count_Ptr == null ? ecs_http_send_ok_count_Ptr = ecs_http_send_ok_count_BindgenGetExtern() : ecs_http_send_ok_count_Ptr);
+public static ref ecs_os_api_t ecs_os_api => ref *(ecs_os_api_t*)(ecs_os_api_Ptr == null ? ecs_os_api_Ptr = ecs_os_api_BindgenGetExtern() : ecs_os_api_Ptr);
+public static ref long ecs_os_api_calloc_count => ref *(long*)(ecs_os_api_calloc_count_Ptr == null ? ecs_os_api_calloc_count_Ptr = ecs_os_api_calloc_count_BindgenGetExtern() : ecs_os_api_calloc_count_Ptr);
+public static ref long ecs_os_api_free_count => ref *(long*)(ecs_os_api_free_count_Ptr == null ? ecs_os_api_free_count_Ptr = ecs_os_api_free_count_BindgenGetExtern() : ecs_os_api_free_count_Ptr);
+public static ref long ecs_os_api_malloc_count => ref *(long*)(ecs_os_api_malloc_count_Ptr == null ? ecs_os_api_malloc_count_Ptr = ecs_os_api_malloc_count_BindgenGetExtern() : ecs_os_api_malloc_count_Ptr);
+public static ref long ecs_os_api_realloc_count => ref *(long*)(ecs_os_api_realloc_count_Ptr == null ? ecs_os_api_realloc_count_Ptr = ecs_os_api_realloc_count_BindgenGetExtern() : ecs_os_api_realloc_count_Ptr);
+public static ref ulong ECS_PAIR => ref *(ulong*)(ECS_PAIR_Ptr == null ? ECS_PAIR_Ptr = ECS_PAIR_BindgenGetExtern() : ECS_PAIR_Ptr);
+public static ref long ecs_stack_allocator_alloc_count => ref *(long*)(ecs_stack_allocator_alloc_count_Ptr == null ? ecs_stack_allocator_alloc_count_Ptr = ecs_stack_allocator_alloc_count_BindgenGetExtern() : ecs_stack_allocator_alloc_count_Ptr);
+public static ref long ecs_stack_allocator_free_count => ref *(long*)(ecs_stack_allocator_free_count_Ptr == null ? ecs_stack_allocator_free_count_Ptr = ecs_stack_allocator_free_count_BindgenGetExtern() : ecs_stack_allocator_free_count_Ptr);
+public static ref ulong ECS_TOGGLE => ref *(ulong*)(ECS_TOGGLE_Ptr == null ? ECS_TOGGLE_Ptr = ECS_TOGGLE_BindgenGetExtern() : ECS_TOGGLE_Ptr);
+public static ref ulong ECS_VALUE_PAIR => ref *(ulong*)(ECS_VALUE_PAIR_Ptr == null ? ECS_VALUE_PAIR_Ptr = ECS_VALUE_PAIR_BindgenGetExtern() : ECS_VALUE_PAIR_Ptr);
+public static ref ulong EcsAcceleration => ref *(ulong*)(EcsAcceleration_Ptr == null ? EcsAcceleration_Ptr = EcsAcceleration_BindgenGetExtern() : EcsAcceleration_Ptr);
+public static ref ulong EcsAcyclic => ref *(ulong*)(EcsAcyclic_Ptr == null ? EcsAcyclic_Ptr = EcsAcyclic_BindgenGetExtern() : EcsAcyclic_Ptr);
+public static ref ulong EcsAlertCritical => ref *(ulong*)(EcsAlertCritical_Ptr == null ? EcsAlertCritical_Ptr = EcsAlertCritical_BindgenGetExtern() : EcsAlertCritical_Ptr);
+public static ref ulong EcsAlertError => ref *(ulong*)(EcsAlertError_Ptr == null ? EcsAlertError_Ptr = EcsAlertError_BindgenGetExtern() : EcsAlertError_Ptr);
+public static ref ulong EcsAlertInfo => ref *(ulong*)(EcsAlertInfo_Ptr == null ? EcsAlertInfo_Ptr = EcsAlertInfo_BindgenGetExtern() : EcsAlertInfo_Ptr);
+public static ref ulong EcsAlertWarning => ref *(ulong*)(EcsAlertWarning_Ptr == null ? EcsAlertWarning_Ptr = EcsAlertWarning_BindgenGetExtern() : EcsAlertWarning_Ptr);
+public static ref ulong EcsAlias => ref *(ulong*)(EcsAlias_Ptr == null ? EcsAlias_Ptr = EcsAlias_BindgenGetExtern() : EcsAlias_Ptr);
+public static ref ulong EcsAmount => ref *(ulong*)(EcsAmount_Ptr == null ? EcsAmount_Ptr = EcsAmount_BindgenGetExtern() : EcsAmount_Ptr);
+public static ref ulong EcsAmpere => ref *(ulong*)(EcsAmpere_Ptr == null ? EcsAmpere_Ptr = EcsAmpere_BindgenGetExtern() : EcsAmpere_Ptr);
+public static ref ulong EcsAngle => ref *(ulong*)(EcsAngle_Ptr == null ? EcsAngle_Ptr = EcsAngle_BindgenGetExtern() : EcsAngle_Ptr);
+public static ref ulong EcsAny => ref *(ulong*)(EcsAny_Ptr == null ? EcsAny_Ptr = EcsAny_BindgenGetExtern() : EcsAny_Ptr);
+public static ref ulong EcsAtto => ref *(ulong*)(EcsAtto_Ptr == null ? EcsAtto_Ptr = EcsAtto_BindgenGetExtern() : EcsAtto_Ptr);
+public static ref ulong EcsBar => ref *(ulong*)(EcsBar_Ptr == null ? EcsBar_Ptr = EcsBar_BindgenGetExtern() : EcsBar_Ptr);
+public static ref ulong EcsBel => ref *(ulong*)(EcsBel_Ptr == null ? EcsBel_Ptr = EcsBel_BindgenGetExtern() : EcsBel_Ptr);
+public static ref ulong EcsBits => ref *(ulong*)(EcsBits_Ptr == null ? EcsBits_Ptr = EcsBits_BindgenGetExtern() : EcsBits_Ptr);
+public static ref ulong EcsBitsPerSecond => ref *(ulong*)(EcsBitsPerSecond_Ptr == null ? EcsBitsPerSecond_Ptr = EcsBitsPerSecond_BindgenGetExtern() : EcsBitsPerSecond_Ptr);
+public static ref ulong EcsBytes => ref *(ulong*)(EcsBytes_Ptr == null ? EcsBytes_Ptr = EcsBytes_BindgenGetExtern() : EcsBytes_Ptr);
+public static ref ulong EcsBytesPerSecond => ref *(ulong*)(EcsBytesPerSecond_Ptr == null ? EcsBytesPerSecond_Ptr = EcsBytesPerSecond_BindgenGetExtern() : EcsBytesPerSecond_Ptr);
+public static ref ulong EcsCandela => ref *(ulong*)(EcsCandela_Ptr == null ? EcsCandela_Ptr = EcsCandela_BindgenGetExtern() : EcsCandela_Ptr);
+public static ref ulong EcsCanToggle => ref *(ulong*)(EcsCanToggle_Ptr == null ? EcsCanToggle_Ptr = EcsCanToggle_BindgenGetExtern() : EcsCanToggle_Ptr);
+public static ref ulong EcsCelsius => ref *(ulong*)(EcsCelsius_Ptr == null ? EcsCelsius_Ptr = EcsCelsius_BindgenGetExtern() : EcsCelsius_Ptr);
+public static ref ulong EcsCenti => ref *(ulong*)(EcsCenti_Ptr == null ? EcsCenti_Ptr = EcsCenti_BindgenGetExtern() : EcsCenti_Ptr);
+public static ref ulong EcsCentiMeters => ref *(ulong*)(EcsCentiMeters_Ptr == null ? EcsCentiMeters_Ptr = EcsCentiMeters_BindgenGetExtern() : EcsCentiMeters_Ptr);
+public static ref ulong EcsChildOf => ref *(ulong*)(EcsChildOf_Ptr == null ? EcsChildOf_Ptr = EcsChildOf_BindgenGetExtern() : EcsChildOf_Ptr);
+public static ref ulong EcsColor => ref *(ulong*)(EcsColor_Ptr == null ? EcsColor_Ptr = EcsColor_BindgenGetExtern() : EcsColor_Ptr);
+public static ref ulong EcsColorCss => ref *(ulong*)(EcsColorCss_Ptr == null ? EcsColorCss_Ptr = EcsColorCss_BindgenGetExtern() : EcsColorCss_Ptr);
+public static ref ulong EcsColorHsl => ref *(ulong*)(EcsColorHsl_Ptr == null ? EcsColorHsl_Ptr = EcsColorHsl_BindgenGetExtern() : EcsColorHsl_Ptr);
+public static ref ulong EcsColorRgb => ref *(ulong*)(EcsColorRgb_Ptr == null ? EcsColorRgb_Ptr = EcsColorRgb_BindgenGetExtern() : EcsColorRgb_Ptr);
+public static ref ulong EcsConstant => ref *(ulong*)(EcsConstant_Ptr == null ? EcsConstant_Ptr = EcsConstant_BindgenGetExtern() : EcsConstant_Ptr);
+public static ref ulong EcsCounter => ref *(ulong*)(EcsCounter_Ptr == null ? EcsCounter_Ptr = EcsCounter_BindgenGetExtern() : EcsCounter_Ptr);
+public static ref ulong EcsCounterId => ref *(ulong*)(EcsCounterId_Ptr == null ? EcsCounterId_Ptr = EcsCounterId_BindgenGetExtern() : EcsCounterId_Ptr);
+public static ref ulong EcsCounterIncrement => ref *(ulong*)(EcsCounterIncrement_Ptr == null ? EcsCounterIncrement_Ptr = EcsCounterIncrement_BindgenGetExtern() : EcsCounterIncrement_Ptr);
+public static ref ulong EcsData => ref *(ulong*)(EcsData_Ptr == null ? EcsData_Ptr = EcsData_BindgenGetExtern() : EcsData_Ptr);
+public static ref ulong EcsDataRate => ref *(ulong*)(EcsDataRate_Ptr == null ? EcsDataRate_Ptr = EcsDataRate_BindgenGetExtern() : EcsDataRate_Ptr);
+public static ref ulong EcsDate => ref *(ulong*)(EcsDate_Ptr == null ? EcsDate_Ptr = EcsDate_BindgenGetExtern() : EcsDate_Ptr);
+public static ref ulong EcsDays => ref *(ulong*)(EcsDays_Ptr == null ? EcsDays_Ptr = EcsDays_BindgenGetExtern() : EcsDays_Ptr);
+public static ref ulong EcsDeca => ref *(ulong*)(EcsDeca_Ptr == null ? EcsDeca_Ptr = EcsDeca_BindgenGetExtern() : EcsDeca_Ptr);
+public static ref ulong EcsDeci => ref *(ulong*)(EcsDeci_Ptr == null ? EcsDeci_Ptr = EcsDeci_BindgenGetExtern() : EcsDeci_Ptr);
+public static ref ulong EcsDeciBel => ref *(ulong*)(EcsDeciBel_Ptr == null ? EcsDeciBel_Ptr = EcsDeciBel_BindgenGetExtern() : EcsDeciBel_Ptr);
+public static ref ulong EcsDegrees => ref *(ulong*)(EcsDegrees_Ptr == null ? EcsDegrees_Ptr = EcsDegrees_BindgenGetExtern() : EcsDegrees_Ptr);
+public static ref ulong EcsDelete => ref *(ulong*)(EcsDelete_Ptr == null ? EcsDelete_Ptr = EcsDelete_BindgenGetExtern() : EcsDelete_Ptr);
+public static ref ulong EcsDependsOn => ref *(ulong*)(EcsDependsOn_Ptr == null ? EcsDependsOn_Ptr = EcsDependsOn_BindgenGetExtern() : EcsDependsOn_Ptr);
+public static ref ulong EcsDisabled => ref *(ulong*)(EcsDisabled_Ptr == null ? EcsDisabled_Ptr = EcsDisabled_BindgenGetExtern() : EcsDisabled_Ptr);
+public static ref ulong EcsDocBrief => ref *(ulong*)(EcsDocBrief_Ptr == null ? EcsDocBrief_Ptr = EcsDocBrief_BindgenGetExtern() : EcsDocBrief_Ptr);
+public static ref ulong EcsDocColor => ref *(ulong*)(EcsDocColor_Ptr == null ? EcsDocColor_Ptr = EcsDocColor_BindgenGetExtern() : EcsDocColor_Ptr);
+public static ref ulong EcsDocDetail => ref *(ulong*)(EcsDocDetail_Ptr == null ? EcsDocDetail_Ptr = EcsDocDetail_BindgenGetExtern() : EcsDocDetail_Ptr);
+public static ref ulong EcsDocLink => ref *(ulong*)(EcsDocLink_Ptr == null ? EcsDocLink_Ptr = EcsDocLink_BindgenGetExtern() : EcsDocLink_Ptr);
+public static ref ulong EcsDocUuid => ref *(ulong*)(EcsDocUuid_Ptr == null ? EcsDocUuid_Ptr = EcsDocUuid_BindgenGetExtern() : EcsDocUuid_Ptr);
+public static ref ulong EcsDontFragment => ref *(ulong*)(EcsDontFragment_Ptr == null ? EcsDontFragment_Ptr = EcsDontFragment_BindgenGetExtern() : EcsDontFragment_Ptr);
+public static ref ulong EcsDontInherit => ref *(ulong*)(EcsDontInherit_Ptr == null ? EcsDontInherit_Ptr = EcsDontInherit_BindgenGetExtern() : EcsDontInherit_Ptr);
+public static ref ulong EcsDuration => ref *(ulong*)(EcsDuration_Ptr == null ? EcsDuration_Ptr = EcsDuration_BindgenGetExtern() : EcsDuration_Ptr);
+public static ref ulong EcsElectricCurrent => ref *(ulong*)(EcsElectricCurrent_Ptr == null ? EcsElectricCurrent_Ptr = EcsElectricCurrent_BindgenGetExtern() : EcsElectricCurrent_Ptr);
+public static ref ulong EcsEmpty => ref *(ulong*)(EcsEmpty_Ptr == null ? EcsEmpty_Ptr = EcsEmpty_BindgenGetExtern() : EcsEmpty_Ptr);
+public static ref ulong EcsExa => ref *(ulong*)(EcsExa_Ptr == null ? EcsExa_Ptr = EcsExa_BindgenGetExtern() : EcsExa_Ptr);
+public static ref ulong EcsExbi => ref *(ulong*)(EcsExbi_Ptr == null ? EcsExbi_Ptr = EcsExbi_BindgenGetExtern() : EcsExbi_Ptr);
+public static ref ulong EcsExclusive => ref *(ulong*)(EcsExclusive_Ptr == null ? EcsExclusive_Ptr = EcsExclusive_BindgenGetExtern() : EcsExclusive_Ptr);
+public static ref ulong EcsFahrenheit => ref *(ulong*)(EcsFahrenheit_Ptr == null ? EcsFahrenheit_Ptr = EcsFahrenheit_BindgenGetExtern() : EcsFahrenheit_Ptr);
+public static ref ulong EcsFemto => ref *(ulong*)(EcsFemto_Ptr == null ? EcsFemto_Ptr = EcsFemto_BindgenGetExtern() : EcsFemto_Ptr);
+public static ref ulong EcsFinal => ref *(ulong*)(EcsFinal_Ptr == null ? EcsFinal_Ptr = EcsFinal_BindgenGetExtern() : EcsFinal_Ptr);
+public static ref ulong EcsFlecs => ref *(ulong*)(EcsFlecs_Ptr == null ? EcsFlecs_Ptr = EcsFlecs_BindgenGetExtern() : EcsFlecs_Ptr);
+public static ref ulong EcsFlecsCore => ref *(ulong*)(EcsFlecsCore_Ptr == null ? EcsFlecsCore_Ptr = EcsFlecsCore_BindgenGetExtern() : EcsFlecsCore_Ptr);
+public static ref ulong EcsForce => ref *(ulong*)(EcsForce_Ptr == null ? EcsForce_Ptr = EcsForce_BindgenGetExtern() : EcsForce_Ptr);
+public static ref ulong EcsFrequency => ref *(ulong*)(EcsFrequency_Ptr == null ? EcsFrequency_Ptr = EcsFrequency_BindgenGetExtern() : EcsFrequency_Ptr);
+public static ref ulong EcsGauge => ref *(ulong*)(EcsGauge_Ptr == null ? EcsGauge_Ptr = EcsGauge_BindgenGetExtern() : EcsGauge_Ptr);
+public static ref ulong EcsGibi => ref *(ulong*)(EcsGibi_Ptr == null ? EcsGibi_Ptr = EcsGibi_BindgenGetExtern() : EcsGibi_Ptr);
+public static ref ulong EcsGibiBytes => ref *(ulong*)(EcsGibiBytes_Ptr == null ? EcsGibiBytes_Ptr = EcsGibiBytes_BindgenGetExtern() : EcsGibiBytes_Ptr);
+public static ref ulong EcsGiga => ref *(ulong*)(EcsGiga_Ptr == null ? EcsGiga_Ptr = EcsGiga_BindgenGetExtern() : EcsGiga_Ptr);
+public static ref ulong EcsGigaBits => ref *(ulong*)(EcsGigaBits_Ptr == null ? EcsGigaBits_Ptr = EcsGigaBits_BindgenGetExtern() : EcsGigaBits_Ptr);
+public static ref ulong EcsGigaBitsPerSecond => ref *(ulong*)(EcsGigaBitsPerSecond_Ptr == null ? EcsGigaBitsPerSecond_Ptr = EcsGigaBitsPerSecond_BindgenGetExtern() : EcsGigaBitsPerSecond_Ptr);
+public static ref ulong EcsGigaBytes => ref *(ulong*)(EcsGigaBytes_Ptr == null ? EcsGigaBytes_Ptr = EcsGigaBytes_BindgenGetExtern() : EcsGigaBytes_Ptr);
+public static ref ulong EcsGigaBytesPerSecond => ref *(ulong*)(EcsGigaBytesPerSecond_Ptr == null ? EcsGigaBytesPerSecond_Ptr = EcsGigaBytesPerSecond_BindgenGetExtern() : EcsGigaBytesPerSecond_Ptr);
+public static ref ulong EcsGigaHertz => ref *(ulong*)(EcsGigaHertz_Ptr == null ? EcsGigaHertz_Ptr = EcsGigaHertz_BindgenGetExtern() : EcsGigaHertz_Ptr);
+public static ref ulong EcsGrams => ref *(ulong*)(EcsGrams_Ptr == null ? EcsGrams_Ptr = EcsGrams_BindgenGetExtern() : EcsGrams_Ptr);
+public static ref ulong EcsHecto => ref *(ulong*)(EcsHecto_Ptr == null ? EcsHecto_Ptr = EcsHecto_BindgenGetExtern() : EcsHecto_Ptr);
+public static ref ulong EcsHertz => ref *(ulong*)(EcsHertz_Ptr == null ? EcsHertz_Ptr = EcsHertz_BindgenGetExtern() : EcsHertz_Ptr);
+public static ref ulong EcsHours => ref *(ulong*)(EcsHours_Ptr == null ? EcsHours_Ptr = EcsHours_BindgenGetExtern() : EcsHours_Ptr);
+public static ref ulong EcsInherit => ref *(ulong*)(EcsInherit_Ptr == null ? EcsInherit_Ptr = EcsInherit_BindgenGetExtern() : EcsInherit_Ptr);
+public static ref ulong EcsInheritable => ref *(ulong*)(EcsInheritable_Ptr == null ? EcsInheritable_Ptr = EcsInheritable_BindgenGetExtern() : EcsInheritable_Ptr);
+public static ref ulong EcsIsA => ref *(ulong*)(EcsIsA_Ptr == null ? EcsIsA_Ptr = EcsIsA_BindgenGetExtern() : EcsIsA_Ptr);
+public static ref ulong EcsKelvin => ref *(ulong*)(EcsKelvin_Ptr == null ? EcsKelvin_Ptr = EcsKelvin_BindgenGetExtern() : EcsKelvin_Ptr);
+public static ref ulong EcsKibi => ref *(ulong*)(EcsKibi_Ptr == null ? EcsKibi_Ptr = EcsKibi_BindgenGetExtern() : EcsKibi_Ptr);
+public static ref ulong EcsKibiBytes => ref *(ulong*)(EcsKibiBytes_Ptr == null ? EcsKibiBytes_Ptr = EcsKibiBytes_BindgenGetExtern() : EcsKibiBytes_Ptr);
+public static ref ulong EcsKilo => ref *(ulong*)(EcsKilo_Ptr == null ? EcsKilo_Ptr = EcsKilo_BindgenGetExtern() : EcsKilo_Ptr);
+public static ref ulong EcsKiloBits => ref *(ulong*)(EcsKiloBits_Ptr == null ? EcsKiloBits_Ptr = EcsKiloBits_BindgenGetExtern() : EcsKiloBits_Ptr);
+public static ref ulong EcsKiloBitsPerSecond => ref *(ulong*)(EcsKiloBitsPerSecond_Ptr == null ? EcsKiloBitsPerSecond_Ptr = EcsKiloBitsPerSecond_BindgenGetExtern() : EcsKiloBitsPerSecond_Ptr);
+public static ref ulong EcsKiloBytes => ref *(ulong*)(EcsKiloBytes_Ptr == null ? EcsKiloBytes_Ptr = EcsKiloBytes_BindgenGetExtern() : EcsKiloBytes_Ptr);
+public static ref ulong EcsKiloBytesPerSecond => ref *(ulong*)(EcsKiloBytesPerSecond_Ptr == null ? EcsKiloBytesPerSecond_Ptr = EcsKiloBytesPerSecond_BindgenGetExtern() : EcsKiloBytesPerSecond_Ptr);
+public static ref ulong EcsKiloGrams => ref *(ulong*)(EcsKiloGrams_Ptr == null ? EcsKiloGrams_Ptr = EcsKiloGrams_BindgenGetExtern() : EcsKiloGrams_Ptr);
+public static ref ulong EcsKiloHertz => ref *(ulong*)(EcsKiloHertz_Ptr == null ? EcsKiloHertz_Ptr = EcsKiloHertz_BindgenGetExtern() : EcsKiloHertz_Ptr);
+public static ref ulong EcsKiloMeters => ref *(ulong*)(EcsKiloMeters_Ptr == null ? EcsKiloMeters_Ptr = EcsKiloMeters_BindgenGetExtern() : EcsKiloMeters_Ptr);
+public static ref ulong EcsKiloMetersPerHour => ref *(ulong*)(EcsKiloMetersPerHour_Ptr == null ? EcsKiloMetersPerHour_Ptr = EcsKiloMetersPerHour_BindgenGetExtern() : EcsKiloMetersPerHour_Ptr);
+public static ref ulong EcsKiloMetersPerSecond => ref *(ulong*)(EcsKiloMetersPerSecond_Ptr == null ? EcsKiloMetersPerSecond_Ptr = EcsKiloMetersPerSecond_BindgenGetExtern() : EcsKiloMetersPerSecond_Ptr);
+public static ref ulong EcsLength => ref *(ulong*)(EcsLength_Ptr == null ? EcsLength_Ptr = EcsLength_BindgenGetExtern() : EcsLength_Ptr);
+public static ref ulong EcsLuminousIntensity => ref *(ulong*)(EcsLuminousIntensity_Ptr == null ? EcsLuminousIntensity_Ptr = EcsLuminousIntensity_BindgenGetExtern() : EcsLuminousIntensity_Ptr);
+public static ref ulong EcsMass => ref *(ulong*)(EcsMass_Ptr == null ? EcsMass_Ptr = EcsMass_BindgenGetExtern() : EcsMass_Ptr);
+public static ref ulong EcsMebi => ref *(ulong*)(EcsMebi_Ptr == null ? EcsMebi_Ptr = EcsMebi_BindgenGetExtern() : EcsMebi_Ptr);
+public static ref ulong EcsMebiBytes => ref *(ulong*)(EcsMebiBytes_Ptr == null ? EcsMebiBytes_Ptr = EcsMebiBytes_BindgenGetExtern() : EcsMebiBytes_Ptr);
+public static ref ulong EcsMega => ref *(ulong*)(EcsMega_Ptr == null ? EcsMega_Ptr = EcsMega_BindgenGetExtern() : EcsMega_Ptr);
+public static ref ulong EcsMegaBits => ref *(ulong*)(EcsMegaBits_Ptr == null ? EcsMegaBits_Ptr = EcsMegaBits_BindgenGetExtern() : EcsMegaBits_Ptr);
+public static ref ulong EcsMegaBitsPerSecond => ref *(ulong*)(EcsMegaBitsPerSecond_Ptr == null ? EcsMegaBitsPerSecond_Ptr = EcsMegaBitsPerSecond_BindgenGetExtern() : EcsMegaBitsPerSecond_Ptr);
+public static ref ulong EcsMegaBytes => ref *(ulong*)(EcsMegaBytes_Ptr == null ? EcsMegaBytes_Ptr = EcsMegaBytes_BindgenGetExtern() : EcsMegaBytes_Ptr);
+public static ref ulong EcsMegaBytesPerSecond => ref *(ulong*)(EcsMegaBytesPerSecond_Ptr == null ? EcsMegaBytesPerSecond_Ptr = EcsMegaBytesPerSecond_BindgenGetExtern() : EcsMegaBytesPerSecond_Ptr);
+public static ref ulong EcsMegaHertz => ref *(ulong*)(EcsMegaHertz_Ptr == null ? EcsMegaHertz_Ptr = EcsMegaHertz_BindgenGetExtern() : EcsMegaHertz_Ptr);
+public static ref ulong EcsMeters => ref *(ulong*)(EcsMeters_Ptr == null ? EcsMeters_Ptr = EcsMeters_BindgenGetExtern() : EcsMeters_Ptr);
+public static ref ulong EcsMetersPerSecond => ref *(ulong*)(EcsMetersPerSecond_Ptr == null ? EcsMetersPerSecond_Ptr = EcsMetersPerSecond_BindgenGetExtern() : EcsMetersPerSecond_Ptr);
+public static ref ulong EcsMetric => ref *(ulong*)(EcsMetric_Ptr == null ? EcsMetric_Ptr = EcsMetric_BindgenGetExtern() : EcsMetric_Ptr);
+public static ref ulong EcsMetricInstance => ref *(ulong*)(EcsMetricInstance_Ptr == null ? EcsMetricInstance_Ptr = EcsMetricInstance_BindgenGetExtern() : EcsMetricInstance_Ptr);
+public static ref ulong EcsMicro => ref *(ulong*)(EcsMicro_Ptr == null ? EcsMicro_Ptr = EcsMicro_BindgenGetExtern() : EcsMicro_Ptr);
+public static ref ulong EcsMicroMeters => ref *(ulong*)(EcsMicroMeters_Ptr == null ? EcsMicroMeters_Ptr = EcsMicroMeters_BindgenGetExtern() : EcsMicroMeters_Ptr);
+public static ref ulong EcsMicroSeconds => ref *(ulong*)(EcsMicroSeconds_Ptr == null ? EcsMicroSeconds_Ptr = EcsMicroSeconds_BindgenGetExtern() : EcsMicroSeconds_Ptr);
+public static ref ulong EcsMiles => ref *(ulong*)(EcsMiles_Ptr == null ? EcsMiles_Ptr = EcsMiles_BindgenGetExtern() : EcsMiles_Ptr);
+public static ref ulong EcsMilesPerHour => ref *(ulong*)(EcsMilesPerHour_Ptr == null ? EcsMilesPerHour_Ptr = EcsMilesPerHour_BindgenGetExtern() : EcsMilesPerHour_Ptr);
+public static ref ulong EcsMilli => ref *(ulong*)(EcsMilli_Ptr == null ? EcsMilli_Ptr = EcsMilli_BindgenGetExtern() : EcsMilli_Ptr);
+public static ref ulong EcsMilliMeters => ref *(ulong*)(EcsMilliMeters_Ptr == null ? EcsMilliMeters_Ptr = EcsMilliMeters_BindgenGetExtern() : EcsMilliMeters_Ptr);
+public static ref ulong EcsMilliSeconds => ref *(ulong*)(EcsMilliSeconds_Ptr == null ? EcsMilliSeconds_Ptr = EcsMilliSeconds_BindgenGetExtern() : EcsMilliSeconds_Ptr);
+public static ref ulong EcsMinutes => ref *(ulong*)(EcsMinutes_Ptr == null ? EcsMinutes_Ptr = EcsMinutes_BindgenGetExtern() : EcsMinutes_Ptr);
+public static ref ulong EcsModule => ref *(ulong*)(EcsModule_Ptr == null ? EcsModule_Ptr = EcsModule_BindgenGetExtern() : EcsModule_Ptr);
+public static ref ulong EcsMole => ref *(ulong*)(EcsMole_Ptr == null ? EcsMole_Ptr = EcsMole_BindgenGetExtern() : EcsMole_Ptr);
+public static ref ulong EcsMonitor => ref *(ulong*)(EcsMonitor_Ptr == null ? EcsMonitor_Ptr = EcsMonitor_BindgenGetExtern() : EcsMonitor_Ptr);
+public static ref ulong EcsName => ref *(ulong*)(EcsName_Ptr == null ? EcsName_Ptr = EcsName_BindgenGetExtern() : EcsName_Ptr);
+public static ref ulong EcsNano => ref *(ulong*)(EcsNano_Ptr == null ? EcsNano_Ptr = EcsNano_BindgenGetExtern() : EcsNano_Ptr);
+public static ref ulong EcsNanoMeters => ref *(ulong*)(EcsNanoMeters_Ptr == null ? EcsNanoMeters_Ptr = EcsNanoMeters_BindgenGetExtern() : EcsNanoMeters_Ptr);
+public static ref ulong EcsNanoSeconds => ref *(ulong*)(EcsNanoSeconds_Ptr == null ? EcsNanoSeconds_Ptr = EcsNanoSeconds_BindgenGetExtern() : EcsNanoSeconds_Ptr);
+public static ref ulong EcsNewton => ref *(ulong*)(EcsNewton_Ptr == null ? EcsNewton_Ptr = EcsNewton_BindgenGetExtern() : EcsNewton_Ptr);
+public static ref ulong EcsNotQueryable => ref *(ulong*)(EcsNotQueryable_Ptr == null ? EcsNotQueryable_Ptr = EcsNotQueryable_BindgenGetExtern() : EcsNotQueryable_Ptr);
+public static ref ulong EcsObserver => ref *(ulong*)(EcsObserver_Ptr == null ? EcsObserver_Ptr = EcsObserver_BindgenGetExtern() : EcsObserver_Ptr);
+public static ref ulong EcsOnAdd => ref *(ulong*)(EcsOnAdd_Ptr == null ? EcsOnAdd_Ptr = EcsOnAdd_BindgenGetExtern() : EcsOnAdd_Ptr);
+public static ref ulong EcsOnDelete => ref *(ulong*)(EcsOnDelete_Ptr == null ? EcsOnDelete_Ptr = EcsOnDelete_BindgenGetExtern() : EcsOnDelete_Ptr);
+public static ref ulong EcsOnDeleteTarget => ref *(ulong*)(EcsOnDeleteTarget_Ptr == null ? EcsOnDeleteTarget_Ptr = EcsOnDeleteTarget_BindgenGetExtern() : EcsOnDeleteTarget_Ptr);
+public static ref ulong EcsOneOf => ref *(ulong*)(EcsOneOf_Ptr == null ? EcsOneOf_Ptr = EcsOneOf_BindgenGetExtern() : EcsOneOf_Ptr);
+public static ref ulong EcsOnInstantiate => ref *(ulong*)(EcsOnInstantiate_Ptr == null ? EcsOnInstantiate_Ptr = EcsOnInstantiate_BindgenGetExtern() : EcsOnInstantiate_Ptr);
+public static ref ulong EcsOnLoad => ref *(ulong*)(EcsOnLoad_Ptr == null ? EcsOnLoad_Ptr = EcsOnLoad_BindgenGetExtern() : EcsOnLoad_Ptr);
+public static ref ulong EcsOnRemove => ref *(ulong*)(EcsOnRemove_Ptr == null ? EcsOnRemove_Ptr = EcsOnRemove_BindgenGetExtern() : EcsOnRemove_Ptr);
+public static ref ulong EcsOnSet => ref *(ulong*)(EcsOnSet_Ptr == null ? EcsOnSet_Ptr = EcsOnSet_BindgenGetExtern() : EcsOnSet_Ptr);
+public static ref ulong EcsOnStart => ref *(ulong*)(EcsOnStart_Ptr == null ? EcsOnStart_Ptr = EcsOnStart_BindgenGetExtern() : EcsOnStart_Ptr);
+public static ref ulong EcsOnStore => ref *(ulong*)(EcsOnStore_Ptr == null ? EcsOnStore_Ptr = EcsOnStore_BindgenGetExtern() : EcsOnStore_Ptr);
+public static ref ulong EcsOnTableCreate => ref *(ulong*)(EcsOnTableCreate_Ptr == null ? EcsOnTableCreate_Ptr = EcsOnTableCreate_BindgenGetExtern() : EcsOnTableCreate_Ptr);
+public static ref ulong EcsOnTableDelete => ref *(ulong*)(EcsOnTableDelete_Ptr == null ? EcsOnTableDelete_Ptr = EcsOnTableDelete_BindgenGetExtern() : EcsOnTableDelete_Ptr);
+public static ref ulong EcsOnUpdate => ref *(ulong*)(EcsOnUpdate_Ptr == null ? EcsOnUpdate_Ptr = EcsOnUpdate_BindgenGetExtern() : EcsOnUpdate_Ptr);
+public static ref ulong EcsOnValidate => ref *(ulong*)(EcsOnValidate_Ptr == null ? EcsOnValidate_Ptr = EcsOnValidate_BindgenGetExtern() : EcsOnValidate_Ptr);
+public static ref ulong EcsOrderedChildren => ref *(ulong*)(EcsOrderedChildren_Ptr == null ? EcsOrderedChildren_Ptr = EcsOrderedChildren_BindgenGetExtern() : EcsOrderedChildren_Ptr);
+public static ref ulong EcsOverride => ref *(ulong*)(EcsOverride_Ptr == null ? EcsOverride_Ptr = EcsOverride_BindgenGetExtern() : EcsOverride_Ptr);
+public static ref ulong EcsPairIsTag => ref *(ulong*)(EcsPairIsTag_Ptr == null ? EcsPairIsTag_Ptr = EcsPairIsTag_BindgenGetExtern() : EcsPairIsTag_Ptr);
+public static ref ulong EcsPanic => ref *(ulong*)(EcsPanic_Ptr == null ? EcsPanic_Ptr = EcsPanic_BindgenGetExtern() : EcsPanic_Ptr);
+public static ref ulong EcsParentDepth => ref *(ulong*)(EcsParentDepth_Ptr == null ? EcsParentDepth_Ptr = EcsParentDepth_BindgenGetExtern() : EcsParentDepth_Ptr);
+public static ref ulong EcsPascal => ref *(ulong*)(EcsPascal_Ptr == null ? EcsPascal_Ptr = EcsPascal_BindgenGetExtern() : EcsPascal_Ptr);
+public static ref ulong EcsPebi => ref *(ulong*)(EcsPebi_Ptr == null ? EcsPebi_Ptr = EcsPebi_BindgenGetExtern() : EcsPebi_Ptr);
+public static ref ulong EcsPercentage => ref *(ulong*)(EcsPercentage_Ptr == null ? EcsPercentage_Ptr = EcsPercentage_BindgenGetExtern() : EcsPercentage_Ptr);
+public static ref ulong EcsPeriod1d => ref *(ulong*)(EcsPeriod1d_Ptr == null ? EcsPeriod1d_Ptr = EcsPeriod1d_BindgenGetExtern() : EcsPeriod1d_Ptr);
+public static ref ulong EcsPeriod1h => ref *(ulong*)(EcsPeriod1h_Ptr == null ? EcsPeriod1h_Ptr = EcsPeriod1h_BindgenGetExtern() : EcsPeriod1h_Ptr);
+public static ref ulong EcsPeriod1m => ref *(ulong*)(EcsPeriod1m_Ptr == null ? EcsPeriod1m_Ptr = EcsPeriod1m_BindgenGetExtern() : EcsPeriod1m_Ptr);
+public static ref ulong EcsPeriod1s => ref *(ulong*)(EcsPeriod1s_Ptr == null ? EcsPeriod1s_Ptr = EcsPeriod1s_BindgenGetExtern() : EcsPeriod1s_Ptr);
+public static ref ulong EcsPeriod1w => ref *(ulong*)(EcsPeriod1w_Ptr == null ? EcsPeriod1w_Ptr = EcsPeriod1w_BindgenGetExtern() : EcsPeriod1w_Ptr);
+public static ref ulong EcsPeta => ref *(ulong*)(EcsPeta_Ptr == null ? EcsPeta_Ptr = EcsPeta_BindgenGetExtern() : EcsPeta_Ptr);
+public static ref ulong EcsPhase => ref *(ulong*)(EcsPhase_Ptr == null ? EcsPhase_Ptr = EcsPhase_BindgenGetExtern() : EcsPhase_Ptr);
+public static ref ulong EcsPico => ref *(ulong*)(EcsPico_Ptr == null ? EcsPico_Ptr = EcsPico_BindgenGetExtern() : EcsPico_Ptr);
+public static ref ulong EcsPicoMeters => ref *(ulong*)(EcsPicoMeters_Ptr == null ? EcsPicoMeters_Ptr = EcsPicoMeters_BindgenGetExtern() : EcsPicoMeters_Ptr);
+public static ref ulong EcsPicoSeconds => ref *(ulong*)(EcsPicoSeconds_Ptr == null ? EcsPicoSeconds_Ptr = EcsPicoSeconds_BindgenGetExtern() : EcsPicoSeconds_Ptr);
+public static ref ulong EcsPixels => ref *(ulong*)(EcsPixels_Ptr == null ? EcsPixels_Ptr = EcsPixels_BindgenGetExtern() : EcsPixels_Ptr);
+public static ref ulong EcsPostFrame => ref *(ulong*)(EcsPostFrame_Ptr == null ? EcsPostFrame_Ptr = EcsPostFrame_BindgenGetExtern() : EcsPostFrame_Ptr);
+public static ref ulong EcsPostLoad => ref *(ulong*)(EcsPostLoad_Ptr == null ? EcsPostLoad_Ptr = EcsPostLoad_BindgenGetExtern() : EcsPostLoad_Ptr);
+public static ref ulong EcsPostUpdate => ref *(ulong*)(EcsPostUpdate_Ptr == null ? EcsPostUpdate_Ptr = EcsPostUpdate_BindgenGetExtern() : EcsPostUpdate_Ptr);
+public static ref ulong EcsPredEq => ref *(ulong*)(EcsPredEq_Ptr == null ? EcsPredEq_Ptr = EcsPredEq_BindgenGetExtern() : EcsPredEq_Ptr);
+public static ref ulong EcsPredLookup => ref *(ulong*)(EcsPredLookup_Ptr == null ? EcsPredLookup_Ptr = EcsPredLookup_BindgenGetExtern() : EcsPredLookup_Ptr);
+public static ref ulong EcsPredMatch => ref *(ulong*)(EcsPredMatch_Ptr == null ? EcsPredMatch_Ptr = EcsPredMatch_BindgenGetExtern() : EcsPredMatch_Ptr);
+public static ref ulong EcsPrefab => ref *(ulong*)(EcsPrefab_Ptr == null ? EcsPrefab_Ptr = EcsPrefab_BindgenGetExtern() : EcsPrefab_Ptr);
+public static ref ulong EcsPreFrame => ref *(ulong*)(EcsPreFrame_Ptr == null ? EcsPreFrame_Ptr = EcsPreFrame_BindgenGetExtern() : EcsPreFrame_Ptr);
+public static ref ulong EcsPressure => ref *(ulong*)(EcsPressure_Ptr == null ? EcsPressure_Ptr = EcsPressure_BindgenGetExtern() : EcsPressure_Ptr);
+public static ref ulong EcsPreStore => ref *(ulong*)(EcsPreStore_Ptr == null ? EcsPreStore_Ptr = EcsPreStore_BindgenGetExtern() : EcsPreStore_Ptr);
+public static ref ulong EcsPreUpdate => ref *(ulong*)(EcsPreUpdate_Ptr == null ? EcsPreUpdate_Ptr = EcsPreUpdate_BindgenGetExtern() : EcsPreUpdate_Ptr);
+public static ref ulong EcsQuantity => ref *(ulong*)(EcsQuantity_Ptr == null ? EcsQuantity_Ptr = EcsQuantity_BindgenGetExtern() : EcsQuantity_Ptr);
+public static ref ulong EcsQuery => ref *(ulong*)(EcsQuery_Ptr == null ? EcsQuery_Ptr = EcsQuery_BindgenGetExtern() : EcsQuery_Ptr);
+public static ref ulong EcsRadians => ref *(ulong*)(EcsRadians_Ptr == null ? EcsRadians_Ptr = EcsRadians_BindgenGetExtern() : EcsRadians_Ptr);
+public static ref ulong EcsReflexive => ref *(ulong*)(EcsReflexive_Ptr == null ? EcsReflexive_Ptr = EcsReflexive_BindgenGetExtern() : EcsReflexive_Ptr);
+public static ref ulong EcsRelationship => ref *(ulong*)(EcsRelationship_Ptr == null ? EcsRelationship_Ptr = EcsRelationship_BindgenGetExtern() : EcsRelationship_Ptr);
+public static ref ulong EcsRemove => ref *(ulong*)(EcsRemove_Ptr == null ? EcsRemove_Ptr = EcsRemove_BindgenGetExtern() : EcsRemove_Ptr);
+public static ref ulong EcsScopeClose => ref *(ulong*)(EcsScopeClose_Ptr == null ? EcsScopeClose_Ptr = EcsScopeClose_BindgenGetExtern() : EcsScopeClose_Ptr);
+public static ref ulong EcsScopeOpen => ref *(ulong*)(EcsScopeOpen_Ptr == null ? EcsScopeOpen_Ptr = EcsScopeOpen_BindgenGetExtern() : EcsScopeOpen_Ptr);
+public static ref ulong EcsScriptTemplate => ref *(ulong*)(EcsScriptTemplate_Ptr == null ? EcsScriptTemplate_Ptr = EcsScriptTemplate_BindgenGetExtern() : EcsScriptTemplate_Ptr);
+public static ref ulong EcsScriptVectorType => ref *(ulong*)(EcsScriptVectorType_Ptr == null ? EcsScriptVectorType_Ptr = EcsScriptVectorType_BindgenGetExtern() : EcsScriptVectorType_Ptr);
+public static ref ulong EcsSeconds => ref *(ulong*)(EcsSeconds_Ptr == null ? EcsSeconds_Ptr = EcsSeconds_BindgenGetExtern() : EcsSeconds_Ptr);
+public static ref ulong EcsSingleton => ref *(ulong*)(EcsSingleton_Ptr == null ? EcsSingleton_Ptr = EcsSingleton_BindgenGetExtern() : EcsSingleton_Ptr);
+public static ref ulong EcsSlotOf => ref *(ulong*)(EcsSlotOf_Ptr == null ? EcsSlotOf_Ptr = EcsSlotOf_BindgenGetExtern() : EcsSlotOf_Ptr);
+public static ref ulong EcsSparse => ref *(ulong*)(EcsSparse_Ptr == null ? EcsSparse_Ptr = EcsSparse_BindgenGetExtern() : EcsSparse_Ptr);
+public static ref ulong EcsSpeed => ref *(ulong*)(EcsSpeed_Ptr == null ? EcsSpeed_Ptr = EcsSpeed_BindgenGetExtern() : EcsSpeed_Ptr);
+public static ref ulong EcsSymbol => ref *(ulong*)(EcsSymbol_Ptr == null ? EcsSymbol_Ptr = EcsSymbol_BindgenGetExtern() : EcsSymbol_Ptr);
+public static ref ulong EcsSymmetric => ref *(ulong*)(EcsSymmetric_Ptr == null ? EcsSymmetric_Ptr = EcsSymmetric_BindgenGetExtern() : EcsSymmetric_Ptr);
+public static ref ulong EcsSystem => ref *(ulong*)(EcsSystem_Ptr == null ? EcsSystem_Ptr = EcsSystem_BindgenGetExtern() : EcsSystem_Ptr);
+public static ref ulong EcsTarget => ref *(ulong*)(EcsTarget_Ptr == null ? EcsTarget_Ptr = EcsTarget_BindgenGetExtern() : EcsTarget_Ptr);
+public static ref ulong EcsTebi => ref *(ulong*)(EcsTebi_Ptr == null ? EcsTebi_Ptr = EcsTebi_BindgenGetExtern() : EcsTebi_Ptr);
+public static ref ulong EcsTemperature => ref *(ulong*)(EcsTemperature_Ptr == null ? EcsTemperature_Ptr = EcsTemperature_BindgenGetExtern() : EcsTemperature_Ptr);
+public static ref ulong EcsTera => ref *(ulong*)(EcsTera_Ptr == null ? EcsTera_Ptr = EcsTera_BindgenGetExtern() : EcsTera_Ptr);
+public static ref ulong EcsThis => ref *(ulong*)(EcsThis_Ptr == null ? EcsThis_Ptr = EcsThis_BindgenGetExtern() : EcsThis_Ptr);
+public static ref ulong EcsTime => ref *(ulong*)(EcsTime_Ptr == null ? EcsTime_Ptr = EcsTime_BindgenGetExtern() : EcsTime_Ptr);
+public static ref ulong EcsTrait => ref *(ulong*)(EcsTrait_Ptr == null ? EcsTrait_Ptr = EcsTrait_BindgenGetExtern() : EcsTrait_Ptr);
+public static ref ulong EcsTransitive => ref *(ulong*)(EcsTransitive_Ptr == null ? EcsTransitive_Ptr = EcsTransitive_BindgenGetExtern() : EcsTransitive_Ptr);
+public static ref ulong EcsTraversable => ref *(ulong*)(EcsTraversable_Ptr == null ? EcsTraversable_Ptr = EcsTraversable_BindgenGetExtern() : EcsTraversable_Ptr);
+public static ref ulong EcsUnitPrefixes => ref *(ulong*)(EcsUnitPrefixes_Ptr == null ? EcsUnitPrefixes_Ptr = EcsUnitPrefixes_BindgenGetExtern() : EcsUnitPrefixes_Ptr);
+public static ref ulong EcsUri => ref *(ulong*)(EcsUri_Ptr == null ? EcsUri_Ptr = EcsUri_BindgenGetExtern() : EcsUri_Ptr);
+public static ref ulong EcsUriFile => ref *(ulong*)(EcsUriFile_Ptr == null ? EcsUriFile_Ptr = EcsUriFile_BindgenGetExtern() : EcsUriFile_Ptr);
+public static ref ulong EcsUriHyperlink => ref *(ulong*)(EcsUriHyperlink_Ptr == null ? EcsUriHyperlink_Ptr = EcsUriHyperlink_BindgenGetExtern() : EcsUriHyperlink_Ptr);
+public static ref ulong EcsUriImage => ref *(ulong*)(EcsUriImage_Ptr == null ? EcsUriImage_Ptr = EcsUriImage_BindgenGetExtern() : EcsUriImage_Ptr);
+public static ref ulong EcsVariable => ref *(ulong*)(EcsVariable_Ptr == null ? EcsVariable_Ptr = EcsVariable_BindgenGetExtern() : EcsVariable_Ptr);
+public static ref ulong EcsWildcard => ref *(ulong*)(EcsWildcard_Ptr == null ? EcsWildcard_Ptr = EcsWildcard_BindgenGetExtern() : EcsWildcard_Ptr);
+public static ref ulong EcsWith => ref *(ulong*)(EcsWith_Ptr == null ? EcsWith_Ptr = EcsWith_BindgenGetExtern() : EcsWith_Ptr);
+public static ref ulong EcsWorld => ref *(ulong*)(EcsWorld_Ptr == null ? EcsWorld_Ptr = EcsWorld_BindgenGetExtern() : EcsWorld_Ptr);
+public static ref ulong EcsYobi => ref *(ulong*)(EcsYobi_Ptr == null ? EcsYobi_Ptr = EcsYobi_BindgenGetExtern() : EcsYobi_Ptr);
+public static ref ulong EcsYocto => ref *(ulong*)(EcsYocto_Ptr == null ? EcsYocto_Ptr = EcsYocto_BindgenGetExtern() : EcsYocto_Ptr);
+public static ref ulong EcsYotta => ref *(ulong*)(EcsYotta_Ptr == null ? EcsYotta_Ptr = EcsYotta_BindgenGetExtern() : EcsYotta_Ptr);
+public static ref ulong EcsZebi => ref *(ulong*)(EcsZebi_Ptr == null ? EcsZebi_Ptr = EcsZebi_BindgenGetExtern() : EcsZebi_Ptr);
+public static ref ulong EcsZepto => ref *(ulong*)(EcsZepto_Ptr == null ? EcsZepto_Ptr = EcsZepto_BindgenGetExtern() : EcsZepto_Ptr);
+public static ref ulong EcsZetta => ref *(ulong*)(EcsZetta_Ptr == null ? EcsZetta_Ptr = EcsZetta_BindgenGetExtern() : EcsZetta_Ptr);
+public static ref ulong FLECS_IDecs_allocator_memory_tID_ => ref *(ulong*)(FLECS_IDecs_allocator_memory_tID__Ptr == null ? FLECS_IDecs_allocator_memory_tID__Ptr = FLECS_IDecs_allocator_memory_tID__BindgenGetExtern() : FLECS_IDecs_allocator_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_bool_tID_ => ref *(ulong*)(FLECS_IDecs_bool_tID__Ptr == null ? FLECS_IDecs_bool_tID__Ptr = FLECS_IDecs_bool_tID__BindgenGetExtern() : FLECS_IDecs_bool_tID__Ptr);
+public static ref ulong FLECS_IDecs_byte_tID_ => ref *(ulong*)(FLECS_IDecs_byte_tID__Ptr == null ? FLECS_IDecs_byte_tID__Ptr = FLECS_IDecs_byte_tID__BindgenGetExtern() : FLECS_IDecs_byte_tID__Ptr);
+public static ref ulong FLECS_IDecs_char_tID_ => ref *(ulong*)(FLECS_IDecs_char_tID__Ptr == null ? FLECS_IDecs_char_tID__Ptr = FLECS_IDecs_char_tID__BindgenGetExtern() : FLECS_IDecs_char_tID__Ptr);
+public static ref ulong FLECS_IDecs_component_index_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_index_memory_tID__Ptr == null ? FLECS_IDecs_component_index_memory_tID__Ptr = FLECS_IDecs_component_index_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_index_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_component_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_memory_tID__Ptr == null ? FLECS_IDecs_component_memory_tID__Ptr = FLECS_IDecs_component_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_entities_memory_tID_ => ref *(ulong*)(FLECS_IDecs_entities_memory_tID__Ptr == null ? FLECS_IDecs_entities_memory_tID__Ptr = FLECS_IDecs_entities_memory_tID__BindgenGetExtern() : FLECS_IDecs_entities_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_entity_tID_ => ref *(ulong*)(FLECS_IDecs_entity_tID__Ptr == null ? FLECS_IDecs_entity_tID__Ptr = FLECS_IDecs_entity_tID__BindgenGetExtern() : FLECS_IDecs_entity_tID__Ptr);
+public static ref ulong FLECS_IDecs_f32_tID_ => ref *(ulong*)(FLECS_IDecs_f32_tID__Ptr == null ? FLECS_IDecs_f32_tID__Ptr = FLECS_IDecs_f32_tID__BindgenGetExtern() : FLECS_IDecs_f32_tID__Ptr);
+public static ref ulong FLECS_IDecs_f64_tID_ => ref *(ulong*)(FLECS_IDecs_f64_tID__Ptr == null ? FLECS_IDecs_f64_tID__Ptr = FLECS_IDecs_f64_tID__BindgenGetExtern() : FLECS_IDecs_f64_tID__Ptr);
+public static ref ulong FLECS_IDecs_i16_tID_ => ref *(ulong*)(FLECS_IDecs_i16_tID__Ptr == null ? FLECS_IDecs_i16_tID__Ptr = FLECS_IDecs_i16_tID__BindgenGetExtern() : FLECS_IDecs_i16_tID__Ptr);
+public static ref ulong FLECS_IDecs_i32_tID_ => ref *(ulong*)(FLECS_IDecs_i32_tID__Ptr == null ? FLECS_IDecs_i32_tID__Ptr = FLECS_IDecs_i32_tID__BindgenGetExtern() : FLECS_IDecs_i32_tID__Ptr);
+public static ref ulong FLECS_IDecs_i64_tID_ => ref *(ulong*)(FLECS_IDecs_i64_tID__Ptr == null ? FLECS_IDecs_i64_tID__Ptr = FLECS_IDecs_i64_tID__BindgenGetExtern() : FLECS_IDecs_i64_tID__Ptr);
+public static ref ulong FLECS_IDecs_i8_tID_ => ref *(ulong*)(FLECS_IDecs_i8_tID__Ptr == null ? FLECS_IDecs_i8_tID__Ptr = FLECS_IDecs_i8_tID__BindgenGetExtern() : FLECS_IDecs_i8_tID__Ptr);
+public static ref ulong FLECS_IDecs_id_tID_ => ref *(ulong*)(FLECS_IDecs_id_tID__Ptr == null ? FLECS_IDecs_id_tID__Ptr = FLECS_IDecs_id_tID__BindgenGetExtern() : FLECS_IDecs_id_tID__Ptr);
+public static ref ulong FLECS_IDecs_iptr_tID_ => ref *(ulong*)(FLECS_IDecs_iptr_tID__Ptr == null ? FLECS_IDecs_iptr_tID__Ptr = FLECS_IDecs_iptr_tID__BindgenGetExtern() : FLECS_IDecs_iptr_tID__Ptr);
+public static ref ulong FLECS_IDecs_misc_memory_tID_ => ref *(ulong*)(FLECS_IDecs_misc_memory_tID__Ptr == null ? FLECS_IDecs_misc_memory_tID__Ptr = FLECS_IDecs_misc_memory_tID__BindgenGetExtern() : FLECS_IDecs_misc_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_query_memory_tID_ => ref *(ulong*)(FLECS_IDecs_query_memory_tID__Ptr == null ? FLECS_IDecs_query_memory_tID__Ptr = FLECS_IDecs_query_memory_tID__BindgenGetExtern() : FLECS_IDecs_query_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_string_tID_ => ref *(ulong*)(FLECS_IDecs_string_tID__Ptr == null ? FLECS_IDecs_string_tID__Ptr = FLECS_IDecs_string_tID__BindgenGetExtern() : FLECS_IDecs_string_tID__Ptr);
+public static ref ulong FLECS_IDecs_table_histogram_tID_ => ref *(ulong*)(FLECS_IDecs_table_histogram_tID__Ptr == null ? FLECS_IDecs_table_histogram_tID__Ptr = FLECS_IDecs_table_histogram_tID__BindgenGetExtern() : FLECS_IDecs_table_histogram_tID__Ptr);
+public static ref ulong FLECS_IDecs_table_memory_tID_ => ref *(ulong*)(FLECS_IDecs_table_memory_tID__Ptr == null ? FLECS_IDecs_table_memory_tID__Ptr = FLECS_IDecs_table_memory_tID__BindgenGetExtern() : FLECS_IDecs_table_memory_tID__Ptr);
+public static ref ulong FLECS_IDecs_u16_tID_ => ref *(ulong*)(FLECS_IDecs_u16_tID__Ptr == null ? FLECS_IDecs_u16_tID__Ptr = FLECS_IDecs_u16_tID__BindgenGetExtern() : FLECS_IDecs_u16_tID__Ptr);
+public static ref ulong FLECS_IDecs_u32_tID_ => ref *(ulong*)(FLECS_IDecs_u32_tID__Ptr == null ? FLECS_IDecs_u32_tID__Ptr = FLECS_IDecs_u32_tID__BindgenGetExtern() : FLECS_IDecs_u32_tID__Ptr);
+public static ref ulong FLECS_IDecs_u64_tID_ => ref *(ulong*)(FLECS_IDecs_u64_tID__Ptr == null ? FLECS_IDecs_u64_tID__Ptr = FLECS_IDecs_u64_tID__BindgenGetExtern() : FLECS_IDecs_u64_tID__Ptr);
+public static ref ulong FLECS_IDecs_u8_tID_ => ref *(ulong*)(FLECS_IDecs_u8_tID__Ptr == null ? FLECS_IDecs_u8_tID__Ptr = FLECS_IDecs_u8_tID__BindgenGetExtern() : FLECS_IDecs_u8_tID__Ptr);
+public static ref ulong FLECS_IDecs_uptr_tID_ => ref *(ulong*)(FLECS_IDecs_uptr_tID__Ptr == null ? FLECS_IDecs_uptr_tID__Ptr = FLECS_IDecs_uptr_tID__BindgenGetExtern() : FLECS_IDecs_uptr_tID__Ptr);
+public static ref ulong FLECS_IDEcsAlertCriticalID_ => ref *(ulong*)(FLECS_IDEcsAlertCriticalID__Ptr == null ? FLECS_IDEcsAlertCriticalID__Ptr = FLECS_IDEcsAlertCriticalID__BindgenGetExtern() : FLECS_IDEcsAlertCriticalID__Ptr);
+public static ref ulong FLECS_IDEcsAlertErrorID_ => ref *(ulong*)(FLECS_IDEcsAlertErrorID__Ptr == null ? FLECS_IDEcsAlertErrorID__Ptr = FLECS_IDEcsAlertErrorID__BindgenGetExtern() : FLECS_IDEcsAlertErrorID__Ptr);
+public static ref ulong FLECS_IDEcsAlertID_ => ref *(ulong*)(FLECS_IDEcsAlertID__Ptr == null ? FLECS_IDEcsAlertID__Ptr = FLECS_IDEcsAlertID__BindgenGetExtern() : FLECS_IDEcsAlertID__Ptr);
+public static ref ulong FLECS_IDEcsAlertInfoID_ => ref *(ulong*)(FLECS_IDEcsAlertInfoID__Ptr == null ? FLECS_IDEcsAlertInfoID__Ptr = FLECS_IDEcsAlertInfoID__BindgenGetExtern() : FLECS_IDEcsAlertInfoID__Ptr);
+public static ref ulong FLECS_IDEcsAlertInstanceID_ => ref *(ulong*)(FLECS_IDEcsAlertInstanceID__Ptr == null ? FLECS_IDEcsAlertInstanceID__Ptr = FLECS_IDEcsAlertInstanceID__BindgenGetExtern() : FLECS_IDEcsAlertInstanceID__Ptr);
+public static ref ulong FLECS_IDEcsAlertsActiveID_ => ref *(ulong*)(FLECS_IDEcsAlertsActiveID__Ptr == null ? FLECS_IDEcsAlertsActiveID__Ptr = FLECS_IDEcsAlertsActiveID__BindgenGetExtern() : FLECS_IDEcsAlertsActiveID__Ptr);
+public static ref ulong FLECS_IDEcsAlertTimeoutID_ => ref *(ulong*)(FLECS_IDEcsAlertTimeoutID__Ptr == null ? FLECS_IDEcsAlertTimeoutID__Ptr = FLECS_IDEcsAlertTimeoutID__BindgenGetExtern() : FLECS_IDEcsAlertTimeoutID__Ptr);
+public static ref ulong FLECS_IDEcsAlertWarningID_ => ref *(ulong*)(FLECS_IDEcsAlertWarningID__Ptr == null ? FLECS_IDEcsAlertWarningID__Ptr = FLECS_IDEcsAlertWarningID__BindgenGetExtern() : FLECS_IDEcsAlertWarningID__Ptr);
+public static ref ulong FLECS_IDEcsArrayID_ => ref *(ulong*)(FLECS_IDEcsArrayID__Ptr == null ? FLECS_IDEcsArrayID__Ptr = FLECS_IDEcsArrayID__BindgenGetExtern() : FLECS_IDEcsArrayID__Ptr);
+public static ref ulong FLECS_IDEcsBitmaskID_ => ref *(ulong*)(FLECS_IDEcsBitmaskID__Ptr == null ? FLECS_IDEcsBitmaskID__Ptr = FLECS_IDEcsBitmaskID__BindgenGetExtern() : FLECS_IDEcsBitmaskID__Ptr);
+public static ref ulong FLECS_IDEcsComponentID_ => ref *(ulong*)(FLECS_IDEcsComponentID__Ptr == null ? FLECS_IDEcsComponentID__Ptr = FLECS_IDEcsComponentID__BindgenGetExtern() : FLECS_IDEcsComponentID__Ptr);
+public static ref ulong FLECS_IDEcsConstantsID_ => ref *(ulong*)(FLECS_IDEcsConstantsID__Ptr == null ? FLECS_IDEcsConstantsID__Ptr = FLECS_IDEcsConstantsID__BindgenGetExtern() : FLECS_IDEcsConstantsID__Ptr);
+public static ref ulong FLECS_IDEcsCounterID_ => ref *(ulong*)(FLECS_IDEcsCounterID__Ptr == null ? FLECS_IDEcsCounterID__Ptr = FLECS_IDEcsCounterID__BindgenGetExtern() : FLECS_IDEcsCounterID__Ptr);
+public static ref ulong FLECS_IDEcsCounterIdID_ => ref *(ulong*)(FLECS_IDEcsCounterIdID__Ptr == null ? FLECS_IDEcsCounterIdID__Ptr = FLECS_IDEcsCounterIdID__BindgenGetExtern() : FLECS_IDEcsCounterIdID__Ptr);
+public static ref ulong FLECS_IDEcsCounterIncrementID_ => ref *(ulong*)(FLECS_IDEcsCounterIncrementID__Ptr == null ? FLECS_IDEcsCounterIncrementID__Ptr = FLECS_IDEcsCounterIncrementID__BindgenGetExtern() : FLECS_IDEcsCounterIncrementID__Ptr);
+public static ref ulong FLECS_IDEcsDefaultChildComponentID_ => ref *(ulong*)(FLECS_IDEcsDefaultChildComponentID__Ptr == null ? FLECS_IDEcsDefaultChildComponentID__Ptr = FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern() : FLECS_IDEcsDefaultChildComponentID__Ptr);
+public static ref ulong FLECS_IDEcsDocDescriptionID_ => ref *(ulong*)(FLECS_IDEcsDocDescriptionID__Ptr == null ? FLECS_IDEcsDocDescriptionID__Ptr = FLECS_IDEcsDocDescriptionID__BindgenGetExtern() : FLECS_IDEcsDocDescriptionID__Ptr);
+public static ref ulong FLECS_IDEcsEnumID_ => ref *(ulong*)(FLECS_IDEcsEnumID__Ptr == null ? FLECS_IDEcsEnumID__Ptr = FLECS_IDEcsEnumID__BindgenGetExtern() : FLECS_IDEcsEnumID__Ptr);
+public static ref ulong FLECS_IDEcsGaugeID_ => ref *(ulong*)(FLECS_IDEcsGaugeID__Ptr == null ? FLECS_IDEcsGaugeID__Ptr = FLECS_IDEcsGaugeID__BindgenGetExtern() : FLECS_IDEcsGaugeID__Ptr);
+public static ref ulong FLECS_IDEcsIdentifierID_ => ref *(ulong*)(FLECS_IDEcsIdentifierID__Ptr == null ? FLECS_IDEcsIdentifierID__Ptr = FLECS_IDEcsIdentifierID__BindgenGetExtern() : FLECS_IDEcsIdentifierID__Ptr);
+public static ref ulong FLECS_IDEcsMemberID_ => ref *(ulong*)(FLECS_IDEcsMemberID__Ptr == null ? FLECS_IDEcsMemberID__Ptr = FLECS_IDEcsMemberID__BindgenGetExtern() : FLECS_IDEcsMemberID__Ptr);
+public static ref ulong FLECS_IDEcsMemberRangesID_ => ref *(ulong*)(FLECS_IDEcsMemberRangesID__Ptr == null ? FLECS_IDEcsMemberRangesID__Ptr = FLECS_IDEcsMemberRangesID__BindgenGetExtern() : FLECS_IDEcsMemberRangesID__Ptr);
+public static ref ulong FLECS_IDEcsMetricID_ => ref *(ulong*)(FLECS_IDEcsMetricID__Ptr == null ? FLECS_IDEcsMetricID__Ptr = FLECS_IDEcsMetricID__BindgenGetExtern() : FLECS_IDEcsMetricID__Ptr);
+public static ref ulong FLECS_IDEcsMetricInstanceID_ => ref *(ulong*)(FLECS_IDEcsMetricInstanceID__Ptr == null ? FLECS_IDEcsMetricInstanceID__Ptr = FLECS_IDEcsMetricInstanceID__BindgenGetExtern() : FLECS_IDEcsMetricInstanceID__Ptr);
+public static ref ulong FLECS_IDEcsMetricSourceID_ => ref *(ulong*)(FLECS_IDEcsMetricSourceID__Ptr == null ? FLECS_IDEcsMetricSourceID__Ptr = FLECS_IDEcsMetricSourceID__BindgenGetExtern() : FLECS_IDEcsMetricSourceID__Ptr);
+public static ref ulong FLECS_IDEcsMetricValueID_ => ref *(ulong*)(FLECS_IDEcsMetricValueID__Ptr == null ? FLECS_IDEcsMetricValueID__Ptr = FLECS_IDEcsMetricValueID__BindgenGetExtern() : FLECS_IDEcsMetricValueID__Ptr);
+public static ref ulong FLECS_IDEcsOpaqueID_ => ref *(ulong*)(FLECS_IDEcsOpaqueID__Ptr == null ? FLECS_IDEcsOpaqueID__Ptr = FLECS_IDEcsOpaqueID__BindgenGetExtern() : FLECS_IDEcsOpaqueID__Ptr);
+public static ref ulong FLECS_IDEcsParentID_ => ref *(ulong*)(FLECS_IDEcsParentID__Ptr == null ? FLECS_IDEcsParentID__Ptr = FLECS_IDEcsParentID__BindgenGetExtern() : FLECS_IDEcsParentID__Ptr);
+public static ref ulong FLECS_IDEcsPipelineID_ => ref *(ulong*)(FLECS_IDEcsPipelineID__Ptr == null ? FLECS_IDEcsPipelineID__Ptr = FLECS_IDEcsPipelineID__BindgenGetExtern() : FLECS_IDEcsPipelineID__Ptr);
+public static ref ulong FLECS_IDEcsPipelineStatsID_ => ref *(ulong*)(FLECS_IDEcsPipelineStatsID__Ptr == null ? FLECS_IDEcsPipelineStatsID__Ptr = FLECS_IDEcsPipelineStatsID__BindgenGetExtern() : FLECS_IDEcsPipelineStatsID__Ptr);
+public static ref ulong FLECS_IDEcsPolyID_ => ref *(ulong*)(FLECS_IDEcsPolyID__Ptr == null ? FLECS_IDEcsPolyID__Ptr = FLECS_IDEcsPolyID__BindgenGetExtern() : FLECS_IDEcsPolyID__Ptr);
+public static ref ulong FLECS_IDEcsPrimitiveID_ => ref *(ulong*)(FLECS_IDEcsPrimitiveID__Ptr == null ? FLECS_IDEcsPrimitiveID__Ptr = FLECS_IDEcsPrimitiveID__BindgenGetExtern() : FLECS_IDEcsPrimitiveID__Ptr);
+public static ref ulong FLECS_IDEcsRateFilterID_ => ref *(ulong*)(FLECS_IDEcsRateFilterID__Ptr == null ? FLECS_IDEcsRateFilterID__Ptr = FLECS_IDEcsRateFilterID__BindgenGetExtern() : FLECS_IDEcsRateFilterID__Ptr);
+public static ref ulong FLECS_IDEcsRestID_ => ref *(ulong*)(FLECS_IDEcsRestID__Ptr == null ? FLECS_IDEcsRestID__Ptr = FLECS_IDEcsRestID__BindgenGetExtern() : FLECS_IDEcsRestID__Ptr);
+public static ref ulong FLECS_IDEcsScriptConstVarID_ => ref *(ulong*)(FLECS_IDEcsScriptConstVarID__Ptr == null ? FLECS_IDEcsScriptConstVarID__Ptr = FLECS_IDEcsScriptConstVarID__BindgenGetExtern() : FLECS_IDEcsScriptConstVarID__Ptr);
+public static ref ulong FLECS_IDEcsScriptFunctionID_ => ref *(ulong*)(FLECS_IDEcsScriptFunctionID__Ptr == null ? FLECS_IDEcsScriptFunctionID__Ptr = FLECS_IDEcsScriptFunctionID__BindgenGetExtern() : FLECS_IDEcsScriptFunctionID__Ptr);
+public static ref ulong FLECS_IDEcsScriptID_ => ref *(ulong*)(FLECS_IDEcsScriptID__Ptr == null ? FLECS_IDEcsScriptID__Ptr = FLECS_IDEcsScriptID__BindgenGetExtern() : FLECS_IDEcsScriptID__Ptr);
+public static ref ulong FLECS_IDEcsScriptMethodID_ => ref *(ulong*)(FLECS_IDEcsScriptMethodID__Ptr == null ? FLECS_IDEcsScriptMethodID__Ptr = FLECS_IDEcsScriptMethodID__BindgenGetExtern() : FLECS_IDEcsScriptMethodID__Ptr);
+public static ref ulong FLECS_IDEcsScriptTemplateID_ => ref *(ulong*)(FLECS_IDEcsScriptTemplateID__Ptr == null ? FLECS_IDEcsScriptTemplateID__Ptr = FLECS_IDEcsScriptTemplateID__BindgenGetExtern() : FLECS_IDEcsScriptTemplateID__Ptr);
+public static ref ulong FLECS_IDEcsScriptVectorTypeID_ => ref *(ulong*)(FLECS_IDEcsScriptVectorTypeID__Ptr == null ? FLECS_IDEcsScriptVectorTypeID__Ptr = FLECS_IDEcsScriptVectorTypeID__BindgenGetExtern() : FLECS_IDEcsScriptVectorTypeID__Ptr);
+public static ref ulong FLECS_IDEcsStructID_ => ref *(ulong*)(FLECS_IDEcsStructID__Ptr == null ? FLECS_IDEcsStructID__Ptr = FLECS_IDEcsStructID__BindgenGetExtern() : FLECS_IDEcsStructID__Ptr);
+public static ref ulong FLECS_IDEcsSystemStatsID_ => ref *(ulong*)(FLECS_IDEcsSystemStatsID__Ptr == null ? FLECS_IDEcsSystemStatsID__Ptr = FLECS_IDEcsSystemStatsID__BindgenGetExtern() : FLECS_IDEcsSystemStatsID__Ptr);
+public static ref ulong FLECS_IDEcsTickSourceID_ => ref *(ulong*)(FLECS_IDEcsTickSourceID__Ptr == null ? FLECS_IDEcsTickSourceID__Ptr = FLECS_IDEcsTickSourceID__BindgenGetExtern() : FLECS_IDEcsTickSourceID__Ptr);
+public static ref ulong FLECS_IDEcsTimerID_ => ref *(ulong*)(FLECS_IDEcsTimerID__Ptr == null ? FLECS_IDEcsTimerID__Ptr = FLECS_IDEcsTimerID__BindgenGetExtern() : FLECS_IDEcsTimerID__Ptr);
+public static ref ulong FLECS_IDEcsTreeSpawnerID_ => ref *(ulong*)(FLECS_IDEcsTreeSpawnerID__Ptr == null ? FLECS_IDEcsTreeSpawnerID__Ptr = FLECS_IDEcsTreeSpawnerID__BindgenGetExtern() : FLECS_IDEcsTreeSpawnerID__Ptr);
+public static ref ulong FLECS_IDEcsTypeID_ => ref *(ulong*)(FLECS_IDEcsTypeID__Ptr == null ? FLECS_IDEcsTypeID__Ptr = FLECS_IDEcsTypeID__BindgenGetExtern() : FLECS_IDEcsTypeID__Ptr);
+public static ref ulong FLECS_IDEcsTypeSerializerID_ => ref *(ulong*)(FLECS_IDEcsTypeSerializerID__Ptr == null ? FLECS_IDEcsTypeSerializerID__Ptr = FLECS_IDEcsTypeSerializerID__BindgenGetExtern() : FLECS_IDEcsTypeSerializerID__Ptr);
+public static ref ulong FLECS_IDEcsUnitID_ => ref *(ulong*)(FLECS_IDEcsUnitID__Ptr == null ? FLECS_IDEcsUnitID__Ptr = FLECS_IDEcsUnitID__BindgenGetExtern() : FLECS_IDEcsUnitID__Ptr);
+public static ref ulong FLECS_IDEcsUnitPrefixID_ => ref *(ulong*)(FLECS_IDEcsUnitPrefixID__Ptr == null ? FLECS_IDEcsUnitPrefixID__Ptr = FLECS_IDEcsUnitPrefixID__BindgenGetExtern() : FLECS_IDEcsUnitPrefixID__Ptr);
+public static ref ulong FLECS_IDEcsVectorID_ => ref *(ulong*)(FLECS_IDEcsVectorID__Ptr == null ? FLECS_IDEcsVectorID__Ptr = FLECS_IDEcsVectorID__BindgenGetExtern() : FLECS_IDEcsVectorID__Ptr);
+public static ref ulong FLECS_IDEcsWorldMemoryID_ => ref *(ulong*)(FLECS_IDEcsWorldMemoryID__Ptr == null ? FLECS_IDEcsWorldMemoryID__Ptr = FLECS_IDEcsWorldMemoryID__BindgenGetExtern() : FLECS_IDEcsWorldMemoryID__Ptr);
+public static ref ulong FLECS_IDEcsWorldStatsID_ => ref *(ulong*)(FLECS_IDEcsWorldStatsID__Ptr == null ? FLECS_IDEcsWorldStatsID__Ptr = FLECS_IDEcsWorldStatsID__BindgenGetExtern() : FLECS_IDEcsWorldStatsID__Ptr);
+public static ref ulong FLECS_IDEcsWorldSummaryID_ => ref *(ulong*)(FLECS_IDEcsWorldSummaryID__Ptr == null ? FLECS_IDEcsWorldSummaryID__Ptr = FLECS_IDEcsWorldSummaryID__BindgenGetExtern() : FLECS_IDEcsWorldSummaryID__Ptr);
+public static ref ulong FLECS_IDFlecsAlertsID_ => ref *(ulong*)(FLECS_IDFlecsAlertsID__Ptr == null ? FLECS_IDFlecsAlertsID__Ptr = FLECS_IDFlecsAlertsID__BindgenGetExtern() : FLECS_IDFlecsAlertsID__Ptr);
+public static ref ulong FLECS_IDFlecsMetricsID_ => ref *(ulong*)(FLECS_IDFlecsMetricsID__Ptr == null ? FLECS_IDFlecsMetricsID__Ptr = FLECS_IDFlecsMetricsID__BindgenGetExtern() : FLECS_IDFlecsMetricsID__Ptr);
+public static ref ulong FLECS_IDFlecsStatsID_ => ref *(ulong*)(FLECS_IDFlecsStatsID__Ptr == null ? FLECS_IDFlecsStatsID__Ptr = FLECS_IDFlecsStatsID__BindgenGetExtern() : FLECS_IDFlecsStatsID__Ptr);
+
+public partial struct ecs_allocator_t : IEquatable<ecs_allocator_t>
+{
+    public bool Equals(ecs_allocator_t other)
+    {
+        fixed (ecs_allocator_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_allocator_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_allocator_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_allocator_t left, ecs_allocator_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_allocator_t left, ecs_allocator_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_allocator_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_type_t : IEquatable<ecs_type_t>
+{
+    public bool Equals(ecs_type_t other)
+    {
+        fixed (ecs_type_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_type_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_type_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_type_t left, ecs_type_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_type_t left, ecs_type_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_type_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_t : IEquatable<ecs_world_t>
+{
+    public bool Equals(ecs_world_t other)
+    {
+        fixed (ecs_world_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_world_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_world_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_world_t left, ecs_world_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_world_t left, ecs_world_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_world_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_stage_t : IEquatable<ecs_stage_t>
+{
+    public bool Equals(ecs_stage_t other)
+    {
+        fixed (ecs_stage_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_stage_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stage_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_stage_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_stage_t left, ecs_stage_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_stage_t left, ecs_stage_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_stage_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stage_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_t : IEquatable<ecs_table_t>
+{
+    public bool Equals(ecs_table_t other)
+    {
+        fixed (ecs_table_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_t left, ecs_table_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_t left, ecs_table_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_term_t : IEquatable<ecs_term_t>
+{
+    public bool Equals(ecs_term_t other)
+    {
+        fixed (ecs_term_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_term_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_term_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_term_t left, ecs_term_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_term_t left, ecs_term_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_term_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_query_t : IEquatable<ecs_query_t>
+{
+    public bool Equals(ecs_query_t other)
+    {
+        fixed (ecs_query_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_t left, ecs_query_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_t left, ecs_query_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_observer_t : IEquatable<ecs_observer_t>
+{
+    public bool Equals(ecs_observer_t other)
+    {
+        fixed (ecs_observer_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_observer_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observer_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_observer_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_observer_t left, ecs_observer_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_observer_t left, ecs_observer_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_observer_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observer_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_observable_t : IEquatable<ecs_observable_t>
+{
+    public bool Equals(ecs_observable_t other)
+    {
+        fixed (ecs_observable_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_observable_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observable_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_observable_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_observable_t left, ecs_observable_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_observable_t left, ecs_observable_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_observable_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observable_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_iter_t : IEquatable<ecs_iter_t>
+{
+    public bool Equals(ecs_iter_t other)
+    {
+        fixed (ecs_iter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_iter_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_iter_t left, ecs_iter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_iter_t left, ecs_iter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_ref_t : IEquatable<ecs_ref_t>
+{
+    public bool Equals(ecs_ref_t other)
+    {
+        fixed (ecs_ref_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_ref_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_ref_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_ref_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_ref_t left, ecs_ref_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_ref_t left, ecs_ref_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_ref_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_ref_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_type_hooks_t : IEquatable<ecs_type_hooks_t>
+{
+    public bool Equals(ecs_type_hooks_t other)
+    {
+        fixed (ecs_type_hooks_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_type_hooks_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_hooks_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_type_hooks_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_type_hooks_t left, ecs_type_hooks_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_type_hooks_t left, ecs_type_hooks_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_type_hooks_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_hooks_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_type_info_t : IEquatable<ecs_type_info_t>
+{
+    public bool Equals(ecs_type_info_t other)
+    {
+        fixed (ecs_type_info_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_type_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_info_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_type_info_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_type_info_t left, ecs_type_info_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_type_info_t left, ecs_type_info_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_type_info_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_info_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_record_t : IEquatable<ecs_record_t>
+{
+    public bool Equals(ecs_record_t other)
+    {
+        fixed (ecs_record_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_record_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_record_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_record_t left, ecs_record_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_record_t left, ecs_record_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_record_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_record_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_component_record_t : IEquatable<ecs_component_record_t>
+{
+    public bool Equals(ecs_component_record_t other)
+    {
+        fixed (ecs_component_record_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_component_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_record_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_component_record_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_component_record_t left, ecs_component_record_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_component_record_t left, ecs_component_record_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_component_record_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_record_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_mixins_t : IEquatable<ecs_mixins_t>
+{
+    public bool Equals(ecs_mixins_t other)
+    {
+        fixed (ecs_mixins_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_mixins_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_mixins_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_mixins_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_mixins_t left, ecs_mixins_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_mixins_t left, ecs_mixins_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_mixins_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_mixins_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_header_t : IEquatable<ecs_header_t>
+{
+    public bool Equals(ecs_header_t other)
+    {
+        fixed (ecs_header_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_header_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_header_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_header_t left, ecs_header_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_header_t left, ecs_header_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_header_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_header_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_record_t : IEquatable<ecs_table_record_t>
+{
+    public bool Equals(ecs_table_record_t other)
+    {
+        fixed (ecs_table_record_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_record_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_record_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_record_t left, ecs_table_record_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_record_t left, ecs_table_record_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_record_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_record_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_vec_t : IEquatable<ecs_vec_t>
+{
+    public bool Equals(ecs_vec_t other)
+    {
+        fixed (ecs_vec_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_vec_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vec_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_vec_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_vec_t left, ecs_vec_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_vec_t left, ecs_vec_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_vec_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vec_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_sparse_page_t : IEquatable<ecs_sparse_page_t>
+{
+    public bool Equals(ecs_sparse_page_t other)
+    {
+        fixed (ecs_sparse_page_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_sparse_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_page_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_sparse_page_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_sparse_page_t left, ecs_sparse_page_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_sparse_page_t left, ecs_sparse_page_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_sparse_page_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_page_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_sparse_t : IEquatable<ecs_sparse_t>
+{
+    public bool Equals(ecs_sparse_t other)
+    {
+        fixed (ecs_sparse_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_sparse_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_sparse_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_sparse_t left, ecs_sparse_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_sparse_t left, ecs_sparse_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_sparse_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_block_allocator_t : IEquatable<ecs_block_allocator_t>
+{
+    public bool Equals(ecs_block_allocator_t other)
+    {
+        fixed (ecs_block_allocator_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_block_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_block_allocator_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_block_allocator_t left, ecs_block_allocator_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_block_allocator_t left, ecs_block_allocator_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_block_allocator_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_map_t : IEquatable<ecs_map_t>
+{
+    public bool Equals(ecs_map_t other)
+    {
+        fixed (ecs_map_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_map_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_map_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_map_t left, ecs_map_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_map_t left, ecs_map_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_map_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_block_allocator_block_t : IEquatable<ecs_block_allocator_block_t>
+{
+    public bool Equals(ecs_block_allocator_block_t other)
+    {
+        fixed (ecs_block_allocator_block_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_block_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_block_allocator_block_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_block_allocator_block_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_block_allocator_chunk_header_t : IEquatable<ecs_block_allocator_chunk_header_t>
+{
+    public bool Equals(ecs_block_allocator_chunk_header_t other)
+    {
+        fixed (ecs_block_allocator_chunk_header_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_chunk_header_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_block_allocator_chunk_header_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_block_allocator_chunk_header_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_stack_page_t : IEquatable<ecs_stack_page_t>
+{
+    public bool Equals(ecs_stack_page_t other)
+    {
+        fixed (ecs_stack_page_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_stack_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_page_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_stack_page_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_stack_page_t left, ecs_stack_page_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_stack_page_t left, ecs_stack_page_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_stack_page_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_page_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_stack_cursor_t : IEquatable<ecs_stack_cursor_t>
+{
+    public bool Equals(ecs_stack_cursor_t other)
+    {
+        fixed (ecs_stack_cursor_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_stack_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_cursor_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_stack_cursor_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_stack_cursor_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_cursor_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_stack_t : IEquatable<ecs_stack_t>
+{
+    public bool Equals(ecs_stack_t other)
+    {
+        fixed (ecs_stack_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_stack_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_stack_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_stack_t left, ecs_stack_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_stack_t left, ecs_stack_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_stack_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_bucket_entry_t : IEquatable<ecs_bucket_entry_t>
+{
+    public bool Equals(ecs_bucket_entry_t other)
+    {
+        fixed (ecs_bucket_entry_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_bucket_entry_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_entry_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_bucket_entry_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_bucket_entry_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_entry_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_bucket_t : IEquatable<ecs_bucket_t>
+{
+    public bool Equals(ecs_bucket_t other)
+    {
+        fixed (ecs_bucket_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_bucket_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_bucket_t left, ecs_bucket_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_bucket_t left, ecs_bucket_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_bucket_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_map_iter_t : IEquatable<ecs_map_iter_t>
+{
+    public bool Equals(ecs_map_iter_t other)
+    {
+        fixed (ecs_map_iter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_map_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_iter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_map_iter_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_map_iter_t left, ecs_map_iter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_map_iter_t left, ecs_map_iter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_map_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_iter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_strbuf_list_elem : IEquatable<ecs_strbuf_list_elem>
+{
+    public bool Equals(ecs_strbuf_list_elem other)
+    {
+        fixed (ecs_strbuf_list_elem* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_strbuf_list_elem other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_strbuf_list_elem* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_strbuf_t : IEquatable<ecs_strbuf_t>
+{
+    public bool Equals(ecs_strbuf_t other)
+    {
+        fixed (ecs_strbuf_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_strbuf_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_strbuf_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_strbuf_t left, ecs_strbuf_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_strbuf_t left, ecs_strbuf_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_strbuf_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_time_t : IEquatable<ecs_time_t>
+{
+    public bool Equals(ecs_time_t other)
+    {
+        fixed (ecs_time_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_time_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_time_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_time_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_time_t left, ecs_time_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_time_t left, ecs_time_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_time_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_time_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_os_api_t : IEquatable<ecs_os_api_t>
+{
+    public bool Equals(ecs_os_api_t other)
+    {
+        fixed (ecs_os_api_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_os_api_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_os_api_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_os_api_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_os_api_t left, ecs_os_api_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_os_api_t left, ecs_os_api_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_os_api_t* __self = &this)
         {
-            public ecs_script_parameter_t Item0;
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_os_api_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_term_ref_t : IEquatable<ecs_term_ref_t>
+{
+    public bool Equals(ecs_term_ref_t other)
     {
-        [InlineArray(32)]
-        public partial struct ecs_meta_scope_t_32
+        fixed (ecs_term_ref_t* __self = &this)
         {
-            public ecs_meta_scope_t Item0;
+            return new Span<byte>(__self, sizeof(ecs_term_ref_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_ref_t)));
         }
     }
 
-    public partial struct InlineArrays
+    public override bool Equals(object? obj)
     {
-        [InlineArray(32)]
-        public partial struct ecs_enum_constant_t_32
-        {
-            public ecs_enum_constant_t Item0;
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        [InlineArray(32)]
-        public partial struct ecs_bitmask_constant_t_32
-        {
-            public ecs_bitmask_constant_t Item0;
-        }
-    }
-
-    public partial struct InlineArrays
-    {
-        [InlineArray(32)]
-        public partial struct ecs_member_t_32
-        {
-            public ecs_member_t Item0;
-        }
-    }
-
-    public const int ECS_ACCESS_VIOLATION = 40;
-
-    public const int ECS_ALERT_MAX_SEVERITY_FILTERS = 4;
-
-    public const int ECS_ALREADY_DEFINED = 8;
-
-    public const int ECS_ALREADY_IN_USE = 30;
-
-    public const string ECS_BLACK = "[1;30m";
-
-    public const string ECS_BLUE = "[0;34m";
-
-    public const string ECS_BOLD = "[1;49m";
-
-    public const int ECS_CLANG_VERSION = 16;
-
-    public const int ECS_COLUMN_INDEX_OUT_OF_RANGE = 41;
-
-    public const int ECS_COLUMN_IS_NOT_SHARED = 42;
-
-    public const int ECS_COLUMN_IS_SHARED = 43;
-
-    public const int ECS_COLUMN_TYPE_MISMATCH = 45;
-
-    public const ulong ECS_COMPONENT_MASK = 1152921504606846975;
-
-    public const int ECS_COMPONENT_NOT_REGISTERED = 25;
-
-    public const int ECS_CONSTRAINT_VIOLATED = 3;
-
-    public const string ECS_CYAN = "[0;36m";
-
-    public const int ECS_CYCLE_DETECTED = 13;
-
-    public const int ECS_DOUBLE_FREE = 15;
-
-    public const ulong ECS_ENTITY_MASK = 4294967295;
-
-    public const ulong ECS_GENERATION_MASK = 281470681743360;
-
-    public const string ECS_GREEN = "[0;32m";
-
-    public const string ECS_GREY = "[0;37m";
-
-    public const int ECS_HTTP_HEADER_COUNT_MAX = 32;
-
-    public const int ECS_HTTP_QUERY_PARAM_COUNT_MAX = 32;
-
-    public const ulong ECS_ID_FLAGS_MASK = 17293822569102704640;
-
-    public const int ECS_INCONSISTENT_COMPONENT_ACTION = 27;
-
-    public const int ECS_INCONSISTENT_COMPONENT_ID = 26;
-
-    public const int ECS_INCONSISTENT_NAME = 20;
-
-    public const int ECS_INTERNAL_ERROR = 7;
-
-    public const int ECS_INVALID_COMPONENT_ALIGNMENT = 24;
-
-    public const int ECS_INVALID_COMPONENT_SIZE = 23;
-
-    public const int ECS_INVALID_CONVERSION = 11;
-
-    public const int ECS_INVALID_FROM_WORKER = 72;
-
-    public const int ECS_INVALID_OPERATION = 1;
-
-    public const int ECS_INVALID_PARAMETER = 2;
-
-    public const int ECS_INVALID_WHILE_READONLY = 70;
-
-    public const int ECS_LEAK_DETECTED = 14;
-
-    public const int ECS_LOCKED_STORAGE = 71;
-
-    public const string ECS_MAGENTA = "[0;35m";
-
-    public const uint ECS_MAX_COMPONENT_ID = 268435455;
-
-    public const int ECS_MAX_RECURSION = 512;
-
-    public const int ECS_MAX_TOKEN_SIZE = 256;
-
-    public const int ECS_MEMBER_DESC_CACHE_SIZE = 32;
-
-    public const int ECS_META_MAX_SCOPE_DEPTH = 32;
-
-    public const int ECS_MISSING_OS_API = 9;
-
-    public const int ECS_MISSING_SYMBOL = 29;
-
-    public const int ECS_MODULE_UNDEFINED = 28;
-
-    public const int ECS_NAME_IN_USE = 21;
-
-    public const string ECS_NORMAL = "[0;49m";
-
-    public const int ecs_observer_t_magic = 1701016418;
-
-    public const int ECS_OPERATION_FAILED = 10;
-
-    public const int ECS_OUT_OF_MEMORY = 4;
-
-    public const int ECS_OUT_OF_RANGE = 5;
-
-    public const int ecs_query_t_magic = 1701016437;
-
-    public const string ECS_RED = "[0;31m";
-
-    public const int ECS_REST_DEFAULT_PORT = 27750;
-
-    public const uint ECS_ROW_FLAGS_MASK = 4026531840;
-
-    public const uint ECS_ROW_MASK = 268435455;
-
-    public const int ecs_stage_t_magic = 1701016435;
-
-    public const int ECS_STAT_WINDOW = 60;
-
-    public const int ECS_STRBUF_MAX_LIST_DEPTH = 32;
-
-    public const int ECS_STRBUF_SMALL_STRING_SIZE = 512;
-
-    public const int ECS_TABLE_MEMORY_HISTOGRAM_BUCKET_COUNT = 14;
-
-    public const int ECS_TABLE_MEMORY_HISTOGRAM_MAX_COUNT = 16384;
-
-    public const uint ECS_TYPE_HOOK_CMP = 256;
-
-    public const uint ECS_TYPE_HOOK_CMP_ILLEGAL = 524288;
-
-    public const uint ECS_TYPE_HOOK_COPY = 4;
-
-    public const uint ECS_TYPE_HOOK_COPY_CTOR = 16;
-
-    public const uint ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL = 32768;
-
-    public const uint ECS_TYPE_HOOK_COPY_ILLEGAL = 8192;
-
-    public const uint ECS_TYPE_HOOK_CTOR = 1;
-
-    public const uint ECS_TYPE_HOOK_CTOR_ILLEGAL = 1024;
-
-    public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR = 64;
-
-    public const uint ECS_TYPE_HOOK_CTOR_MOVE_DTOR_ILLEGAL = 131072;
-
-    public const uint ECS_TYPE_HOOK_DTOR = 2;
-
-    public const uint ECS_TYPE_HOOK_DTOR_ILLEGAL = 4096;
-
-    public const uint ECS_TYPE_HOOK_EQUALS = 512;
-
-    public const uint ECS_TYPE_HOOK_EQUALS_ILLEGAL = 1048576;
-
-    public const uint ECS_TYPE_HOOK_MOVE = 8;
-
-    public const uint ECS_TYPE_HOOK_MOVE_CTOR = 32;
-
-    public const uint ECS_TYPE_HOOK_MOVE_CTOR_ILLEGAL = 65536;
-
-    public const uint ECS_TYPE_HOOK_MOVE_DTOR = 128;
-
-    public const uint ECS_TYPE_HOOK_MOVE_DTOR_ILLEGAL = 262144;
-
-    public const uint ECS_TYPE_HOOK_MOVE_ILLEGAL = 16384;
-
-    public const uint ECS_TYPE_HOOKS = 1023;
-
-    public const uint ECS_TYPE_HOOKS_ILLEGAL = 2094080;
-
-    public const int ECS_UNSUPPORTED = 6;
-
-    public const string ECS_WHITE = "[1;37m";
-
-    public const int ecs_world_t_magic = 1701016439;
-
-    public const string ECS_YELLOW = "[0;33m";
-
-    public const uint EcsAperiodicComponentMonitors = 4;
-
-    public const uint EcsAperiodicEmptyQueries = 16;
-
-    public const ulong EcsCascade = 1152921504606846976;
-
-    public const ulong EcsDesc = 576460752303423488;
-
-    public const uint EcsEntityHasDontFragment = 268435456;
-
-    public const uint EcsEntityIsId = 2147483648;
-
-    public const uint EcsEntityIsTarget = 1073741824;
-
-    public const uint EcsEntityIsTraversable = 536870912;
-
-    public const uint EcsEventNoOnSet = 65536;
-
-    public const uint EcsEventTableOnly = 1048576;
-
-    public const int EcsFirstUserComponentId = 8;
-
-    public const int EcsFirstUserEntityId = 384;
-
-    public const uint EcsIdCanToggle = 8192;
-
-    public const uint EcsIdDontFragment = 4194304;
-
-    public const uint EcsIdEventMask = 20905984;
-
-    public const uint EcsIdExclusive = 512;
-
-    public const uint EcsIdHasOnAdd = 65536;
-
-    public const uint EcsIdHasOnRemove = 131072;
-
-    public const uint EcsIdHasOnSet = 262144;
-
-    public const uint EcsIdHasOnTableCreate = 524288;
-
-    public const uint EcsIdHasOnTableDelete = 1048576;
-
-    public const uint EcsIdInheritable = 32768;
-
-    public const uint EcsIdIsTransitive = 16384;
-
-    public const uint EcsIdMarkedForDelete = 1073741824;
-
-    public const uint EcsIdMatchDontFragment = 8388608;
-
-    public const uint EcsIdOnDeleteDelete = 2;
-
-    public const uint EcsIdOnDeleteMask = 7;
-
-    public const uint EcsIdOnDeletePanic = 4;
-
-    public const uint EcsIdOnDeleteRemove = 1;
-
-    public const uint EcsIdOnDeleteTargetDelete = 16;
-
-    public const uint EcsIdOnDeleteTargetMask = 56;
-
-    public const uint EcsIdOnDeleteTargetPanic = 32;
-
-    public const uint EcsIdOnDeleteTargetRemove = 8;
-
-    public const uint EcsIdOnInstantiateDontInherit = 256;
-
-    public const uint EcsIdOnInstantiateInherit = 128;
-
-    public const uint EcsIdOnInstantiateMask = 448;
-
-    public const uint EcsIdOnInstantiateOverride = 64;
-
-    public const uint EcsIdOrderedChildren = 16777216;
-
-    public const uint EcsIdPairIsTag = 2048;
-
-    public const uint EcsIdSingleton = 33554432;
-
-    public const uint EcsIdSparse = 2097152;
-
-    public const uint EcsIdTraversable = 1024;
-
-    public const uint EcsIdWith = 4096;
-
-    public const ulong EcsIsEntity = 144115188075855872;
-
-    public const ulong EcsIsName = 72057594037927936;
-
-    public const ulong EcsIsVariable = 288230376151711744;
-
-    public const uint EcsIterCached = 32768;
-
-    public const uint EcsIterCppEach = 524288;
-
-    public const uint EcsIterFixedInChangeComputed = 65536;
-
-    public const uint EcsIterFixedInChanged = 131072;
-
-    public const uint EcsIterHasCondSet = 64;
-
-    public const uint EcsIterIgnoreThis = 16;
-
-    public const uint EcsIterIsValid = 1;
-
-    public const uint EcsIterMatchEmptyTables = 8;
-
-    public const uint EcsIterNoData = 2;
-
-    public const uint EcsIterNoResults = 4;
-
-    public const uint EcsIterProfile = 128;
-
-    public const uint EcsIterSkip = 262144;
-
-    public const uint EcsIterTableOnly = 1048576;
-
-    public const uint EcsIterTrivialCached = 16384;
-
-    public const uint EcsIterTrivialChangeDetection = 32;
-
-    public const uint EcsIterTrivialSearch = 256;
-
-    public const uint EcsIterTrivialTest = 2048;
-
-    public const uint EcsNonTrivialIdInherit = 4;
-
-    public const uint EcsNonTrivialIdNonFragmenting = 2;
-
-    public const uint EcsNonTrivialIdSparse = 1;
-
-    public const uint EcsObserverBypassQuery = 128;
-
-    public const uint EcsObserverIsDisabled = 32;
-
-    public const uint EcsObserverIsMonitor = 16;
-
-    public const uint EcsObserverIsMulti = 8;
-
-    public const uint EcsObserverIsParentDisabled = 64;
-
-    public const uint EcsObserverKeepAlive = 2048;
-
-    public const uint EcsObserverMatchDisabled = 4;
-
-    public const uint EcsObserverMatchPrefab = 2;
-
-    public const uint EcsObserverYieldOnCreate = 256;
-
-    public const uint EcsObserverYieldOnDelete = 512;
-
-    public const uint EcsOsApiHighResolutionTimer = 1;
-
-    public const uint EcsOsApiLogWithColors = 2;
-
-    public const uint EcsOsApiLogWithTimeDelta = 8;
-
-    public const uint EcsOsApiLogWithTimeStamp = 4;
-
-    public const uint EcsQueryAllowUnresolvedByName = 64;
-
-    public const uint EcsQueryCacheYieldEmptyTables = 134217728;
-
-    public const uint EcsQueryDetectChanges = 256;
-
-    public const uint EcsQueryHasCacheable = 16777216;
-
-    public const uint EcsQueryHasChangeDetection = 4194304;
-
-    public const uint EcsQueryHasCondSet = 65536;
-
-    public const uint EcsQueryHasNonThisOutTerms = 2097152;
-
-    public const uint EcsQueryHasOutTerms = 1048576;
-
-    public const uint EcsQueryHasPred = 131072;
-
-    public const uint EcsQueryHasRefs = 524288;
-
-    public const uint EcsQueryHasScopes = 262144;
-
-    public const uint EcsQueryHasTableThisVar = 67108864;
-
-    public const uint EcsQueryIsCacheable = 33554432;
-
-    public const uint EcsQueryIsTrivial = 8388608;
-
-    public const uint EcsQueryMatchDisabled = 4;
-
-    public const uint EcsQueryMatchEmptyTables = 8;
-
-    public const uint EcsQueryMatchNothing = 32768;
-
-    public const uint EcsQueryMatchOnlySelf = 8192;
-
-    public const uint EcsQueryMatchOnlyThis = 4096;
-
-    public const uint EcsQueryMatchPrefab = 2;
-
-    public const uint EcsQueryMatchThis = 2048;
-
-    public const uint EcsQueryMatchWildcards = 16384;
-
-    public const uint EcsQueryNested = 536870912;
-
-    public const uint EcsQueryTableOnly = 128;
-
-    public const uint EcsQueryTrivialCache = 268435456;
-
-    public const uint EcsQueryValid = 1073741824;
-
-    public const ulong EcsSelf = 9223372036854775808;
-
-    public const uint EcsTableAddEdgeFlags = 2162688;
-
-    public const uint EcsTableEdgeFlags = 2293760;
-
-    public const uint EcsTableEdgeReparent = 268435456;
-
-    public const uint EcsTableHasAddActions = 329736;
-
-    public const uint EcsTableHasBuiltins = 2;
-
-    public const uint EcsTableHasChildOf = 32;
-
-    public const uint EcsTableHasCopy = 8192;
-
-    public const uint EcsTableHasCtors = 2048;
-
-    public const uint EcsTableHasDontFragment = 4194304;
-
-    public const uint EcsTableHasDtors = 4096;
-
-    public const uint EcsTableHasIsA = 8;
-
-    public const uint EcsTableHasLifecycle = 6144;
-
-    public const uint EcsTableHasModule = 256;
-
-    public const uint EcsTableHasMove = 16384;
-
-    public const uint EcsTableHasMultiIsA = 16;
-
-    public const uint EcsTableHasName = 64;
-
-    public const uint EcsTableHasOnAdd = 65536;
-
-    public const uint EcsTableHasOnRemove = 131072;
-
-    public const uint EcsTableHasOnSet = 262144;
-
-    public const uint EcsTableHasOnTableCreate = 524288;
-
-    public const uint EcsTableHasOnTableDelete = 1048576;
-
-    public const uint EcsTableHasOrderedChildren = 16777216;
-
-    public const uint EcsTableHasOverrides = 33554432;
-
-    public const uint EcsTableHasPairs = 128;
-
-    public const uint EcsTableHasRemoveActions = 135176;
-
-    public const uint EcsTableHasSparse = 2097152;
-
-    public const uint EcsTableHasToggle = 32768;
-
-    public const uint EcsTableHasTraversable = 134217728;
-
-    public const uint EcsTableIsComplex = 2136064;
-
-    public const uint EcsTableIsDisabled = 512;
-
-    public const uint EcsTableIsPrefab = 4;
-
-    public const uint EcsTableMarkedForDelete = 536870912;
-
-    public const uint EcsTableNotQueryable = 1024;
-
-    public const uint EcsTableOverrideDontFragment = 8388608;
-
-    public const uint EcsTableRemoveEdgeFlags = 19005440;
-
-    public const uint EcsTermDontFragment = 16384;
-
-    public const uint EcsTermIdInherited = 16;
-
-    public const uint EcsTermIsCacheable = 128;
-
-    public const uint EcsTermIsMember = 512;
-
-    public const uint EcsTermIsOr = 8192;
-
-    public const uint EcsTermIsScope = 256;
-
-    public const uint EcsTermIsSparse = 4096;
-
-    public const uint EcsTermIsToggle = 1024;
-
-    public const uint EcsTermIsTrivial = 32;
-
-    public const uint EcsTermMatchAny = 1;
-
-    public const uint EcsTermMatchAnySrc = 2;
-
-    public const ulong EcsTermRefFlags = 18374686479671623680;
-
-    public const uint EcsTermReflexive = 8;
-
-    public const uint EcsTermTransitive = 4;
-
-    public const ulong EcsTrav = 2305843009213693952;
-
-    public const ulong EcsTraverseFlags = 17870283321406128128;
-
-    public const ulong EcsUp = 4611686018427387904;
-
-    public const uint EcsWorldFini = 16;
-
-    public const uint EcsWorldFrameInProgress = 256;
-
-    public const uint EcsWorldInit = 4;
-
-    public const uint EcsWorldMeasureFrameTime = 32;
-
-    public const uint EcsWorldMeasureSystemTime = 64;
-
-    public const uint EcsWorldMultiThreaded = 128;
-
-    public const uint EcsWorldQuit = 8;
-
-    public const uint EcsWorldQuitWorkers = 1;
-
-    public const uint EcsWorldReadonly = 2;
-
-    public const int FLECS_DAG_DEPTH_MAX = 128;
-
-    public const int FLECS_ENTITY_PAGE_BITS = 10;
-
-    public const int FLECS_EVENT_DESC_MAX = 8;
-
-    public const int FLECS_HI_COMPONENT_ID = 256;
-
-    public const int FLECS_HI_ID_RECORD_ID = 1024;
-
-    public const int FLECS_ID_DESC_MAX = 32;
-
-    public const int FLECS_QUERY_SCOPE_NESTING_MAX = 8;
-
-    public const int FLECS_QUERY_VARIABLE_COUNT_MAX = 64;
-
-    public const int FLECS_SCRIPT_FUNCTION_ARGS_MAX = 16;
-
-    public const int FLECS_SPARSE_PAGE_BITS = 6;
-
-    public const int FLECS_SPARSE_PAGE_SIZE = 64;
-
-    public const int FLECS_STACK_PAGE_OFFSET = 32;
-
-    public const int FLECS_STACK_PAGE_SIZE = 992;
-
-    public const int FLECS_TERM_ARG_COUNT_MAX = 16;
-
-    public const int FLECS_TERM_COUNT_MAX = 32;
-
-    public const int FLECS_VARIABLE_COUNT_MAX = 64;
-
-    public const string FLECS_VERSION = "4.1.4";
-
-    public const int FLECS_VERSION_MAJOR = 4;
-
-    public const int FLECS_VERSION_MINOR = 1;
-
-    public const int FLECS_VERSION_PATCH = 4;
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_AUTO_OVERRIDE_BindgenGetExtern")]
-    private static extern void* ECS_AUTO_OVERRIDE_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_block_allocator_alloc_count_BindgenGetExtern")]
-    private static extern void* ecs_block_allocator_alloc_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_block_allocator_free_count_BindgenGetExtern")]
-    private static extern void* ecs_block_allocator_free_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_busy_count_BindgenGetExtern")]
-    private static extern void* ecs_http_busy_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_handled_error_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_handled_error_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_handled_ok_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_handled_ok_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_invalid_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_invalid_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_not_handled_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_not_handled_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_preflight_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_preflight_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_request_received_count_BindgenGetExtern")]
-    private static extern void* ecs_http_request_received_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_send_error_count_BindgenGetExtern")]
-    private static extern void* ecs_http_send_error_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_http_send_ok_count_BindgenGetExtern")]
-    private static extern void* ecs_http_send_ok_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_BindgenGetExtern")]
-    private static extern void* ecs_os_api_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_calloc_count_BindgenGetExtern")]
-    private static extern void* ecs_os_api_calloc_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_free_count_BindgenGetExtern")]
-    private static extern void* ecs_os_api_free_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_malloc_count_BindgenGetExtern")]
-    private static extern void* ecs_os_api_malloc_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_os_api_realloc_count_BindgenGetExtern")]
-    private static extern void* ecs_os_api_realloc_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_PAIR_BindgenGetExtern")]
-    private static extern void* ECS_PAIR_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_stack_allocator_alloc_count_BindgenGetExtern")]
-    private static extern void* ecs_stack_allocator_alloc_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ecs_stack_allocator_free_count_BindgenGetExtern")]
-    private static extern void* ecs_stack_allocator_free_count_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "ECS_TOGGLE_BindgenGetExtern")]
-    private static extern void* ECS_TOGGLE_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAcceleration_BindgenGetExtern")]
-    private static extern void* EcsAcceleration_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAcyclic_BindgenGetExtern")]
-    private static extern void* EcsAcyclic_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertCritical_BindgenGetExtern")]
-    private static extern void* EcsAlertCritical_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertError_BindgenGetExtern")]
-    private static extern void* EcsAlertError_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertInfo_BindgenGetExtern")]
-    private static extern void* EcsAlertInfo_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlertWarning_BindgenGetExtern")]
-    private static extern void* EcsAlertWarning_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAlias_BindgenGetExtern")]
-    private static extern void* EcsAlias_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAmount_BindgenGetExtern")]
-    private static extern void* EcsAmount_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAmpere_BindgenGetExtern")]
-    private static extern void* EcsAmpere_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAngle_BindgenGetExtern")]
-    private static extern void* EcsAngle_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAny_BindgenGetExtern")]
-    private static extern void* EcsAny_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsAtto_BindgenGetExtern")]
-    private static extern void* EcsAtto_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBar_BindgenGetExtern")]
-    private static extern void* EcsBar_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBel_BindgenGetExtern")]
-    private static extern void* EcsBel_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBits_BindgenGetExtern")]
-    private static extern void* EcsBits_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBitsPerSecond_BindgenGetExtern")]
-    private static extern void* EcsBitsPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBytes_BindgenGetExtern")]
-    private static extern void* EcsBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsBytesPerSecond_BindgenGetExtern")]
-    private static extern void* EcsBytesPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCandela_BindgenGetExtern")]
-    private static extern void* EcsCandela_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCanToggle_BindgenGetExtern")]
-    private static extern void* EcsCanToggle_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCelsius_BindgenGetExtern")]
-    private static extern void* EcsCelsius_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCenti_BindgenGetExtern")]
-    private static extern void* EcsCenti_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCentiMeters_BindgenGetExtern")]
-    private static extern void* EcsCentiMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsChildOf_BindgenGetExtern")]
-    private static extern void* EcsChildOf_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColor_BindgenGetExtern")]
-    private static extern void* EcsColor_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorCss_BindgenGetExtern")]
-    private static extern void* EcsColorCss_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorHsl_BindgenGetExtern")]
-    private static extern void* EcsColorHsl_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsColorRgb_BindgenGetExtern")]
-    private static extern void* EcsColorRgb_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsConstant_BindgenGetExtern")]
-    private static extern void* EcsConstant_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounter_BindgenGetExtern")]
-    private static extern void* EcsCounter_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounterId_BindgenGetExtern")]
-    private static extern void* EcsCounterId_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsCounterIncrement_BindgenGetExtern")]
-    private static extern void* EcsCounterIncrement_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsData_BindgenGetExtern")]
-    private static extern void* EcsData_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDataRate_BindgenGetExtern")]
-    private static extern void* EcsDataRate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDate_BindgenGetExtern")]
-    private static extern void* EcsDate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDays_BindgenGetExtern")]
-    private static extern void* EcsDays_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeca_BindgenGetExtern")]
-    private static extern void* EcsDeca_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeci_BindgenGetExtern")]
-    private static extern void* EcsDeci_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDeciBel_BindgenGetExtern")]
-    private static extern void* EcsDeciBel_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDegrees_BindgenGetExtern")]
-    private static extern void* EcsDegrees_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDelete_BindgenGetExtern")]
-    private static extern void* EcsDelete_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDependsOn_BindgenGetExtern")]
-    private static extern void* EcsDependsOn_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDisabled_BindgenGetExtern")]
-    private static extern void* EcsDisabled_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocBrief_BindgenGetExtern")]
-    private static extern void* EcsDocBrief_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocColor_BindgenGetExtern")]
-    private static extern void* EcsDocColor_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocDetail_BindgenGetExtern")]
-    private static extern void* EcsDocDetail_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocLink_BindgenGetExtern")]
-    private static extern void* EcsDocLink_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDocUuid_BindgenGetExtern")]
-    private static extern void* EcsDocUuid_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontFragment_BindgenGetExtern")]
-    private static extern void* EcsDontFragment_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDontInherit_BindgenGetExtern")]
-    private static extern void* EcsDontInherit_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsDuration_BindgenGetExtern")]
-    private static extern void* EcsDuration_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsElectricCurrent_BindgenGetExtern")]
-    private static extern void* EcsElectricCurrent_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsEmpty_BindgenGetExtern")]
-    private static extern void* EcsEmpty_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExa_BindgenGetExtern")]
-    private static extern void* EcsExa_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExbi_BindgenGetExtern")]
-    private static extern void* EcsExbi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsExclusive_BindgenGetExtern")]
-    private static extern void* EcsExclusive_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFahrenheit_BindgenGetExtern")]
-    private static extern void* EcsFahrenheit_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFemto_BindgenGetExtern")]
-    private static extern void* EcsFemto_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFinal_BindgenGetExtern")]
-    private static extern void* EcsFinal_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFlecs_BindgenGetExtern")]
-    private static extern void* EcsFlecs_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFlecsCore_BindgenGetExtern")]
-    private static extern void* EcsFlecsCore_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsForce_BindgenGetExtern")]
-    private static extern void* EcsForce_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsFrequency_BindgenGetExtern")]
-    private static extern void* EcsFrequency_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGauge_BindgenGetExtern")]
-    private static extern void* EcsGauge_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGibi_BindgenGetExtern")]
-    private static extern void* EcsGibi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGibiBytes_BindgenGetExtern")]
-    private static extern void* EcsGibiBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGiga_BindgenGetExtern")]
-    private static extern void* EcsGiga_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBits_BindgenGetExtern")]
-    private static extern void* EcsGigaBits_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBitsPerSecond_BindgenGetExtern")]
-    private static extern void* EcsGigaBitsPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBytes_BindgenGetExtern")]
-    private static extern void* EcsGigaBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaBytesPerSecond_BindgenGetExtern")]
-    private static extern void* EcsGigaBytesPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGigaHertz_BindgenGetExtern")]
-    private static extern void* EcsGigaHertz_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsGrams_BindgenGetExtern")]
-    private static extern void* EcsGrams_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHecto_BindgenGetExtern")]
-    private static extern void* EcsHecto_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHertz_BindgenGetExtern")]
-    private static extern void* EcsHertz_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsHours_BindgenGetExtern")]
-    private static extern void* EcsHours_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsInherit_BindgenGetExtern")]
-    private static extern void* EcsInherit_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsInheritable_BindgenGetExtern")]
-    private static extern void* EcsInheritable_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsIsA_BindgenGetExtern")]
-    private static extern void* EcsIsA_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKelvin_BindgenGetExtern")]
-    private static extern void* EcsKelvin_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKibi_BindgenGetExtern")]
-    private static extern void* EcsKibi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKibiBytes_BindgenGetExtern")]
-    private static extern void* EcsKibiBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKilo_BindgenGetExtern")]
-    private static extern void* EcsKilo_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBits_BindgenGetExtern")]
-    private static extern void* EcsKiloBits_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBitsPerSecond_BindgenGetExtern")]
-    private static extern void* EcsKiloBitsPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBytes_BindgenGetExtern")]
-    private static extern void* EcsKiloBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloBytesPerSecond_BindgenGetExtern")]
-    private static extern void* EcsKiloBytesPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloGrams_BindgenGetExtern")]
-    private static extern void* EcsKiloGrams_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloHertz_BindgenGetExtern")]
-    private static extern void* EcsKiloHertz_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMeters_BindgenGetExtern")]
-    private static extern void* EcsKiloMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMetersPerHour_BindgenGetExtern")]
-    private static extern void* EcsKiloMetersPerHour_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsKiloMetersPerSecond_BindgenGetExtern")]
-    private static extern void* EcsKiloMetersPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsLength_BindgenGetExtern")]
-    private static extern void* EcsLength_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsLuminousIntensity_BindgenGetExtern")]
-    private static extern void* EcsLuminousIntensity_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMass_BindgenGetExtern")]
-    private static extern void* EcsMass_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMebi_BindgenGetExtern")]
-    private static extern void* EcsMebi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMebiBytes_BindgenGetExtern")]
-    private static extern void* EcsMebiBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMega_BindgenGetExtern")]
-    private static extern void* EcsMega_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBits_BindgenGetExtern")]
-    private static extern void* EcsMegaBits_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBitsPerSecond_BindgenGetExtern")]
-    private static extern void* EcsMegaBitsPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBytes_BindgenGetExtern")]
-    private static extern void* EcsMegaBytes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaBytesPerSecond_BindgenGetExtern")]
-    private static extern void* EcsMegaBytesPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMegaHertz_BindgenGetExtern")]
-    private static extern void* EcsMegaHertz_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMeters_BindgenGetExtern")]
-    private static extern void* EcsMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetersPerSecond_BindgenGetExtern")]
-    private static extern void* EcsMetersPerSecond_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetric_BindgenGetExtern")]
-    private static extern void* EcsMetric_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMetricInstance_BindgenGetExtern")]
-    private static extern void* EcsMetricInstance_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicro_BindgenGetExtern")]
-    private static extern void* EcsMicro_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicroMeters_BindgenGetExtern")]
-    private static extern void* EcsMicroMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMicroSeconds_BindgenGetExtern")]
-    private static extern void* EcsMicroSeconds_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMiles_BindgenGetExtern")]
-    private static extern void* EcsMiles_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilesPerHour_BindgenGetExtern")]
-    private static extern void* EcsMilesPerHour_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilli_BindgenGetExtern")]
-    private static extern void* EcsMilli_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilliMeters_BindgenGetExtern")]
-    private static extern void* EcsMilliMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMilliSeconds_BindgenGetExtern")]
-    private static extern void* EcsMilliSeconds_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMinutes_BindgenGetExtern")]
-    private static extern void* EcsMinutes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsModule_BindgenGetExtern")]
-    private static extern void* EcsModule_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMole_BindgenGetExtern")]
-    private static extern void* EcsMole_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsMonitor_BindgenGetExtern")]
-    private static extern void* EcsMonitor_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsName_BindgenGetExtern")]
-    private static extern void* EcsName_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNano_BindgenGetExtern")]
-    private static extern void* EcsNano_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNanoMeters_BindgenGetExtern")]
-    private static extern void* EcsNanoMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNanoSeconds_BindgenGetExtern")]
-    private static extern void* EcsNanoSeconds_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNewton_BindgenGetExtern")]
-    private static extern void* EcsNewton_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsNotQueryable_BindgenGetExtern")]
-    private static extern void* EcsNotQueryable_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsObserver_BindgenGetExtern")]
-    private static extern void* EcsObserver_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnAdd_BindgenGetExtern")]
-    private static extern void* EcsOnAdd_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnDelete_BindgenGetExtern")]
-    private static extern void* EcsOnDelete_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnDeleteTarget_BindgenGetExtern")]
-    private static extern void* EcsOnDeleteTarget_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOneOf_BindgenGetExtern")]
-    private static extern void* EcsOneOf_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnInstantiate_BindgenGetExtern")]
-    private static extern void* EcsOnInstantiate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnLoad_BindgenGetExtern")]
-    private static extern void* EcsOnLoad_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnRemove_BindgenGetExtern")]
-    private static extern void* EcsOnRemove_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnSet_BindgenGetExtern")]
-    private static extern void* EcsOnSet_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnStart_BindgenGetExtern")]
-    private static extern void* EcsOnStart_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnStore_BindgenGetExtern")]
-    private static extern void* EcsOnStore_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnTableCreate_BindgenGetExtern")]
-    private static extern void* EcsOnTableCreate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnTableDelete_BindgenGetExtern")]
-    private static extern void* EcsOnTableDelete_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnUpdate_BindgenGetExtern")]
-    private static extern void* EcsOnUpdate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOnValidate_BindgenGetExtern")]
-    private static extern void* EcsOnValidate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOrderedChildren_BindgenGetExtern")]
-    private static extern void* EcsOrderedChildren_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsOverride_BindgenGetExtern")]
-    private static extern void* EcsOverride_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPairIsTag_BindgenGetExtern")]
-    private static extern void* EcsPairIsTag_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPanic_BindgenGetExtern")]
-    private static extern void* EcsPanic_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPascal_BindgenGetExtern")]
-    private static extern void* EcsPascal_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPebi_BindgenGetExtern")]
-    private static extern void* EcsPebi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPercentage_BindgenGetExtern")]
-    private static extern void* EcsPercentage_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1d_BindgenGetExtern")]
-    private static extern void* EcsPeriod1d_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1h_BindgenGetExtern")]
-    private static extern void* EcsPeriod1h_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1m_BindgenGetExtern")]
-    private static extern void* EcsPeriod1m_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1s_BindgenGetExtern")]
-    private static extern void* EcsPeriod1s_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeriod1w_BindgenGetExtern")]
-    private static extern void* EcsPeriod1w_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPeta_BindgenGetExtern")]
-    private static extern void* EcsPeta_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPhase_BindgenGetExtern")]
-    private static extern void* EcsPhase_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPico_BindgenGetExtern")]
-    private static extern void* EcsPico_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPicoMeters_BindgenGetExtern")]
-    private static extern void* EcsPicoMeters_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPicoSeconds_BindgenGetExtern")]
-    private static extern void* EcsPicoSeconds_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPixels_BindgenGetExtern")]
-    private static extern void* EcsPixels_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostFrame_BindgenGetExtern")]
-    private static extern void* EcsPostFrame_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostLoad_BindgenGetExtern")]
-    private static extern void* EcsPostLoad_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPostUpdate_BindgenGetExtern")]
-    private static extern void* EcsPostUpdate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredEq_BindgenGetExtern")]
-    private static extern void* EcsPredEq_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredLookup_BindgenGetExtern")]
-    private static extern void* EcsPredLookup_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPredMatch_BindgenGetExtern")]
-    private static extern void* EcsPredMatch_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPrefab_BindgenGetExtern")]
-    private static extern void* EcsPrefab_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreFrame_BindgenGetExtern")]
-    private static extern void* EcsPreFrame_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPressure_BindgenGetExtern")]
-    private static extern void* EcsPressure_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreStore_BindgenGetExtern")]
-    private static extern void* EcsPreStore_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPreUpdate_BindgenGetExtern")]
-    private static extern void* EcsPreUpdate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsPrivate_BindgenGetExtern")]
-    private static extern void* EcsPrivate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsQuantity_BindgenGetExtern")]
-    private static extern void* EcsQuantity_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsQuery_BindgenGetExtern")]
-    private static extern void* EcsQuery_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRadians_BindgenGetExtern")]
-    private static extern void* EcsRadians_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsReflexive_BindgenGetExtern")]
-    private static extern void* EcsReflexive_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRelationship_BindgenGetExtern")]
-    private static extern void* EcsRelationship_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsRemove_BindgenGetExtern")]
-    private static extern void* EcsRemove_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScopeClose_BindgenGetExtern")]
-    private static extern void* EcsScopeClose_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScopeOpen_BindgenGetExtern")]
-    private static extern void* EcsScopeOpen_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsScriptTemplate_BindgenGetExtern")]
-    private static extern void* EcsScriptTemplate_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSeconds_BindgenGetExtern")]
-    private static extern void* EcsSeconds_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSingleton_BindgenGetExtern")]
-    private static extern void* EcsSingleton_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSlotOf_BindgenGetExtern")]
-    private static extern void* EcsSlotOf_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSparse_BindgenGetExtern")]
-    private static extern void* EcsSparse_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSpeed_BindgenGetExtern")]
-    private static extern void* EcsSpeed_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSymbol_BindgenGetExtern")]
-    private static extern void* EcsSymbol_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSymmetric_BindgenGetExtern")]
-    private static extern void* EcsSymmetric_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsSystem_BindgenGetExtern")]
-    private static extern void* EcsSystem_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTarget_BindgenGetExtern")]
-    private static extern void* EcsTarget_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTebi_BindgenGetExtern")]
-    private static extern void* EcsTebi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTemperature_BindgenGetExtern")]
-    private static extern void* EcsTemperature_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTera_BindgenGetExtern")]
-    private static extern void* EcsTera_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsThis_BindgenGetExtern")]
-    private static extern void* EcsThis_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTime_BindgenGetExtern")]
-    private static extern void* EcsTime_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTrait_BindgenGetExtern")]
-    private static extern void* EcsTrait_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTransitive_BindgenGetExtern")]
-    private static extern void* EcsTransitive_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsTraversable_BindgenGetExtern")]
-    private static extern void* EcsTraversable_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUnitPrefixes_BindgenGetExtern")]
-    private static extern void* EcsUnitPrefixes_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUri_BindgenGetExtern")]
-    private static extern void* EcsUri_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriFile_BindgenGetExtern")]
-    private static extern void* EcsUriFile_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriHyperlink_BindgenGetExtern")]
-    private static extern void* EcsUriHyperlink_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsUriImage_BindgenGetExtern")]
-    private static extern void* EcsUriImage_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsVariable_BindgenGetExtern")]
-    private static extern void* EcsVariable_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWildcard_BindgenGetExtern")]
-    private static extern void* EcsWildcard_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWith_BindgenGetExtern")]
-    private static extern void* EcsWith_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsWorld_BindgenGetExtern")]
-    private static extern void* EcsWorld_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYobi_BindgenGetExtern")]
-    private static extern void* EcsYobi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYocto_BindgenGetExtern")]
-    private static extern void* EcsYocto_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsYotta_BindgenGetExtern")]
-    private static extern void* EcsYotta_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZebi_BindgenGetExtern")]
-    private static extern void* EcsZebi_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZepto_BindgenGetExtern")]
-    private static extern void* EcsZepto_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "EcsZetta_BindgenGetExtern")]
-    private static extern void* EcsZetta_BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_allocator_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_allocator_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_bool_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_bool_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_byte_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_byte_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_char_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_char_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_index_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_component_index_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_component_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_component_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entities_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_entities_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_entity_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_entity_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_f32_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_f32_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_f64_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_f64_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i16_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_i16_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i32_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_i32_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i64_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_i64_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_i8_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_i8_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_id_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_id_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_iptr_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_iptr_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_misc_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_misc_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_query_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_query_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_string_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_string_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_histogram_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_table_histogram_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_table_memory_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_table_memory_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u16_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_u16_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u32_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_u32_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u64_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_u64_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_u8_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_u8_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDecs_uptr_tID__BindgenGetExtern")]
-    private static extern void* FLECS_IDecs_uptr_tID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertCriticalID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertCriticalID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertErrorID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertErrorID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertInfoID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertInfoID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertInstanceID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertInstanceID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertsActiveID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertsActiveID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertTimeoutID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertTimeoutID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsAlertWarningID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsAlertWarningID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsArrayID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsArrayID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsBitmaskID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsBitmaskID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsComponentID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsComponentID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsConstantsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsConstantsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsCounterID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterIdID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsCounterIdID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsCounterIncrementID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsCounterIncrementID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsDocDescriptionID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsDocDescriptionID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsEnumID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsEnumID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsGaugeID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsGaugeID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsIdentifierID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsIdentifierID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMemberID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMemberID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMemberRangesID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMemberRangesID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMetricID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricInstanceID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMetricInstanceID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricSourceID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMetricSourceID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsMetricValueID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsMetricValueID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsOpaqueID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsOpaqueID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPipelineID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsPipelineID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPipelineStatsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsPipelineStatsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPolyID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsPolyID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsPrimitiveID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsPrimitiveID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsRateFilterID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsRateFilterID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsRestID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsRestID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptConstVarID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsScriptConstVarID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptFunctionID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsScriptFunctionID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsScriptID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptMethodID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsScriptMethodID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsScriptTemplateID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsScriptTemplateID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsStructID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsStructID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsSystemStatsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsSystemStatsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTickSourceID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsTickSourceID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTimerID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsTimerID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTypeID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsTypeID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsTypeSerializerID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsTypeSerializerID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsUnitID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsUnitID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsUnitPrefixID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsUnitPrefixID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsVectorID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsVectorID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldMemoryID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsWorldMemoryID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldStatsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsWorldStatsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDEcsWorldSummaryID__BindgenGetExtern")]
-    private static extern void* FLECS_IDEcsWorldSummaryID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsAlertsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDFlecsAlertsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsMetricsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDFlecsMetricsID__BindgenGetExtern();
-
-    [DllImport(BindgenInternal.DllImportPath, EntryPoint = "FLECS_IDFlecsStatsID__BindgenGetExtern")]
-    private static extern void* FLECS_IDFlecsStatsID__BindgenGetExtern();
-
-    private static void* ECS_AUTO_OVERRIDE_Ptr;
-
-    private static void* ecs_block_allocator_alloc_count_Ptr;
-
-    private static void* ecs_block_allocator_free_count_Ptr;
-
-    private static void* ecs_http_busy_count_Ptr;
-
-    private static void* ecs_http_request_handled_error_count_Ptr;
-
-    private static void* ecs_http_request_handled_ok_count_Ptr;
-
-    private static void* ecs_http_request_invalid_count_Ptr;
-
-    private static void* ecs_http_request_not_handled_count_Ptr;
-
-    private static void* ecs_http_request_preflight_count_Ptr;
-
-    private static void* ecs_http_request_received_count_Ptr;
-
-    private static void* ecs_http_send_error_count_Ptr;
-
-    private static void* ecs_http_send_ok_count_Ptr;
-
-    private static void* ecs_os_api_Ptr;
-
-    private static void* ecs_os_api_calloc_count_Ptr;
-
-    private static void* ecs_os_api_free_count_Ptr;
-
-    private static void* ecs_os_api_malloc_count_Ptr;
-
-    private static void* ecs_os_api_realloc_count_Ptr;
-
-    private static void* ECS_PAIR_Ptr;
-
-    private static void* ecs_stack_allocator_alloc_count_Ptr;
-
-    private static void* ecs_stack_allocator_free_count_Ptr;
-
-    private static void* ECS_TOGGLE_Ptr;
-
-    private static void* EcsAcceleration_Ptr;
-
-    private static void* EcsAcyclic_Ptr;
-
-    private static void* EcsAlertCritical_Ptr;
-
-    private static void* EcsAlertError_Ptr;
-
-    private static void* EcsAlertInfo_Ptr;
-
-    private static void* EcsAlertWarning_Ptr;
-
-    private static void* EcsAlias_Ptr;
-
-    private static void* EcsAmount_Ptr;
-
-    private static void* EcsAmpere_Ptr;
-
-    private static void* EcsAngle_Ptr;
-
-    private static void* EcsAny_Ptr;
-
-    private static void* EcsAtto_Ptr;
-
-    private static void* EcsBar_Ptr;
-
-    private static void* EcsBel_Ptr;
-
-    private static void* EcsBits_Ptr;
-
-    private static void* EcsBitsPerSecond_Ptr;
-
-    private static void* EcsBytes_Ptr;
-
-    private static void* EcsBytesPerSecond_Ptr;
-
-    private static void* EcsCandela_Ptr;
-
-    private static void* EcsCanToggle_Ptr;
-
-    private static void* EcsCelsius_Ptr;
-
-    private static void* EcsCenti_Ptr;
-
-    private static void* EcsCentiMeters_Ptr;
-
-    private static void* EcsChildOf_Ptr;
-
-    private static void* EcsColor_Ptr;
-
-    private static void* EcsColorCss_Ptr;
-
-    private static void* EcsColorHsl_Ptr;
-
-    private static void* EcsColorRgb_Ptr;
-
-    private static void* EcsConstant_Ptr;
-
-    private static void* EcsCounter_Ptr;
-
-    private static void* EcsCounterId_Ptr;
-
-    private static void* EcsCounterIncrement_Ptr;
-
-    private static void* EcsData_Ptr;
-
-    private static void* EcsDataRate_Ptr;
-
-    private static void* EcsDate_Ptr;
-
-    private static void* EcsDays_Ptr;
-
-    private static void* EcsDeca_Ptr;
-
-    private static void* EcsDeci_Ptr;
-
-    private static void* EcsDeciBel_Ptr;
-
-    private static void* EcsDegrees_Ptr;
-
-    private static void* EcsDelete_Ptr;
-
-    private static void* EcsDependsOn_Ptr;
-
-    private static void* EcsDisabled_Ptr;
-
-    private static void* EcsDocBrief_Ptr;
-
-    private static void* EcsDocColor_Ptr;
-
-    private static void* EcsDocDetail_Ptr;
-
-    private static void* EcsDocLink_Ptr;
-
-    private static void* EcsDocUuid_Ptr;
-
-    private static void* EcsDontFragment_Ptr;
-
-    private static void* EcsDontInherit_Ptr;
-
-    private static void* EcsDuration_Ptr;
-
-    private static void* EcsElectricCurrent_Ptr;
-
-    private static void* EcsEmpty_Ptr;
-
-    private static void* EcsExa_Ptr;
-
-    private static void* EcsExbi_Ptr;
-
-    private static void* EcsExclusive_Ptr;
-
-    private static void* EcsFahrenheit_Ptr;
-
-    private static void* EcsFemto_Ptr;
-
-    private static void* EcsFinal_Ptr;
-
-    private static void* EcsFlecs_Ptr;
-
-    private static void* EcsFlecsCore_Ptr;
-
-    private static void* EcsForce_Ptr;
-
-    private static void* EcsFrequency_Ptr;
-
-    private static void* EcsGauge_Ptr;
-
-    private static void* EcsGibi_Ptr;
-
-    private static void* EcsGibiBytes_Ptr;
-
-    private static void* EcsGiga_Ptr;
-
-    private static void* EcsGigaBits_Ptr;
-
-    private static void* EcsGigaBitsPerSecond_Ptr;
-
-    private static void* EcsGigaBytes_Ptr;
-
-    private static void* EcsGigaBytesPerSecond_Ptr;
-
-    private static void* EcsGigaHertz_Ptr;
-
-    private static void* EcsGrams_Ptr;
-
-    private static void* EcsHecto_Ptr;
-
-    private static void* EcsHertz_Ptr;
-
-    private static void* EcsHours_Ptr;
-
-    private static void* EcsInherit_Ptr;
-
-    private static void* EcsInheritable_Ptr;
-
-    private static void* EcsIsA_Ptr;
-
-    private static void* EcsKelvin_Ptr;
-
-    private static void* EcsKibi_Ptr;
-
-    private static void* EcsKibiBytes_Ptr;
-
-    private static void* EcsKilo_Ptr;
-
-    private static void* EcsKiloBits_Ptr;
-
-    private static void* EcsKiloBitsPerSecond_Ptr;
-
-    private static void* EcsKiloBytes_Ptr;
-
-    private static void* EcsKiloBytesPerSecond_Ptr;
-
-    private static void* EcsKiloGrams_Ptr;
-
-    private static void* EcsKiloHertz_Ptr;
-
-    private static void* EcsKiloMeters_Ptr;
-
-    private static void* EcsKiloMetersPerHour_Ptr;
-
-    private static void* EcsKiloMetersPerSecond_Ptr;
-
-    private static void* EcsLength_Ptr;
-
-    private static void* EcsLuminousIntensity_Ptr;
-
-    private static void* EcsMass_Ptr;
-
-    private static void* EcsMebi_Ptr;
-
-    private static void* EcsMebiBytes_Ptr;
-
-    private static void* EcsMega_Ptr;
-
-    private static void* EcsMegaBits_Ptr;
-
-    private static void* EcsMegaBitsPerSecond_Ptr;
-
-    private static void* EcsMegaBytes_Ptr;
-
-    private static void* EcsMegaBytesPerSecond_Ptr;
-
-    private static void* EcsMegaHertz_Ptr;
-
-    private static void* EcsMeters_Ptr;
-
-    private static void* EcsMetersPerSecond_Ptr;
-
-    private static void* EcsMetric_Ptr;
-
-    private static void* EcsMetricInstance_Ptr;
-
-    private static void* EcsMicro_Ptr;
-
-    private static void* EcsMicroMeters_Ptr;
-
-    private static void* EcsMicroSeconds_Ptr;
-
-    private static void* EcsMiles_Ptr;
-
-    private static void* EcsMilesPerHour_Ptr;
-
-    private static void* EcsMilli_Ptr;
-
-    private static void* EcsMilliMeters_Ptr;
-
-    private static void* EcsMilliSeconds_Ptr;
-
-    private static void* EcsMinutes_Ptr;
-
-    private static void* EcsModule_Ptr;
-
-    private static void* EcsMole_Ptr;
-
-    private static void* EcsMonitor_Ptr;
-
-    private static void* EcsName_Ptr;
-
-    private static void* EcsNano_Ptr;
-
-    private static void* EcsNanoMeters_Ptr;
-
-    private static void* EcsNanoSeconds_Ptr;
-
-    private static void* EcsNewton_Ptr;
-
-    private static void* EcsNotQueryable_Ptr;
-
-    private static void* EcsObserver_Ptr;
-
-    private static void* EcsOnAdd_Ptr;
-
-    private static void* EcsOnDelete_Ptr;
-
-    private static void* EcsOnDeleteTarget_Ptr;
-
-    private static void* EcsOneOf_Ptr;
-
-    private static void* EcsOnInstantiate_Ptr;
-
-    private static void* EcsOnLoad_Ptr;
-
-    private static void* EcsOnRemove_Ptr;
-
-    private static void* EcsOnSet_Ptr;
-
-    private static void* EcsOnStart_Ptr;
-
-    private static void* EcsOnStore_Ptr;
-
-    private static void* EcsOnTableCreate_Ptr;
-
-    private static void* EcsOnTableDelete_Ptr;
-
-    private static void* EcsOnUpdate_Ptr;
-
-    private static void* EcsOnValidate_Ptr;
-
-    private static void* EcsOrderedChildren_Ptr;
-
-    private static void* EcsOverride_Ptr;
-
-    private static void* EcsPairIsTag_Ptr;
-
-    private static void* EcsPanic_Ptr;
-
-    private static void* EcsPascal_Ptr;
-
-    private static void* EcsPebi_Ptr;
-
-    private static void* EcsPercentage_Ptr;
-
-    private static void* EcsPeriod1d_Ptr;
-
-    private static void* EcsPeriod1h_Ptr;
-
-    private static void* EcsPeriod1m_Ptr;
-
-    private static void* EcsPeriod1s_Ptr;
-
-    private static void* EcsPeriod1w_Ptr;
-
-    private static void* EcsPeta_Ptr;
-
-    private static void* EcsPhase_Ptr;
-
-    private static void* EcsPico_Ptr;
-
-    private static void* EcsPicoMeters_Ptr;
-
-    private static void* EcsPicoSeconds_Ptr;
-
-    private static void* EcsPixels_Ptr;
-
-    private static void* EcsPostFrame_Ptr;
-
-    private static void* EcsPostLoad_Ptr;
-
-    private static void* EcsPostUpdate_Ptr;
-
-    private static void* EcsPredEq_Ptr;
-
-    private static void* EcsPredLookup_Ptr;
-
-    private static void* EcsPredMatch_Ptr;
-
-    private static void* EcsPrefab_Ptr;
-
-    private static void* EcsPreFrame_Ptr;
-
-    private static void* EcsPressure_Ptr;
-
-    private static void* EcsPreStore_Ptr;
-
-    private static void* EcsPreUpdate_Ptr;
-
-    private static void* EcsPrivate_Ptr;
-
-    private static void* EcsQuantity_Ptr;
-
-    private static void* EcsQuery_Ptr;
-
-    private static void* EcsRadians_Ptr;
-
-    private static void* EcsReflexive_Ptr;
-
-    private static void* EcsRelationship_Ptr;
-
-    private static void* EcsRemove_Ptr;
-
-    private static void* EcsScopeClose_Ptr;
-
-    private static void* EcsScopeOpen_Ptr;
-
-    private static void* EcsScriptTemplate_Ptr;
-
-    private static void* EcsSeconds_Ptr;
-
-    private static void* EcsSingleton_Ptr;
-
-    private static void* EcsSlotOf_Ptr;
-
-    private static void* EcsSparse_Ptr;
-
-    private static void* EcsSpeed_Ptr;
-
-    private static void* EcsSymbol_Ptr;
-
-    private static void* EcsSymmetric_Ptr;
-
-    private static void* EcsSystem_Ptr;
-
-    private static void* EcsTarget_Ptr;
-
-    private static void* EcsTebi_Ptr;
-
-    private static void* EcsTemperature_Ptr;
-
-    private static void* EcsTera_Ptr;
-
-    private static void* EcsThis_Ptr;
-
-    private static void* EcsTime_Ptr;
-
-    private static void* EcsTrait_Ptr;
-
-    private static void* EcsTransitive_Ptr;
-
-    private static void* EcsTraversable_Ptr;
-
-    private static void* EcsUnitPrefixes_Ptr;
-
-    private static void* EcsUri_Ptr;
-
-    private static void* EcsUriFile_Ptr;
-
-    private static void* EcsUriHyperlink_Ptr;
-
-    private static void* EcsUriImage_Ptr;
-
-    private static void* EcsVariable_Ptr;
-
-    private static void* EcsWildcard_Ptr;
-
-    private static void* EcsWith_Ptr;
-
-    private static void* EcsWorld_Ptr;
-
-    private static void* EcsYobi_Ptr;
-
-    private static void* EcsYocto_Ptr;
-
-    private static void* EcsYotta_Ptr;
-
-    private static void* EcsZebi_Ptr;
-
-    private static void* EcsZepto_Ptr;
-
-    private static void* EcsZetta_Ptr;
-
-    private static void* FLECS_IDecs_allocator_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_bool_tID__Ptr;
-
-    private static void* FLECS_IDecs_byte_tID__Ptr;
-
-    private static void* FLECS_IDecs_char_tID__Ptr;
-
-    private static void* FLECS_IDecs_component_index_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_component_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_entities_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_entity_tID__Ptr;
-
-    private static void* FLECS_IDecs_f32_tID__Ptr;
-
-    private static void* FLECS_IDecs_f64_tID__Ptr;
-
-    private static void* FLECS_IDecs_i16_tID__Ptr;
-
-    private static void* FLECS_IDecs_i32_tID__Ptr;
-
-    private static void* FLECS_IDecs_i64_tID__Ptr;
-
-    private static void* FLECS_IDecs_i8_tID__Ptr;
-
-    private static void* FLECS_IDecs_id_tID__Ptr;
-
-    private static void* FLECS_IDecs_iptr_tID__Ptr;
-
-    private static void* FLECS_IDecs_misc_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_query_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_string_tID__Ptr;
-
-    private static void* FLECS_IDecs_table_histogram_tID__Ptr;
-
-    private static void* FLECS_IDecs_table_memory_tID__Ptr;
-
-    private static void* FLECS_IDecs_u16_tID__Ptr;
-
-    private static void* FLECS_IDecs_u32_tID__Ptr;
-
-    private static void* FLECS_IDecs_u64_tID__Ptr;
-
-    private static void* FLECS_IDecs_u8_tID__Ptr;
-
-    private static void* FLECS_IDecs_uptr_tID__Ptr;
-
-    private static void* FLECS_IDEcsAlertCriticalID__Ptr;
-
-    private static void* FLECS_IDEcsAlertErrorID__Ptr;
-
-    private static void* FLECS_IDEcsAlertID__Ptr;
-
-    private static void* FLECS_IDEcsAlertInfoID__Ptr;
-
-    private static void* FLECS_IDEcsAlertInstanceID__Ptr;
-
-    private static void* FLECS_IDEcsAlertsActiveID__Ptr;
-
-    private static void* FLECS_IDEcsAlertTimeoutID__Ptr;
-
-    private static void* FLECS_IDEcsAlertWarningID__Ptr;
-
-    private static void* FLECS_IDEcsArrayID__Ptr;
-
-    private static void* FLECS_IDEcsBitmaskID__Ptr;
-
-    private static void* FLECS_IDEcsComponentID__Ptr;
-
-    private static void* FLECS_IDEcsConstantsID__Ptr;
-
-    private static void* FLECS_IDEcsCounterID__Ptr;
-
-    private static void* FLECS_IDEcsCounterIdID__Ptr;
-
-    private static void* FLECS_IDEcsCounterIncrementID__Ptr;
-
-    private static void* FLECS_IDEcsDefaultChildComponentID__Ptr;
-
-    private static void* FLECS_IDEcsDocDescriptionID__Ptr;
-
-    private static void* FLECS_IDEcsEnumID__Ptr;
-
-    private static void* FLECS_IDEcsGaugeID__Ptr;
-
-    private static void* FLECS_IDEcsIdentifierID__Ptr;
-
-    private static void* FLECS_IDEcsMemberID__Ptr;
-
-    private static void* FLECS_IDEcsMemberRangesID__Ptr;
-
-    private static void* FLECS_IDEcsMetricID__Ptr;
-
-    private static void* FLECS_IDEcsMetricInstanceID__Ptr;
-
-    private static void* FLECS_IDEcsMetricSourceID__Ptr;
-
-    private static void* FLECS_IDEcsMetricValueID__Ptr;
-
-    private static void* FLECS_IDEcsOpaqueID__Ptr;
-
-    private static void* FLECS_IDEcsPipelineID__Ptr;
-
-    private static void* FLECS_IDEcsPipelineStatsID__Ptr;
-
-    private static void* FLECS_IDEcsPolyID__Ptr;
-
-    private static void* FLECS_IDEcsPrimitiveID__Ptr;
-
-    private static void* FLECS_IDEcsRateFilterID__Ptr;
-
-    private static void* FLECS_IDEcsRestID__Ptr;
-
-    private static void* FLECS_IDEcsScriptConstVarID__Ptr;
-
-    private static void* FLECS_IDEcsScriptFunctionID__Ptr;
-
-    private static void* FLECS_IDEcsScriptID__Ptr;
-
-    private static void* FLECS_IDEcsScriptMethodID__Ptr;
-
-    private static void* FLECS_IDEcsScriptTemplateID__Ptr;
-
-    private static void* FLECS_IDEcsStructID__Ptr;
-
-    private static void* FLECS_IDEcsSystemStatsID__Ptr;
-
-    private static void* FLECS_IDEcsTickSourceID__Ptr;
-
-    private static void* FLECS_IDEcsTimerID__Ptr;
-
-    private static void* FLECS_IDEcsTypeID__Ptr;
-
-    private static void* FLECS_IDEcsTypeSerializerID__Ptr;
-
-    private static void* FLECS_IDEcsUnitID__Ptr;
-
-    private static void* FLECS_IDEcsUnitPrefixID__Ptr;
-
-    private static void* FLECS_IDEcsVectorID__Ptr;
-
-    private static void* FLECS_IDEcsWorldMemoryID__Ptr;
-
-    private static void* FLECS_IDEcsWorldStatsID__Ptr;
-
-    private static void* FLECS_IDEcsWorldSummaryID__Ptr;
-
-    private static void* FLECS_IDFlecsAlertsID__Ptr;
-
-    private static void* FLECS_IDFlecsMetricsID__Ptr;
-
-    private static void* FLECS_IDFlecsStatsID__Ptr;
-
-    public static ref ulong ECS_AUTO_OVERRIDE => ref *(ulong*)(ECS_AUTO_OVERRIDE_Ptr == null ? ECS_AUTO_OVERRIDE_Ptr = ECS_AUTO_OVERRIDE_BindgenGetExtern() : ECS_AUTO_OVERRIDE_Ptr);
-
-    public static ref long ecs_block_allocator_alloc_count => ref *(long*)(ecs_block_allocator_alloc_count_Ptr == null ? ecs_block_allocator_alloc_count_Ptr = ecs_block_allocator_alloc_count_BindgenGetExtern() : ecs_block_allocator_alloc_count_Ptr);
-
-    public static ref long ecs_block_allocator_free_count => ref *(long*)(ecs_block_allocator_free_count_Ptr == null ? ecs_block_allocator_free_count_Ptr = ecs_block_allocator_free_count_BindgenGetExtern() : ecs_block_allocator_free_count_Ptr);
-
-    public static ref long ecs_http_busy_count => ref *(long*)(ecs_http_busy_count_Ptr == null ? ecs_http_busy_count_Ptr = ecs_http_busy_count_BindgenGetExtern() : ecs_http_busy_count_Ptr);
-
-    public static ref long ecs_http_request_handled_error_count => ref *(long*)(ecs_http_request_handled_error_count_Ptr == null ? ecs_http_request_handled_error_count_Ptr = ecs_http_request_handled_error_count_BindgenGetExtern() : ecs_http_request_handled_error_count_Ptr);
-
-    public static ref long ecs_http_request_handled_ok_count => ref *(long*)(ecs_http_request_handled_ok_count_Ptr == null ? ecs_http_request_handled_ok_count_Ptr = ecs_http_request_handled_ok_count_BindgenGetExtern() : ecs_http_request_handled_ok_count_Ptr);
-
-    public static ref long ecs_http_request_invalid_count => ref *(long*)(ecs_http_request_invalid_count_Ptr == null ? ecs_http_request_invalid_count_Ptr = ecs_http_request_invalid_count_BindgenGetExtern() : ecs_http_request_invalid_count_Ptr);
-
-    public static ref long ecs_http_request_not_handled_count => ref *(long*)(ecs_http_request_not_handled_count_Ptr == null ? ecs_http_request_not_handled_count_Ptr = ecs_http_request_not_handled_count_BindgenGetExtern() : ecs_http_request_not_handled_count_Ptr);
-
-    public static ref long ecs_http_request_preflight_count => ref *(long*)(ecs_http_request_preflight_count_Ptr == null ? ecs_http_request_preflight_count_Ptr = ecs_http_request_preflight_count_BindgenGetExtern() : ecs_http_request_preflight_count_Ptr);
-
-    public static ref long ecs_http_request_received_count => ref *(long*)(ecs_http_request_received_count_Ptr == null ? ecs_http_request_received_count_Ptr = ecs_http_request_received_count_BindgenGetExtern() : ecs_http_request_received_count_Ptr);
-
-    public static ref long ecs_http_send_error_count => ref *(long*)(ecs_http_send_error_count_Ptr == null ? ecs_http_send_error_count_Ptr = ecs_http_send_error_count_BindgenGetExtern() : ecs_http_send_error_count_Ptr);
-
-    public static ref long ecs_http_send_ok_count => ref *(long*)(ecs_http_send_ok_count_Ptr == null ? ecs_http_send_ok_count_Ptr = ecs_http_send_ok_count_BindgenGetExtern() : ecs_http_send_ok_count_Ptr);
-
-    public static ref ecs_os_api_t ecs_os_api => ref *(ecs_os_api_t*)(ecs_os_api_Ptr == null ? ecs_os_api_Ptr = ecs_os_api_BindgenGetExtern() : ecs_os_api_Ptr);
-
-    public static ref long ecs_os_api_calloc_count => ref *(long*)(ecs_os_api_calloc_count_Ptr == null ? ecs_os_api_calloc_count_Ptr = ecs_os_api_calloc_count_BindgenGetExtern() : ecs_os_api_calloc_count_Ptr);
-
-    public static ref long ecs_os_api_free_count => ref *(long*)(ecs_os_api_free_count_Ptr == null ? ecs_os_api_free_count_Ptr = ecs_os_api_free_count_BindgenGetExtern() : ecs_os_api_free_count_Ptr);
-
-    public static ref long ecs_os_api_malloc_count => ref *(long*)(ecs_os_api_malloc_count_Ptr == null ? ecs_os_api_malloc_count_Ptr = ecs_os_api_malloc_count_BindgenGetExtern() : ecs_os_api_malloc_count_Ptr);
-
-    public static ref long ecs_os_api_realloc_count => ref *(long*)(ecs_os_api_realloc_count_Ptr == null ? ecs_os_api_realloc_count_Ptr = ecs_os_api_realloc_count_BindgenGetExtern() : ecs_os_api_realloc_count_Ptr);
-
-    public static ref ulong ECS_PAIR => ref *(ulong*)(ECS_PAIR_Ptr == null ? ECS_PAIR_Ptr = ECS_PAIR_BindgenGetExtern() : ECS_PAIR_Ptr);
-
-    public static ref long ecs_stack_allocator_alloc_count => ref *(long*)(ecs_stack_allocator_alloc_count_Ptr == null ? ecs_stack_allocator_alloc_count_Ptr = ecs_stack_allocator_alloc_count_BindgenGetExtern() : ecs_stack_allocator_alloc_count_Ptr);
-
-    public static ref long ecs_stack_allocator_free_count => ref *(long*)(ecs_stack_allocator_free_count_Ptr == null ? ecs_stack_allocator_free_count_Ptr = ecs_stack_allocator_free_count_BindgenGetExtern() : ecs_stack_allocator_free_count_Ptr);
-
-    public static ref ulong ECS_TOGGLE => ref *(ulong*)(ECS_TOGGLE_Ptr == null ? ECS_TOGGLE_Ptr = ECS_TOGGLE_BindgenGetExtern() : ECS_TOGGLE_Ptr);
-
-    public static ref ulong EcsAcceleration => ref *(ulong*)(EcsAcceleration_Ptr == null ? EcsAcceleration_Ptr = EcsAcceleration_BindgenGetExtern() : EcsAcceleration_Ptr);
-
-    public static ref ulong EcsAcyclic => ref *(ulong*)(EcsAcyclic_Ptr == null ? EcsAcyclic_Ptr = EcsAcyclic_BindgenGetExtern() : EcsAcyclic_Ptr);
-
-    public static ref ulong EcsAlertCritical => ref *(ulong*)(EcsAlertCritical_Ptr == null ? EcsAlertCritical_Ptr = EcsAlertCritical_BindgenGetExtern() : EcsAlertCritical_Ptr);
-
-    public static ref ulong EcsAlertError => ref *(ulong*)(EcsAlertError_Ptr == null ? EcsAlertError_Ptr = EcsAlertError_BindgenGetExtern() : EcsAlertError_Ptr);
-
-    public static ref ulong EcsAlertInfo => ref *(ulong*)(EcsAlertInfo_Ptr == null ? EcsAlertInfo_Ptr = EcsAlertInfo_BindgenGetExtern() : EcsAlertInfo_Ptr);
-
-    public static ref ulong EcsAlertWarning => ref *(ulong*)(EcsAlertWarning_Ptr == null ? EcsAlertWarning_Ptr = EcsAlertWarning_BindgenGetExtern() : EcsAlertWarning_Ptr);
-
-    public static ref ulong EcsAlias => ref *(ulong*)(EcsAlias_Ptr == null ? EcsAlias_Ptr = EcsAlias_BindgenGetExtern() : EcsAlias_Ptr);
-
-    public static ref ulong EcsAmount => ref *(ulong*)(EcsAmount_Ptr == null ? EcsAmount_Ptr = EcsAmount_BindgenGetExtern() : EcsAmount_Ptr);
-
-    public static ref ulong EcsAmpere => ref *(ulong*)(EcsAmpere_Ptr == null ? EcsAmpere_Ptr = EcsAmpere_BindgenGetExtern() : EcsAmpere_Ptr);
-
-    public static ref ulong EcsAngle => ref *(ulong*)(EcsAngle_Ptr == null ? EcsAngle_Ptr = EcsAngle_BindgenGetExtern() : EcsAngle_Ptr);
-
-    public static ref ulong EcsAny => ref *(ulong*)(EcsAny_Ptr == null ? EcsAny_Ptr = EcsAny_BindgenGetExtern() : EcsAny_Ptr);
-
-    public static ref ulong EcsAtto => ref *(ulong*)(EcsAtto_Ptr == null ? EcsAtto_Ptr = EcsAtto_BindgenGetExtern() : EcsAtto_Ptr);
-
-    public static ref ulong EcsBar => ref *(ulong*)(EcsBar_Ptr == null ? EcsBar_Ptr = EcsBar_BindgenGetExtern() : EcsBar_Ptr);
-
-    public static ref ulong EcsBel => ref *(ulong*)(EcsBel_Ptr == null ? EcsBel_Ptr = EcsBel_BindgenGetExtern() : EcsBel_Ptr);
-
-    public static ref ulong EcsBits => ref *(ulong*)(EcsBits_Ptr == null ? EcsBits_Ptr = EcsBits_BindgenGetExtern() : EcsBits_Ptr);
-
-    public static ref ulong EcsBitsPerSecond => ref *(ulong*)(EcsBitsPerSecond_Ptr == null ? EcsBitsPerSecond_Ptr = EcsBitsPerSecond_BindgenGetExtern() : EcsBitsPerSecond_Ptr);
-
-    public static ref ulong EcsBytes => ref *(ulong*)(EcsBytes_Ptr == null ? EcsBytes_Ptr = EcsBytes_BindgenGetExtern() : EcsBytes_Ptr);
-
-    public static ref ulong EcsBytesPerSecond => ref *(ulong*)(EcsBytesPerSecond_Ptr == null ? EcsBytesPerSecond_Ptr = EcsBytesPerSecond_BindgenGetExtern() : EcsBytesPerSecond_Ptr);
-
-    public static ref ulong EcsCandela => ref *(ulong*)(EcsCandela_Ptr == null ? EcsCandela_Ptr = EcsCandela_BindgenGetExtern() : EcsCandela_Ptr);
-
-    public static ref ulong EcsCanToggle => ref *(ulong*)(EcsCanToggle_Ptr == null ? EcsCanToggle_Ptr = EcsCanToggle_BindgenGetExtern() : EcsCanToggle_Ptr);
-
-    public static ref ulong EcsCelsius => ref *(ulong*)(EcsCelsius_Ptr == null ? EcsCelsius_Ptr = EcsCelsius_BindgenGetExtern() : EcsCelsius_Ptr);
-
-    public static ref ulong EcsCenti => ref *(ulong*)(EcsCenti_Ptr == null ? EcsCenti_Ptr = EcsCenti_BindgenGetExtern() : EcsCenti_Ptr);
-
-    public static ref ulong EcsCentiMeters => ref *(ulong*)(EcsCentiMeters_Ptr == null ? EcsCentiMeters_Ptr = EcsCentiMeters_BindgenGetExtern() : EcsCentiMeters_Ptr);
-
-    public static ref ulong EcsChildOf => ref *(ulong*)(EcsChildOf_Ptr == null ? EcsChildOf_Ptr = EcsChildOf_BindgenGetExtern() : EcsChildOf_Ptr);
-
-    public static ref ulong EcsColor => ref *(ulong*)(EcsColor_Ptr == null ? EcsColor_Ptr = EcsColor_BindgenGetExtern() : EcsColor_Ptr);
-
-    public static ref ulong EcsColorCss => ref *(ulong*)(EcsColorCss_Ptr == null ? EcsColorCss_Ptr = EcsColorCss_BindgenGetExtern() : EcsColorCss_Ptr);
-
-    public static ref ulong EcsColorHsl => ref *(ulong*)(EcsColorHsl_Ptr == null ? EcsColorHsl_Ptr = EcsColorHsl_BindgenGetExtern() : EcsColorHsl_Ptr);
-
-    public static ref ulong EcsColorRgb => ref *(ulong*)(EcsColorRgb_Ptr == null ? EcsColorRgb_Ptr = EcsColorRgb_BindgenGetExtern() : EcsColorRgb_Ptr);
-
-    public static ref ulong EcsConstant => ref *(ulong*)(EcsConstant_Ptr == null ? EcsConstant_Ptr = EcsConstant_BindgenGetExtern() : EcsConstant_Ptr);
-
-    public static ref ulong EcsCounter => ref *(ulong*)(EcsCounter_Ptr == null ? EcsCounter_Ptr = EcsCounter_BindgenGetExtern() : EcsCounter_Ptr);
-
-    public static ref ulong EcsCounterId => ref *(ulong*)(EcsCounterId_Ptr == null ? EcsCounterId_Ptr = EcsCounterId_BindgenGetExtern() : EcsCounterId_Ptr);
-
-    public static ref ulong EcsCounterIncrement => ref *(ulong*)(EcsCounterIncrement_Ptr == null ? EcsCounterIncrement_Ptr = EcsCounterIncrement_BindgenGetExtern() : EcsCounterIncrement_Ptr);
-
-    public static ref ulong EcsData => ref *(ulong*)(EcsData_Ptr == null ? EcsData_Ptr = EcsData_BindgenGetExtern() : EcsData_Ptr);
-
-    public static ref ulong EcsDataRate => ref *(ulong*)(EcsDataRate_Ptr == null ? EcsDataRate_Ptr = EcsDataRate_BindgenGetExtern() : EcsDataRate_Ptr);
-
-    public static ref ulong EcsDate => ref *(ulong*)(EcsDate_Ptr == null ? EcsDate_Ptr = EcsDate_BindgenGetExtern() : EcsDate_Ptr);
-
-    public static ref ulong EcsDays => ref *(ulong*)(EcsDays_Ptr == null ? EcsDays_Ptr = EcsDays_BindgenGetExtern() : EcsDays_Ptr);
-
-    public static ref ulong EcsDeca => ref *(ulong*)(EcsDeca_Ptr == null ? EcsDeca_Ptr = EcsDeca_BindgenGetExtern() : EcsDeca_Ptr);
-
-    public static ref ulong EcsDeci => ref *(ulong*)(EcsDeci_Ptr == null ? EcsDeci_Ptr = EcsDeci_BindgenGetExtern() : EcsDeci_Ptr);
-
-    public static ref ulong EcsDeciBel => ref *(ulong*)(EcsDeciBel_Ptr == null ? EcsDeciBel_Ptr = EcsDeciBel_BindgenGetExtern() : EcsDeciBel_Ptr);
-
-    public static ref ulong EcsDegrees => ref *(ulong*)(EcsDegrees_Ptr == null ? EcsDegrees_Ptr = EcsDegrees_BindgenGetExtern() : EcsDegrees_Ptr);
-
-    public static ref ulong EcsDelete => ref *(ulong*)(EcsDelete_Ptr == null ? EcsDelete_Ptr = EcsDelete_BindgenGetExtern() : EcsDelete_Ptr);
-
-    public static ref ulong EcsDependsOn => ref *(ulong*)(EcsDependsOn_Ptr == null ? EcsDependsOn_Ptr = EcsDependsOn_BindgenGetExtern() : EcsDependsOn_Ptr);
-
-    public static ref ulong EcsDisabled => ref *(ulong*)(EcsDisabled_Ptr == null ? EcsDisabled_Ptr = EcsDisabled_BindgenGetExtern() : EcsDisabled_Ptr);
-
-    public static ref ulong EcsDocBrief => ref *(ulong*)(EcsDocBrief_Ptr == null ? EcsDocBrief_Ptr = EcsDocBrief_BindgenGetExtern() : EcsDocBrief_Ptr);
-
-    public static ref ulong EcsDocColor => ref *(ulong*)(EcsDocColor_Ptr == null ? EcsDocColor_Ptr = EcsDocColor_BindgenGetExtern() : EcsDocColor_Ptr);
-
-    public static ref ulong EcsDocDetail => ref *(ulong*)(EcsDocDetail_Ptr == null ? EcsDocDetail_Ptr = EcsDocDetail_BindgenGetExtern() : EcsDocDetail_Ptr);
-
-    public static ref ulong EcsDocLink => ref *(ulong*)(EcsDocLink_Ptr == null ? EcsDocLink_Ptr = EcsDocLink_BindgenGetExtern() : EcsDocLink_Ptr);
-
-    public static ref ulong EcsDocUuid => ref *(ulong*)(EcsDocUuid_Ptr == null ? EcsDocUuid_Ptr = EcsDocUuid_BindgenGetExtern() : EcsDocUuid_Ptr);
-
-    public static ref ulong EcsDontFragment => ref *(ulong*)(EcsDontFragment_Ptr == null ? EcsDontFragment_Ptr = EcsDontFragment_BindgenGetExtern() : EcsDontFragment_Ptr);
-
-    public static ref ulong EcsDontInherit => ref *(ulong*)(EcsDontInherit_Ptr == null ? EcsDontInherit_Ptr = EcsDontInherit_BindgenGetExtern() : EcsDontInherit_Ptr);
-
-    public static ref ulong EcsDuration => ref *(ulong*)(EcsDuration_Ptr == null ? EcsDuration_Ptr = EcsDuration_BindgenGetExtern() : EcsDuration_Ptr);
-
-    public static ref ulong EcsElectricCurrent => ref *(ulong*)(EcsElectricCurrent_Ptr == null ? EcsElectricCurrent_Ptr = EcsElectricCurrent_BindgenGetExtern() : EcsElectricCurrent_Ptr);
-
-    public static ref ulong EcsEmpty => ref *(ulong*)(EcsEmpty_Ptr == null ? EcsEmpty_Ptr = EcsEmpty_BindgenGetExtern() : EcsEmpty_Ptr);
-
-    public static ref ulong EcsExa => ref *(ulong*)(EcsExa_Ptr == null ? EcsExa_Ptr = EcsExa_BindgenGetExtern() : EcsExa_Ptr);
-
-    public static ref ulong EcsExbi => ref *(ulong*)(EcsExbi_Ptr == null ? EcsExbi_Ptr = EcsExbi_BindgenGetExtern() : EcsExbi_Ptr);
-
-    public static ref ulong EcsExclusive => ref *(ulong*)(EcsExclusive_Ptr == null ? EcsExclusive_Ptr = EcsExclusive_BindgenGetExtern() : EcsExclusive_Ptr);
-
-    public static ref ulong EcsFahrenheit => ref *(ulong*)(EcsFahrenheit_Ptr == null ? EcsFahrenheit_Ptr = EcsFahrenheit_BindgenGetExtern() : EcsFahrenheit_Ptr);
-
-    public static ref ulong EcsFemto => ref *(ulong*)(EcsFemto_Ptr == null ? EcsFemto_Ptr = EcsFemto_BindgenGetExtern() : EcsFemto_Ptr);
-
-    public static ref ulong EcsFinal => ref *(ulong*)(EcsFinal_Ptr == null ? EcsFinal_Ptr = EcsFinal_BindgenGetExtern() : EcsFinal_Ptr);
-
-    public static ref ulong EcsFlecs => ref *(ulong*)(EcsFlecs_Ptr == null ? EcsFlecs_Ptr = EcsFlecs_BindgenGetExtern() : EcsFlecs_Ptr);
-
-    public static ref ulong EcsFlecsCore => ref *(ulong*)(EcsFlecsCore_Ptr == null ? EcsFlecsCore_Ptr = EcsFlecsCore_BindgenGetExtern() : EcsFlecsCore_Ptr);
-
-    public static ref ulong EcsForce => ref *(ulong*)(EcsForce_Ptr == null ? EcsForce_Ptr = EcsForce_BindgenGetExtern() : EcsForce_Ptr);
-
-    public static ref ulong EcsFrequency => ref *(ulong*)(EcsFrequency_Ptr == null ? EcsFrequency_Ptr = EcsFrequency_BindgenGetExtern() : EcsFrequency_Ptr);
-
-    public static ref ulong EcsGauge => ref *(ulong*)(EcsGauge_Ptr == null ? EcsGauge_Ptr = EcsGauge_BindgenGetExtern() : EcsGauge_Ptr);
-
-    public static ref ulong EcsGibi => ref *(ulong*)(EcsGibi_Ptr == null ? EcsGibi_Ptr = EcsGibi_BindgenGetExtern() : EcsGibi_Ptr);
-
-    public static ref ulong EcsGibiBytes => ref *(ulong*)(EcsGibiBytes_Ptr == null ? EcsGibiBytes_Ptr = EcsGibiBytes_BindgenGetExtern() : EcsGibiBytes_Ptr);
-
-    public static ref ulong EcsGiga => ref *(ulong*)(EcsGiga_Ptr == null ? EcsGiga_Ptr = EcsGiga_BindgenGetExtern() : EcsGiga_Ptr);
-
-    public static ref ulong EcsGigaBits => ref *(ulong*)(EcsGigaBits_Ptr == null ? EcsGigaBits_Ptr = EcsGigaBits_BindgenGetExtern() : EcsGigaBits_Ptr);
-
-    public static ref ulong EcsGigaBitsPerSecond => ref *(ulong*)(EcsGigaBitsPerSecond_Ptr == null ? EcsGigaBitsPerSecond_Ptr = EcsGigaBitsPerSecond_BindgenGetExtern() : EcsGigaBitsPerSecond_Ptr);
-
-    public static ref ulong EcsGigaBytes => ref *(ulong*)(EcsGigaBytes_Ptr == null ? EcsGigaBytes_Ptr = EcsGigaBytes_BindgenGetExtern() : EcsGigaBytes_Ptr);
-
-    public static ref ulong EcsGigaBytesPerSecond => ref *(ulong*)(EcsGigaBytesPerSecond_Ptr == null ? EcsGigaBytesPerSecond_Ptr = EcsGigaBytesPerSecond_BindgenGetExtern() : EcsGigaBytesPerSecond_Ptr);
-
-    public static ref ulong EcsGigaHertz => ref *(ulong*)(EcsGigaHertz_Ptr == null ? EcsGigaHertz_Ptr = EcsGigaHertz_BindgenGetExtern() : EcsGigaHertz_Ptr);
-
-    public static ref ulong EcsGrams => ref *(ulong*)(EcsGrams_Ptr == null ? EcsGrams_Ptr = EcsGrams_BindgenGetExtern() : EcsGrams_Ptr);
-
-    public static ref ulong EcsHecto => ref *(ulong*)(EcsHecto_Ptr == null ? EcsHecto_Ptr = EcsHecto_BindgenGetExtern() : EcsHecto_Ptr);
-
-    public static ref ulong EcsHertz => ref *(ulong*)(EcsHertz_Ptr == null ? EcsHertz_Ptr = EcsHertz_BindgenGetExtern() : EcsHertz_Ptr);
-
-    public static ref ulong EcsHours => ref *(ulong*)(EcsHours_Ptr == null ? EcsHours_Ptr = EcsHours_BindgenGetExtern() : EcsHours_Ptr);
-
-    public static ref ulong EcsInherit => ref *(ulong*)(EcsInherit_Ptr == null ? EcsInherit_Ptr = EcsInherit_BindgenGetExtern() : EcsInherit_Ptr);
-
-    public static ref ulong EcsInheritable => ref *(ulong*)(EcsInheritable_Ptr == null ? EcsInheritable_Ptr = EcsInheritable_BindgenGetExtern() : EcsInheritable_Ptr);
-
-    public static ref ulong EcsIsA => ref *(ulong*)(EcsIsA_Ptr == null ? EcsIsA_Ptr = EcsIsA_BindgenGetExtern() : EcsIsA_Ptr);
-
-    public static ref ulong EcsKelvin => ref *(ulong*)(EcsKelvin_Ptr == null ? EcsKelvin_Ptr = EcsKelvin_BindgenGetExtern() : EcsKelvin_Ptr);
-
-    public static ref ulong EcsKibi => ref *(ulong*)(EcsKibi_Ptr == null ? EcsKibi_Ptr = EcsKibi_BindgenGetExtern() : EcsKibi_Ptr);
-
-    public static ref ulong EcsKibiBytes => ref *(ulong*)(EcsKibiBytes_Ptr == null ? EcsKibiBytes_Ptr = EcsKibiBytes_BindgenGetExtern() : EcsKibiBytes_Ptr);
-
-    public static ref ulong EcsKilo => ref *(ulong*)(EcsKilo_Ptr == null ? EcsKilo_Ptr = EcsKilo_BindgenGetExtern() : EcsKilo_Ptr);
-
-    public static ref ulong EcsKiloBits => ref *(ulong*)(EcsKiloBits_Ptr == null ? EcsKiloBits_Ptr = EcsKiloBits_BindgenGetExtern() : EcsKiloBits_Ptr);
-
-    public static ref ulong EcsKiloBitsPerSecond => ref *(ulong*)(EcsKiloBitsPerSecond_Ptr == null ? EcsKiloBitsPerSecond_Ptr = EcsKiloBitsPerSecond_BindgenGetExtern() : EcsKiloBitsPerSecond_Ptr);
-
-    public static ref ulong EcsKiloBytes => ref *(ulong*)(EcsKiloBytes_Ptr == null ? EcsKiloBytes_Ptr = EcsKiloBytes_BindgenGetExtern() : EcsKiloBytes_Ptr);
-
-    public static ref ulong EcsKiloBytesPerSecond => ref *(ulong*)(EcsKiloBytesPerSecond_Ptr == null ? EcsKiloBytesPerSecond_Ptr = EcsKiloBytesPerSecond_BindgenGetExtern() : EcsKiloBytesPerSecond_Ptr);
-
-    public static ref ulong EcsKiloGrams => ref *(ulong*)(EcsKiloGrams_Ptr == null ? EcsKiloGrams_Ptr = EcsKiloGrams_BindgenGetExtern() : EcsKiloGrams_Ptr);
-
-    public static ref ulong EcsKiloHertz => ref *(ulong*)(EcsKiloHertz_Ptr == null ? EcsKiloHertz_Ptr = EcsKiloHertz_BindgenGetExtern() : EcsKiloHertz_Ptr);
-
-    public static ref ulong EcsKiloMeters => ref *(ulong*)(EcsKiloMeters_Ptr == null ? EcsKiloMeters_Ptr = EcsKiloMeters_BindgenGetExtern() : EcsKiloMeters_Ptr);
-
-    public static ref ulong EcsKiloMetersPerHour => ref *(ulong*)(EcsKiloMetersPerHour_Ptr == null ? EcsKiloMetersPerHour_Ptr = EcsKiloMetersPerHour_BindgenGetExtern() : EcsKiloMetersPerHour_Ptr);
-
-    public static ref ulong EcsKiloMetersPerSecond => ref *(ulong*)(EcsKiloMetersPerSecond_Ptr == null ? EcsKiloMetersPerSecond_Ptr = EcsKiloMetersPerSecond_BindgenGetExtern() : EcsKiloMetersPerSecond_Ptr);
-
-    public static ref ulong EcsLength => ref *(ulong*)(EcsLength_Ptr == null ? EcsLength_Ptr = EcsLength_BindgenGetExtern() : EcsLength_Ptr);
-
-    public static ref ulong EcsLuminousIntensity => ref *(ulong*)(EcsLuminousIntensity_Ptr == null ? EcsLuminousIntensity_Ptr = EcsLuminousIntensity_BindgenGetExtern() : EcsLuminousIntensity_Ptr);
-
-    public static ref ulong EcsMass => ref *(ulong*)(EcsMass_Ptr == null ? EcsMass_Ptr = EcsMass_BindgenGetExtern() : EcsMass_Ptr);
-
-    public static ref ulong EcsMebi => ref *(ulong*)(EcsMebi_Ptr == null ? EcsMebi_Ptr = EcsMebi_BindgenGetExtern() : EcsMebi_Ptr);
-
-    public static ref ulong EcsMebiBytes => ref *(ulong*)(EcsMebiBytes_Ptr == null ? EcsMebiBytes_Ptr = EcsMebiBytes_BindgenGetExtern() : EcsMebiBytes_Ptr);
-
-    public static ref ulong EcsMega => ref *(ulong*)(EcsMega_Ptr == null ? EcsMega_Ptr = EcsMega_BindgenGetExtern() : EcsMega_Ptr);
-
-    public static ref ulong EcsMegaBits => ref *(ulong*)(EcsMegaBits_Ptr == null ? EcsMegaBits_Ptr = EcsMegaBits_BindgenGetExtern() : EcsMegaBits_Ptr);
-
-    public static ref ulong EcsMegaBitsPerSecond => ref *(ulong*)(EcsMegaBitsPerSecond_Ptr == null ? EcsMegaBitsPerSecond_Ptr = EcsMegaBitsPerSecond_BindgenGetExtern() : EcsMegaBitsPerSecond_Ptr);
-
-    public static ref ulong EcsMegaBytes => ref *(ulong*)(EcsMegaBytes_Ptr == null ? EcsMegaBytes_Ptr = EcsMegaBytes_BindgenGetExtern() : EcsMegaBytes_Ptr);
-
-    public static ref ulong EcsMegaBytesPerSecond => ref *(ulong*)(EcsMegaBytesPerSecond_Ptr == null ? EcsMegaBytesPerSecond_Ptr = EcsMegaBytesPerSecond_BindgenGetExtern() : EcsMegaBytesPerSecond_Ptr);
-
-    public static ref ulong EcsMegaHertz => ref *(ulong*)(EcsMegaHertz_Ptr == null ? EcsMegaHertz_Ptr = EcsMegaHertz_BindgenGetExtern() : EcsMegaHertz_Ptr);
-
-    public static ref ulong EcsMeters => ref *(ulong*)(EcsMeters_Ptr == null ? EcsMeters_Ptr = EcsMeters_BindgenGetExtern() : EcsMeters_Ptr);
-
-    public static ref ulong EcsMetersPerSecond => ref *(ulong*)(EcsMetersPerSecond_Ptr == null ? EcsMetersPerSecond_Ptr = EcsMetersPerSecond_BindgenGetExtern() : EcsMetersPerSecond_Ptr);
-
-    public static ref ulong EcsMetric => ref *(ulong*)(EcsMetric_Ptr == null ? EcsMetric_Ptr = EcsMetric_BindgenGetExtern() : EcsMetric_Ptr);
-
-    public static ref ulong EcsMetricInstance => ref *(ulong*)(EcsMetricInstance_Ptr == null ? EcsMetricInstance_Ptr = EcsMetricInstance_BindgenGetExtern() : EcsMetricInstance_Ptr);
-
-    public static ref ulong EcsMicro => ref *(ulong*)(EcsMicro_Ptr == null ? EcsMicro_Ptr = EcsMicro_BindgenGetExtern() : EcsMicro_Ptr);
-
-    public static ref ulong EcsMicroMeters => ref *(ulong*)(EcsMicroMeters_Ptr == null ? EcsMicroMeters_Ptr = EcsMicroMeters_BindgenGetExtern() : EcsMicroMeters_Ptr);
-
-    public static ref ulong EcsMicroSeconds => ref *(ulong*)(EcsMicroSeconds_Ptr == null ? EcsMicroSeconds_Ptr = EcsMicroSeconds_BindgenGetExtern() : EcsMicroSeconds_Ptr);
-
-    public static ref ulong EcsMiles => ref *(ulong*)(EcsMiles_Ptr == null ? EcsMiles_Ptr = EcsMiles_BindgenGetExtern() : EcsMiles_Ptr);
-
-    public static ref ulong EcsMilesPerHour => ref *(ulong*)(EcsMilesPerHour_Ptr == null ? EcsMilesPerHour_Ptr = EcsMilesPerHour_BindgenGetExtern() : EcsMilesPerHour_Ptr);
-
-    public static ref ulong EcsMilli => ref *(ulong*)(EcsMilli_Ptr == null ? EcsMilli_Ptr = EcsMilli_BindgenGetExtern() : EcsMilli_Ptr);
-
-    public static ref ulong EcsMilliMeters => ref *(ulong*)(EcsMilliMeters_Ptr == null ? EcsMilliMeters_Ptr = EcsMilliMeters_BindgenGetExtern() : EcsMilliMeters_Ptr);
-
-    public static ref ulong EcsMilliSeconds => ref *(ulong*)(EcsMilliSeconds_Ptr == null ? EcsMilliSeconds_Ptr = EcsMilliSeconds_BindgenGetExtern() : EcsMilliSeconds_Ptr);
-
-    public static ref ulong EcsMinutes => ref *(ulong*)(EcsMinutes_Ptr == null ? EcsMinutes_Ptr = EcsMinutes_BindgenGetExtern() : EcsMinutes_Ptr);
-
-    public static ref ulong EcsModule => ref *(ulong*)(EcsModule_Ptr == null ? EcsModule_Ptr = EcsModule_BindgenGetExtern() : EcsModule_Ptr);
-
-    public static ref ulong EcsMole => ref *(ulong*)(EcsMole_Ptr == null ? EcsMole_Ptr = EcsMole_BindgenGetExtern() : EcsMole_Ptr);
-
-    public static ref ulong EcsMonitor => ref *(ulong*)(EcsMonitor_Ptr == null ? EcsMonitor_Ptr = EcsMonitor_BindgenGetExtern() : EcsMonitor_Ptr);
-
-    public static ref ulong EcsName => ref *(ulong*)(EcsName_Ptr == null ? EcsName_Ptr = EcsName_BindgenGetExtern() : EcsName_Ptr);
-
-    public static ref ulong EcsNano => ref *(ulong*)(EcsNano_Ptr == null ? EcsNano_Ptr = EcsNano_BindgenGetExtern() : EcsNano_Ptr);
-
-    public static ref ulong EcsNanoMeters => ref *(ulong*)(EcsNanoMeters_Ptr == null ? EcsNanoMeters_Ptr = EcsNanoMeters_BindgenGetExtern() : EcsNanoMeters_Ptr);
-
-    public static ref ulong EcsNanoSeconds => ref *(ulong*)(EcsNanoSeconds_Ptr == null ? EcsNanoSeconds_Ptr = EcsNanoSeconds_BindgenGetExtern() : EcsNanoSeconds_Ptr);
-
-    public static ref ulong EcsNewton => ref *(ulong*)(EcsNewton_Ptr == null ? EcsNewton_Ptr = EcsNewton_BindgenGetExtern() : EcsNewton_Ptr);
-
-    public static ref ulong EcsNotQueryable => ref *(ulong*)(EcsNotQueryable_Ptr == null ? EcsNotQueryable_Ptr = EcsNotQueryable_BindgenGetExtern() : EcsNotQueryable_Ptr);
-
-    public static ref ulong EcsObserver => ref *(ulong*)(EcsObserver_Ptr == null ? EcsObserver_Ptr = EcsObserver_BindgenGetExtern() : EcsObserver_Ptr);
-
-    public static ref ulong EcsOnAdd => ref *(ulong*)(EcsOnAdd_Ptr == null ? EcsOnAdd_Ptr = EcsOnAdd_BindgenGetExtern() : EcsOnAdd_Ptr);
-
-    public static ref ulong EcsOnDelete => ref *(ulong*)(EcsOnDelete_Ptr == null ? EcsOnDelete_Ptr = EcsOnDelete_BindgenGetExtern() : EcsOnDelete_Ptr);
-
-    public static ref ulong EcsOnDeleteTarget => ref *(ulong*)(EcsOnDeleteTarget_Ptr == null ? EcsOnDeleteTarget_Ptr = EcsOnDeleteTarget_BindgenGetExtern() : EcsOnDeleteTarget_Ptr);
-
-    public static ref ulong EcsOneOf => ref *(ulong*)(EcsOneOf_Ptr == null ? EcsOneOf_Ptr = EcsOneOf_BindgenGetExtern() : EcsOneOf_Ptr);
-
-    public static ref ulong EcsOnInstantiate => ref *(ulong*)(EcsOnInstantiate_Ptr == null ? EcsOnInstantiate_Ptr = EcsOnInstantiate_BindgenGetExtern() : EcsOnInstantiate_Ptr);
-
-    public static ref ulong EcsOnLoad => ref *(ulong*)(EcsOnLoad_Ptr == null ? EcsOnLoad_Ptr = EcsOnLoad_BindgenGetExtern() : EcsOnLoad_Ptr);
-
-    public static ref ulong EcsOnRemove => ref *(ulong*)(EcsOnRemove_Ptr == null ? EcsOnRemove_Ptr = EcsOnRemove_BindgenGetExtern() : EcsOnRemove_Ptr);
-
-    public static ref ulong EcsOnSet => ref *(ulong*)(EcsOnSet_Ptr == null ? EcsOnSet_Ptr = EcsOnSet_BindgenGetExtern() : EcsOnSet_Ptr);
-
-    public static ref ulong EcsOnStart => ref *(ulong*)(EcsOnStart_Ptr == null ? EcsOnStart_Ptr = EcsOnStart_BindgenGetExtern() : EcsOnStart_Ptr);
-
-    public static ref ulong EcsOnStore => ref *(ulong*)(EcsOnStore_Ptr == null ? EcsOnStore_Ptr = EcsOnStore_BindgenGetExtern() : EcsOnStore_Ptr);
-
-    public static ref ulong EcsOnTableCreate => ref *(ulong*)(EcsOnTableCreate_Ptr == null ? EcsOnTableCreate_Ptr = EcsOnTableCreate_BindgenGetExtern() : EcsOnTableCreate_Ptr);
-
-    public static ref ulong EcsOnTableDelete => ref *(ulong*)(EcsOnTableDelete_Ptr == null ? EcsOnTableDelete_Ptr = EcsOnTableDelete_BindgenGetExtern() : EcsOnTableDelete_Ptr);
-
-    public static ref ulong EcsOnUpdate => ref *(ulong*)(EcsOnUpdate_Ptr == null ? EcsOnUpdate_Ptr = EcsOnUpdate_BindgenGetExtern() : EcsOnUpdate_Ptr);
-
-    public static ref ulong EcsOnValidate => ref *(ulong*)(EcsOnValidate_Ptr == null ? EcsOnValidate_Ptr = EcsOnValidate_BindgenGetExtern() : EcsOnValidate_Ptr);
-
-    public static ref ulong EcsOrderedChildren => ref *(ulong*)(EcsOrderedChildren_Ptr == null ? EcsOrderedChildren_Ptr = EcsOrderedChildren_BindgenGetExtern() : EcsOrderedChildren_Ptr);
-
-    public static ref ulong EcsOverride => ref *(ulong*)(EcsOverride_Ptr == null ? EcsOverride_Ptr = EcsOverride_BindgenGetExtern() : EcsOverride_Ptr);
-
-    public static ref ulong EcsPairIsTag => ref *(ulong*)(EcsPairIsTag_Ptr == null ? EcsPairIsTag_Ptr = EcsPairIsTag_BindgenGetExtern() : EcsPairIsTag_Ptr);
-
-    public static ref ulong EcsPanic => ref *(ulong*)(EcsPanic_Ptr == null ? EcsPanic_Ptr = EcsPanic_BindgenGetExtern() : EcsPanic_Ptr);
-
-    public static ref ulong EcsPascal => ref *(ulong*)(EcsPascal_Ptr == null ? EcsPascal_Ptr = EcsPascal_BindgenGetExtern() : EcsPascal_Ptr);
-
-    public static ref ulong EcsPebi => ref *(ulong*)(EcsPebi_Ptr == null ? EcsPebi_Ptr = EcsPebi_BindgenGetExtern() : EcsPebi_Ptr);
-
-    public static ref ulong EcsPercentage => ref *(ulong*)(EcsPercentage_Ptr == null ? EcsPercentage_Ptr = EcsPercentage_BindgenGetExtern() : EcsPercentage_Ptr);
-
-    public static ref ulong EcsPeriod1d => ref *(ulong*)(EcsPeriod1d_Ptr == null ? EcsPeriod1d_Ptr = EcsPeriod1d_BindgenGetExtern() : EcsPeriod1d_Ptr);
-
-    public static ref ulong EcsPeriod1h => ref *(ulong*)(EcsPeriod1h_Ptr == null ? EcsPeriod1h_Ptr = EcsPeriod1h_BindgenGetExtern() : EcsPeriod1h_Ptr);
-
-    public static ref ulong EcsPeriod1m => ref *(ulong*)(EcsPeriod1m_Ptr == null ? EcsPeriod1m_Ptr = EcsPeriod1m_BindgenGetExtern() : EcsPeriod1m_Ptr);
-
-    public static ref ulong EcsPeriod1s => ref *(ulong*)(EcsPeriod1s_Ptr == null ? EcsPeriod1s_Ptr = EcsPeriod1s_BindgenGetExtern() : EcsPeriod1s_Ptr);
-
-    public static ref ulong EcsPeriod1w => ref *(ulong*)(EcsPeriod1w_Ptr == null ? EcsPeriod1w_Ptr = EcsPeriod1w_BindgenGetExtern() : EcsPeriod1w_Ptr);
-
-    public static ref ulong EcsPeta => ref *(ulong*)(EcsPeta_Ptr == null ? EcsPeta_Ptr = EcsPeta_BindgenGetExtern() : EcsPeta_Ptr);
-
-    public static ref ulong EcsPhase => ref *(ulong*)(EcsPhase_Ptr == null ? EcsPhase_Ptr = EcsPhase_BindgenGetExtern() : EcsPhase_Ptr);
-
-    public static ref ulong EcsPico => ref *(ulong*)(EcsPico_Ptr == null ? EcsPico_Ptr = EcsPico_BindgenGetExtern() : EcsPico_Ptr);
-
-    public static ref ulong EcsPicoMeters => ref *(ulong*)(EcsPicoMeters_Ptr == null ? EcsPicoMeters_Ptr = EcsPicoMeters_BindgenGetExtern() : EcsPicoMeters_Ptr);
-
-    public static ref ulong EcsPicoSeconds => ref *(ulong*)(EcsPicoSeconds_Ptr == null ? EcsPicoSeconds_Ptr = EcsPicoSeconds_BindgenGetExtern() : EcsPicoSeconds_Ptr);
-
-    public static ref ulong EcsPixels => ref *(ulong*)(EcsPixels_Ptr == null ? EcsPixels_Ptr = EcsPixels_BindgenGetExtern() : EcsPixels_Ptr);
-
-    public static ref ulong EcsPostFrame => ref *(ulong*)(EcsPostFrame_Ptr == null ? EcsPostFrame_Ptr = EcsPostFrame_BindgenGetExtern() : EcsPostFrame_Ptr);
-
-    public static ref ulong EcsPostLoad => ref *(ulong*)(EcsPostLoad_Ptr == null ? EcsPostLoad_Ptr = EcsPostLoad_BindgenGetExtern() : EcsPostLoad_Ptr);
-
-    public static ref ulong EcsPostUpdate => ref *(ulong*)(EcsPostUpdate_Ptr == null ? EcsPostUpdate_Ptr = EcsPostUpdate_BindgenGetExtern() : EcsPostUpdate_Ptr);
-
-    public static ref ulong EcsPredEq => ref *(ulong*)(EcsPredEq_Ptr == null ? EcsPredEq_Ptr = EcsPredEq_BindgenGetExtern() : EcsPredEq_Ptr);
-
-    public static ref ulong EcsPredLookup => ref *(ulong*)(EcsPredLookup_Ptr == null ? EcsPredLookup_Ptr = EcsPredLookup_BindgenGetExtern() : EcsPredLookup_Ptr);
-
-    public static ref ulong EcsPredMatch => ref *(ulong*)(EcsPredMatch_Ptr == null ? EcsPredMatch_Ptr = EcsPredMatch_BindgenGetExtern() : EcsPredMatch_Ptr);
-
-    public static ref ulong EcsPrefab => ref *(ulong*)(EcsPrefab_Ptr == null ? EcsPrefab_Ptr = EcsPrefab_BindgenGetExtern() : EcsPrefab_Ptr);
-
-    public static ref ulong EcsPreFrame => ref *(ulong*)(EcsPreFrame_Ptr == null ? EcsPreFrame_Ptr = EcsPreFrame_BindgenGetExtern() : EcsPreFrame_Ptr);
-
-    public static ref ulong EcsPressure => ref *(ulong*)(EcsPressure_Ptr == null ? EcsPressure_Ptr = EcsPressure_BindgenGetExtern() : EcsPressure_Ptr);
-
-    public static ref ulong EcsPreStore => ref *(ulong*)(EcsPreStore_Ptr == null ? EcsPreStore_Ptr = EcsPreStore_BindgenGetExtern() : EcsPreStore_Ptr);
-
-    public static ref ulong EcsPreUpdate => ref *(ulong*)(EcsPreUpdate_Ptr == null ? EcsPreUpdate_Ptr = EcsPreUpdate_BindgenGetExtern() : EcsPreUpdate_Ptr);
-
-    public static ref ulong EcsPrivate => ref *(ulong*)(EcsPrivate_Ptr == null ? EcsPrivate_Ptr = EcsPrivate_BindgenGetExtern() : EcsPrivate_Ptr);
-
-    public static ref ulong EcsQuantity => ref *(ulong*)(EcsQuantity_Ptr == null ? EcsQuantity_Ptr = EcsQuantity_BindgenGetExtern() : EcsQuantity_Ptr);
-
-    public static ref ulong EcsQuery => ref *(ulong*)(EcsQuery_Ptr == null ? EcsQuery_Ptr = EcsQuery_BindgenGetExtern() : EcsQuery_Ptr);
-
-    public static ref ulong EcsRadians => ref *(ulong*)(EcsRadians_Ptr == null ? EcsRadians_Ptr = EcsRadians_BindgenGetExtern() : EcsRadians_Ptr);
-
-    public static ref ulong EcsReflexive => ref *(ulong*)(EcsReflexive_Ptr == null ? EcsReflexive_Ptr = EcsReflexive_BindgenGetExtern() : EcsReflexive_Ptr);
-
-    public static ref ulong EcsRelationship => ref *(ulong*)(EcsRelationship_Ptr == null ? EcsRelationship_Ptr = EcsRelationship_BindgenGetExtern() : EcsRelationship_Ptr);
-
-    public static ref ulong EcsRemove => ref *(ulong*)(EcsRemove_Ptr == null ? EcsRemove_Ptr = EcsRemove_BindgenGetExtern() : EcsRemove_Ptr);
-
-    public static ref ulong EcsScopeClose => ref *(ulong*)(EcsScopeClose_Ptr == null ? EcsScopeClose_Ptr = EcsScopeClose_BindgenGetExtern() : EcsScopeClose_Ptr);
-
-    public static ref ulong EcsScopeOpen => ref *(ulong*)(EcsScopeOpen_Ptr == null ? EcsScopeOpen_Ptr = EcsScopeOpen_BindgenGetExtern() : EcsScopeOpen_Ptr);
-
-    public static ref ulong EcsScriptTemplate => ref *(ulong*)(EcsScriptTemplate_Ptr == null ? EcsScriptTemplate_Ptr = EcsScriptTemplate_BindgenGetExtern() : EcsScriptTemplate_Ptr);
-
-    public static ref ulong EcsSeconds => ref *(ulong*)(EcsSeconds_Ptr == null ? EcsSeconds_Ptr = EcsSeconds_BindgenGetExtern() : EcsSeconds_Ptr);
-
-    public static ref ulong EcsSingleton => ref *(ulong*)(EcsSingleton_Ptr == null ? EcsSingleton_Ptr = EcsSingleton_BindgenGetExtern() : EcsSingleton_Ptr);
-
-    public static ref ulong EcsSlotOf => ref *(ulong*)(EcsSlotOf_Ptr == null ? EcsSlotOf_Ptr = EcsSlotOf_BindgenGetExtern() : EcsSlotOf_Ptr);
-
-    public static ref ulong EcsSparse => ref *(ulong*)(EcsSparse_Ptr == null ? EcsSparse_Ptr = EcsSparse_BindgenGetExtern() : EcsSparse_Ptr);
-
-    public static ref ulong EcsSpeed => ref *(ulong*)(EcsSpeed_Ptr == null ? EcsSpeed_Ptr = EcsSpeed_BindgenGetExtern() : EcsSpeed_Ptr);
-
-    public static ref ulong EcsSymbol => ref *(ulong*)(EcsSymbol_Ptr == null ? EcsSymbol_Ptr = EcsSymbol_BindgenGetExtern() : EcsSymbol_Ptr);
-
-    public static ref ulong EcsSymmetric => ref *(ulong*)(EcsSymmetric_Ptr == null ? EcsSymmetric_Ptr = EcsSymmetric_BindgenGetExtern() : EcsSymmetric_Ptr);
-
-    public static ref ulong EcsSystem => ref *(ulong*)(EcsSystem_Ptr == null ? EcsSystem_Ptr = EcsSystem_BindgenGetExtern() : EcsSystem_Ptr);
-
-    public static ref ulong EcsTarget => ref *(ulong*)(EcsTarget_Ptr == null ? EcsTarget_Ptr = EcsTarget_BindgenGetExtern() : EcsTarget_Ptr);
-
-    public static ref ulong EcsTebi => ref *(ulong*)(EcsTebi_Ptr == null ? EcsTebi_Ptr = EcsTebi_BindgenGetExtern() : EcsTebi_Ptr);
-
-    public static ref ulong EcsTemperature => ref *(ulong*)(EcsTemperature_Ptr == null ? EcsTemperature_Ptr = EcsTemperature_BindgenGetExtern() : EcsTemperature_Ptr);
-
-    public static ref ulong EcsTera => ref *(ulong*)(EcsTera_Ptr == null ? EcsTera_Ptr = EcsTera_BindgenGetExtern() : EcsTera_Ptr);
-
-    public static ref ulong EcsThis => ref *(ulong*)(EcsThis_Ptr == null ? EcsThis_Ptr = EcsThis_BindgenGetExtern() : EcsThis_Ptr);
-
-    public static ref ulong EcsTime => ref *(ulong*)(EcsTime_Ptr == null ? EcsTime_Ptr = EcsTime_BindgenGetExtern() : EcsTime_Ptr);
-
-    public static ref ulong EcsTrait => ref *(ulong*)(EcsTrait_Ptr == null ? EcsTrait_Ptr = EcsTrait_BindgenGetExtern() : EcsTrait_Ptr);
-
-    public static ref ulong EcsTransitive => ref *(ulong*)(EcsTransitive_Ptr == null ? EcsTransitive_Ptr = EcsTransitive_BindgenGetExtern() : EcsTransitive_Ptr);
-
-    public static ref ulong EcsTraversable => ref *(ulong*)(EcsTraversable_Ptr == null ? EcsTraversable_Ptr = EcsTraversable_BindgenGetExtern() : EcsTraversable_Ptr);
-
-    public static ref ulong EcsUnitPrefixes => ref *(ulong*)(EcsUnitPrefixes_Ptr == null ? EcsUnitPrefixes_Ptr = EcsUnitPrefixes_BindgenGetExtern() : EcsUnitPrefixes_Ptr);
-
-    public static ref ulong EcsUri => ref *(ulong*)(EcsUri_Ptr == null ? EcsUri_Ptr = EcsUri_BindgenGetExtern() : EcsUri_Ptr);
-
-    public static ref ulong EcsUriFile => ref *(ulong*)(EcsUriFile_Ptr == null ? EcsUriFile_Ptr = EcsUriFile_BindgenGetExtern() : EcsUriFile_Ptr);
-
-    public static ref ulong EcsUriHyperlink => ref *(ulong*)(EcsUriHyperlink_Ptr == null ? EcsUriHyperlink_Ptr = EcsUriHyperlink_BindgenGetExtern() : EcsUriHyperlink_Ptr);
-
-    public static ref ulong EcsUriImage => ref *(ulong*)(EcsUriImage_Ptr == null ? EcsUriImage_Ptr = EcsUriImage_BindgenGetExtern() : EcsUriImage_Ptr);
-
-    public static ref ulong EcsVariable => ref *(ulong*)(EcsVariable_Ptr == null ? EcsVariable_Ptr = EcsVariable_BindgenGetExtern() : EcsVariable_Ptr);
-
-    public static ref ulong EcsWildcard => ref *(ulong*)(EcsWildcard_Ptr == null ? EcsWildcard_Ptr = EcsWildcard_BindgenGetExtern() : EcsWildcard_Ptr);
-
-    public static ref ulong EcsWith => ref *(ulong*)(EcsWith_Ptr == null ? EcsWith_Ptr = EcsWith_BindgenGetExtern() : EcsWith_Ptr);
-
-    public static ref ulong EcsWorld => ref *(ulong*)(EcsWorld_Ptr == null ? EcsWorld_Ptr = EcsWorld_BindgenGetExtern() : EcsWorld_Ptr);
-
-    public static ref ulong EcsYobi => ref *(ulong*)(EcsYobi_Ptr == null ? EcsYobi_Ptr = EcsYobi_BindgenGetExtern() : EcsYobi_Ptr);
-
-    public static ref ulong EcsYocto => ref *(ulong*)(EcsYocto_Ptr == null ? EcsYocto_Ptr = EcsYocto_BindgenGetExtern() : EcsYocto_Ptr);
-
-    public static ref ulong EcsYotta => ref *(ulong*)(EcsYotta_Ptr == null ? EcsYotta_Ptr = EcsYotta_BindgenGetExtern() : EcsYotta_Ptr);
-
-    public static ref ulong EcsZebi => ref *(ulong*)(EcsZebi_Ptr == null ? EcsZebi_Ptr = EcsZebi_BindgenGetExtern() : EcsZebi_Ptr);
-
-    public static ref ulong EcsZepto => ref *(ulong*)(EcsZepto_Ptr == null ? EcsZepto_Ptr = EcsZepto_BindgenGetExtern() : EcsZepto_Ptr);
-
-    public static ref ulong EcsZetta => ref *(ulong*)(EcsZetta_Ptr == null ? EcsZetta_Ptr = EcsZetta_BindgenGetExtern() : EcsZetta_Ptr);
-
-    public static ref ulong FLECS_IDecs_allocator_memory_tID_ => ref *(ulong*)(FLECS_IDecs_allocator_memory_tID__Ptr == null ? FLECS_IDecs_allocator_memory_tID__Ptr = FLECS_IDecs_allocator_memory_tID__BindgenGetExtern() : FLECS_IDecs_allocator_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_bool_tID_ => ref *(ulong*)(FLECS_IDecs_bool_tID__Ptr == null ? FLECS_IDecs_bool_tID__Ptr = FLECS_IDecs_bool_tID__BindgenGetExtern() : FLECS_IDecs_bool_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_byte_tID_ => ref *(ulong*)(FLECS_IDecs_byte_tID__Ptr == null ? FLECS_IDecs_byte_tID__Ptr = FLECS_IDecs_byte_tID__BindgenGetExtern() : FLECS_IDecs_byte_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_char_tID_ => ref *(ulong*)(FLECS_IDecs_char_tID__Ptr == null ? FLECS_IDecs_char_tID__Ptr = FLECS_IDecs_char_tID__BindgenGetExtern() : FLECS_IDecs_char_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_component_index_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_index_memory_tID__Ptr == null ? FLECS_IDecs_component_index_memory_tID__Ptr = FLECS_IDecs_component_index_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_index_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_component_memory_tID_ => ref *(ulong*)(FLECS_IDecs_component_memory_tID__Ptr == null ? FLECS_IDecs_component_memory_tID__Ptr = FLECS_IDecs_component_memory_tID__BindgenGetExtern() : FLECS_IDecs_component_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_entities_memory_tID_ => ref *(ulong*)(FLECS_IDecs_entities_memory_tID__Ptr == null ? FLECS_IDecs_entities_memory_tID__Ptr = FLECS_IDecs_entities_memory_tID__BindgenGetExtern() : FLECS_IDecs_entities_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_entity_tID_ => ref *(ulong*)(FLECS_IDecs_entity_tID__Ptr == null ? FLECS_IDecs_entity_tID__Ptr = FLECS_IDecs_entity_tID__BindgenGetExtern() : FLECS_IDecs_entity_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_f32_tID_ => ref *(ulong*)(FLECS_IDecs_f32_tID__Ptr == null ? FLECS_IDecs_f32_tID__Ptr = FLECS_IDecs_f32_tID__BindgenGetExtern() : FLECS_IDecs_f32_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_f64_tID_ => ref *(ulong*)(FLECS_IDecs_f64_tID__Ptr == null ? FLECS_IDecs_f64_tID__Ptr = FLECS_IDecs_f64_tID__BindgenGetExtern() : FLECS_IDecs_f64_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_i16_tID_ => ref *(ulong*)(FLECS_IDecs_i16_tID__Ptr == null ? FLECS_IDecs_i16_tID__Ptr = FLECS_IDecs_i16_tID__BindgenGetExtern() : FLECS_IDecs_i16_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_i32_tID_ => ref *(ulong*)(FLECS_IDecs_i32_tID__Ptr == null ? FLECS_IDecs_i32_tID__Ptr = FLECS_IDecs_i32_tID__BindgenGetExtern() : FLECS_IDecs_i32_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_i64_tID_ => ref *(ulong*)(FLECS_IDecs_i64_tID__Ptr == null ? FLECS_IDecs_i64_tID__Ptr = FLECS_IDecs_i64_tID__BindgenGetExtern() : FLECS_IDecs_i64_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_i8_tID_ => ref *(ulong*)(FLECS_IDecs_i8_tID__Ptr == null ? FLECS_IDecs_i8_tID__Ptr = FLECS_IDecs_i8_tID__BindgenGetExtern() : FLECS_IDecs_i8_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_id_tID_ => ref *(ulong*)(FLECS_IDecs_id_tID__Ptr == null ? FLECS_IDecs_id_tID__Ptr = FLECS_IDecs_id_tID__BindgenGetExtern() : FLECS_IDecs_id_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_iptr_tID_ => ref *(ulong*)(FLECS_IDecs_iptr_tID__Ptr == null ? FLECS_IDecs_iptr_tID__Ptr = FLECS_IDecs_iptr_tID__BindgenGetExtern() : FLECS_IDecs_iptr_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_misc_memory_tID_ => ref *(ulong*)(FLECS_IDecs_misc_memory_tID__Ptr == null ? FLECS_IDecs_misc_memory_tID__Ptr = FLECS_IDecs_misc_memory_tID__BindgenGetExtern() : FLECS_IDecs_misc_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_query_memory_tID_ => ref *(ulong*)(FLECS_IDecs_query_memory_tID__Ptr == null ? FLECS_IDecs_query_memory_tID__Ptr = FLECS_IDecs_query_memory_tID__BindgenGetExtern() : FLECS_IDecs_query_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_string_tID_ => ref *(ulong*)(FLECS_IDecs_string_tID__Ptr == null ? FLECS_IDecs_string_tID__Ptr = FLECS_IDecs_string_tID__BindgenGetExtern() : FLECS_IDecs_string_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_table_histogram_tID_ => ref *(ulong*)(FLECS_IDecs_table_histogram_tID__Ptr == null ? FLECS_IDecs_table_histogram_tID__Ptr = FLECS_IDecs_table_histogram_tID__BindgenGetExtern() : FLECS_IDecs_table_histogram_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_table_memory_tID_ => ref *(ulong*)(FLECS_IDecs_table_memory_tID__Ptr == null ? FLECS_IDecs_table_memory_tID__Ptr = FLECS_IDecs_table_memory_tID__BindgenGetExtern() : FLECS_IDecs_table_memory_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_u16_tID_ => ref *(ulong*)(FLECS_IDecs_u16_tID__Ptr == null ? FLECS_IDecs_u16_tID__Ptr = FLECS_IDecs_u16_tID__BindgenGetExtern() : FLECS_IDecs_u16_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_u32_tID_ => ref *(ulong*)(FLECS_IDecs_u32_tID__Ptr == null ? FLECS_IDecs_u32_tID__Ptr = FLECS_IDecs_u32_tID__BindgenGetExtern() : FLECS_IDecs_u32_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_u64_tID_ => ref *(ulong*)(FLECS_IDecs_u64_tID__Ptr == null ? FLECS_IDecs_u64_tID__Ptr = FLECS_IDecs_u64_tID__BindgenGetExtern() : FLECS_IDecs_u64_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_u8_tID_ => ref *(ulong*)(FLECS_IDecs_u8_tID__Ptr == null ? FLECS_IDecs_u8_tID__Ptr = FLECS_IDecs_u8_tID__BindgenGetExtern() : FLECS_IDecs_u8_tID__Ptr);
-
-    public static ref ulong FLECS_IDecs_uptr_tID_ => ref *(ulong*)(FLECS_IDecs_uptr_tID__Ptr == null ? FLECS_IDecs_uptr_tID__Ptr = FLECS_IDecs_uptr_tID__BindgenGetExtern() : FLECS_IDecs_uptr_tID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertCriticalID_ => ref *(ulong*)(FLECS_IDEcsAlertCriticalID__Ptr == null ? FLECS_IDEcsAlertCriticalID__Ptr = FLECS_IDEcsAlertCriticalID__BindgenGetExtern() : FLECS_IDEcsAlertCriticalID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertErrorID_ => ref *(ulong*)(FLECS_IDEcsAlertErrorID__Ptr == null ? FLECS_IDEcsAlertErrorID__Ptr = FLECS_IDEcsAlertErrorID__BindgenGetExtern() : FLECS_IDEcsAlertErrorID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertID_ => ref *(ulong*)(FLECS_IDEcsAlertID__Ptr == null ? FLECS_IDEcsAlertID__Ptr = FLECS_IDEcsAlertID__BindgenGetExtern() : FLECS_IDEcsAlertID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertInfoID_ => ref *(ulong*)(FLECS_IDEcsAlertInfoID__Ptr == null ? FLECS_IDEcsAlertInfoID__Ptr = FLECS_IDEcsAlertInfoID__BindgenGetExtern() : FLECS_IDEcsAlertInfoID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertInstanceID_ => ref *(ulong*)(FLECS_IDEcsAlertInstanceID__Ptr == null ? FLECS_IDEcsAlertInstanceID__Ptr = FLECS_IDEcsAlertInstanceID__BindgenGetExtern() : FLECS_IDEcsAlertInstanceID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertsActiveID_ => ref *(ulong*)(FLECS_IDEcsAlertsActiveID__Ptr == null ? FLECS_IDEcsAlertsActiveID__Ptr = FLECS_IDEcsAlertsActiveID__BindgenGetExtern() : FLECS_IDEcsAlertsActiveID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertTimeoutID_ => ref *(ulong*)(FLECS_IDEcsAlertTimeoutID__Ptr == null ? FLECS_IDEcsAlertTimeoutID__Ptr = FLECS_IDEcsAlertTimeoutID__BindgenGetExtern() : FLECS_IDEcsAlertTimeoutID__Ptr);
-
-    public static ref ulong FLECS_IDEcsAlertWarningID_ => ref *(ulong*)(FLECS_IDEcsAlertWarningID__Ptr == null ? FLECS_IDEcsAlertWarningID__Ptr = FLECS_IDEcsAlertWarningID__BindgenGetExtern() : FLECS_IDEcsAlertWarningID__Ptr);
-
-    public static ref ulong FLECS_IDEcsArrayID_ => ref *(ulong*)(FLECS_IDEcsArrayID__Ptr == null ? FLECS_IDEcsArrayID__Ptr = FLECS_IDEcsArrayID__BindgenGetExtern() : FLECS_IDEcsArrayID__Ptr);
-
-    public static ref ulong FLECS_IDEcsBitmaskID_ => ref *(ulong*)(FLECS_IDEcsBitmaskID__Ptr == null ? FLECS_IDEcsBitmaskID__Ptr = FLECS_IDEcsBitmaskID__BindgenGetExtern() : FLECS_IDEcsBitmaskID__Ptr);
-
-    public static ref ulong FLECS_IDEcsComponentID_ => ref *(ulong*)(FLECS_IDEcsComponentID__Ptr == null ? FLECS_IDEcsComponentID__Ptr = FLECS_IDEcsComponentID__BindgenGetExtern() : FLECS_IDEcsComponentID__Ptr);
-
-    public static ref ulong FLECS_IDEcsConstantsID_ => ref *(ulong*)(FLECS_IDEcsConstantsID__Ptr == null ? FLECS_IDEcsConstantsID__Ptr = FLECS_IDEcsConstantsID__BindgenGetExtern() : FLECS_IDEcsConstantsID__Ptr);
-
-    public static ref ulong FLECS_IDEcsCounterID_ => ref *(ulong*)(FLECS_IDEcsCounterID__Ptr == null ? FLECS_IDEcsCounterID__Ptr = FLECS_IDEcsCounterID__BindgenGetExtern() : FLECS_IDEcsCounterID__Ptr);
-
-    public static ref ulong FLECS_IDEcsCounterIdID_ => ref *(ulong*)(FLECS_IDEcsCounterIdID__Ptr == null ? FLECS_IDEcsCounterIdID__Ptr = FLECS_IDEcsCounterIdID__BindgenGetExtern() : FLECS_IDEcsCounterIdID__Ptr);
-
-    public static ref ulong FLECS_IDEcsCounterIncrementID_ => ref *(ulong*)(FLECS_IDEcsCounterIncrementID__Ptr == null ? FLECS_IDEcsCounterIncrementID__Ptr = FLECS_IDEcsCounterIncrementID__BindgenGetExtern() : FLECS_IDEcsCounterIncrementID__Ptr);
-
-    public static ref ulong FLECS_IDEcsDefaultChildComponentID_ => ref *(ulong*)(FLECS_IDEcsDefaultChildComponentID__Ptr == null ? FLECS_IDEcsDefaultChildComponentID__Ptr = FLECS_IDEcsDefaultChildComponentID__BindgenGetExtern() : FLECS_IDEcsDefaultChildComponentID__Ptr);
-
-    public static ref ulong FLECS_IDEcsDocDescriptionID_ => ref *(ulong*)(FLECS_IDEcsDocDescriptionID__Ptr == null ? FLECS_IDEcsDocDescriptionID__Ptr = FLECS_IDEcsDocDescriptionID__BindgenGetExtern() : FLECS_IDEcsDocDescriptionID__Ptr);
-
-    public static ref ulong FLECS_IDEcsEnumID_ => ref *(ulong*)(FLECS_IDEcsEnumID__Ptr == null ? FLECS_IDEcsEnumID__Ptr = FLECS_IDEcsEnumID__BindgenGetExtern() : FLECS_IDEcsEnumID__Ptr);
-
-    public static ref ulong FLECS_IDEcsGaugeID_ => ref *(ulong*)(FLECS_IDEcsGaugeID__Ptr == null ? FLECS_IDEcsGaugeID__Ptr = FLECS_IDEcsGaugeID__BindgenGetExtern() : FLECS_IDEcsGaugeID__Ptr);
-
-    public static ref ulong FLECS_IDEcsIdentifierID_ => ref *(ulong*)(FLECS_IDEcsIdentifierID__Ptr == null ? FLECS_IDEcsIdentifierID__Ptr = FLECS_IDEcsIdentifierID__BindgenGetExtern() : FLECS_IDEcsIdentifierID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMemberID_ => ref *(ulong*)(FLECS_IDEcsMemberID__Ptr == null ? FLECS_IDEcsMemberID__Ptr = FLECS_IDEcsMemberID__BindgenGetExtern() : FLECS_IDEcsMemberID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMemberRangesID_ => ref *(ulong*)(FLECS_IDEcsMemberRangesID__Ptr == null ? FLECS_IDEcsMemberRangesID__Ptr = FLECS_IDEcsMemberRangesID__BindgenGetExtern() : FLECS_IDEcsMemberRangesID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMetricID_ => ref *(ulong*)(FLECS_IDEcsMetricID__Ptr == null ? FLECS_IDEcsMetricID__Ptr = FLECS_IDEcsMetricID__BindgenGetExtern() : FLECS_IDEcsMetricID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMetricInstanceID_ => ref *(ulong*)(FLECS_IDEcsMetricInstanceID__Ptr == null ? FLECS_IDEcsMetricInstanceID__Ptr = FLECS_IDEcsMetricInstanceID__BindgenGetExtern() : FLECS_IDEcsMetricInstanceID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMetricSourceID_ => ref *(ulong*)(FLECS_IDEcsMetricSourceID__Ptr == null ? FLECS_IDEcsMetricSourceID__Ptr = FLECS_IDEcsMetricSourceID__BindgenGetExtern() : FLECS_IDEcsMetricSourceID__Ptr);
-
-    public static ref ulong FLECS_IDEcsMetricValueID_ => ref *(ulong*)(FLECS_IDEcsMetricValueID__Ptr == null ? FLECS_IDEcsMetricValueID__Ptr = FLECS_IDEcsMetricValueID__BindgenGetExtern() : FLECS_IDEcsMetricValueID__Ptr);
-
-    public static ref ulong FLECS_IDEcsOpaqueID_ => ref *(ulong*)(FLECS_IDEcsOpaqueID__Ptr == null ? FLECS_IDEcsOpaqueID__Ptr = FLECS_IDEcsOpaqueID__BindgenGetExtern() : FLECS_IDEcsOpaqueID__Ptr);
-
-    public static ref ulong FLECS_IDEcsPipelineID_ => ref *(ulong*)(FLECS_IDEcsPipelineID__Ptr == null ? FLECS_IDEcsPipelineID__Ptr = FLECS_IDEcsPipelineID__BindgenGetExtern() : FLECS_IDEcsPipelineID__Ptr);
-
-    public static ref ulong FLECS_IDEcsPipelineStatsID_ => ref *(ulong*)(FLECS_IDEcsPipelineStatsID__Ptr == null ? FLECS_IDEcsPipelineStatsID__Ptr = FLECS_IDEcsPipelineStatsID__BindgenGetExtern() : FLECS_IDEcsPipelineStatsID__Ptr);
-
-    public static ref ulong FLECS_IDEcsPolyID_ => ref *(ulong*)(FLECS_IDEcsPolyID__Ptr == null ? FLECS_IDEcsPolyID__Ptr = FLECS_IDEcsPolyID__BindgenGetExtern() : FLECS_IDEcsPolyID__Ptr);
-
-    public static ref ulong FLECS_IDEcsPrimitiveID_ => ref *(ulong*)(FLECS_IDEcsPrimitiveID__Ptr == null ? FLECS_IDEcsPrimitiveID__Ptr = FLECS_IDEcsPrimitiveID__BindgenGetExtern() : FLECS_IDEcsPrimitiveID__Ptr);
-
-    public static ref ulong FLECS_IDEcsRateFilterID_ => ref *(ulong*)(FLECS_IDEcsRateFilterID__Ptr == null ? FLECS_IDEcsRateFilterID__Ptr = FLECS_IDEcsRateFilterID__BindgenGetExtern() : FLECS_IDEcsRateFilterID__Ptr);
-
-    public static ref ulong FLECS_IDEcsRestID_ => ref *(ulong*)(FLECS_IDEcsRestID__Ptr == null ? FLECS_IDEcsRestID__Ptr = FLECS_IDEcsRestID__BindgenGetExtern() : FLECS_IDEcsRestID__Ptr);
-
-    public static ref ulong FLECS_IDEcsScriptConstVarID_ => ref *(ulong*)(FLECS_IDEcsScriptConstVarID__Ptr == null ? FLECS_IDEcsScriptConstVarID__Ptr = FLECS_IDEcsScriptConstVarID__BindgenGetExtern() : FLECS_IDEcsScriptConstVarID__Ptr);
-
-    public static ref ulong FLECS_IDEcsScriptFunctionID_ => ref *(ulong*)(FLECS_IDEcsScriptFunctionID__Ptr == null ? FLECS_IDEcsScriptFunctionID__Ptr = FLECS_IDEcsScriptFunctionID__BindgenGetExtern() : FLECS_IDEcsScriptFunctionID__Ptr);
-
-    public static ref ulong FLECS_IDEcsScriptID_ => ref *(ulong*)(FLECS_IDEcsScriptID__Ptr == null ? FLECS_IDEcsScriptID__Ptr = FLECS_IDEcsScriptID__BindgenGetExtern() : FLECS_IDEcsScriptID__Ptr);
-
-    public static ref ulong FLECS_IDEcsScriptMethodID_ => ref *(ulong*)(FLECS_IDEcsScriptMethodID__Ptr == null ? FLECS_IDEcsScriptMethodID__Ptr = FLECS_IDEcsScriptMethodID__BindgenGetExtern() : FLECS_IDEcsScriptMethodID__Ptr);
-
-    public static ref ulong FLECS_IDEcsScriptTemplateID_ => ref *(ulong*)(FLECS_IDEcsScriptTemplateID__Ptr == null ? FLECS_IDEcsScriptTemplateID__Ptr = FLECS_IDEcsScriptTemplateID__BindgenGetExtern() : FLECS_IDEcsScriptTemplateID__Ptr);
-
-    public static ref ulong FLECS_IDEcsStructID_ => ref *(ulong*)(FLECS_IDEcsStructID__Ptr == null ? FLECS_IDEcsStructID__Ptr = FLECS_IDEcsStructID__BindgenGetExtern() : FLECS_IDEcsStructID__Ptr);
-
-    public static ref ulong FLECS_IDEcsSystemStatsID_ => ref *(ulong*)(FLECS_IDEcsSystemStatsID__Ptr == null ? FLECS_IDEcsSystemStatsID__Ptr = FLECS_IDEcsSystemStatsID__BindgenGetExtern() : FLECS_IDEcsSystemStatsID__Ptr);
-
-    public static ref ulong FLECS_IDEcsTickSourceID_ => ref *(ulong*)(FLECS_IDEcsTickSourceID__Ptr == null ? FLECS_IDEcsTickSourceID__Ptr = FLECS_IDEcsTickSourceID__BindgenGetExtern() : FLECS_IDEcsTickSourceID__Ptr);
-
-    public static ref ulong FLECS_IDEcsTimerID_ => ref *(ulong*)(FLECS_IDEcsTimerID__Ptr == null ? FLECS_IDEcsTimerID__Ptr = FLECS_IDEcsTimerID__BindgenGetExtern() : FLECS_IDEcsTimerID__Ptr);
-
-    public static ref ulong FLECS_IDEcsTypeID_ => ref *(ulong*)(FLECS_IDEcsTypeID__Ptr == null ? FLECS_IDEcsTypeID__Ptr = FLECS_IDEcsTypeID__BindgenGetExtern() : FLECS_IDEcsTypeID__Ptr);
-
-    public static ref ulong FLECS_IDEcsTypeSerializerID_ => ref *(ulong*)(FLECS_IDEcsTypeSerializerID__Ptr == null ? FLECS_IDEcsTypeSerializerID__Ptr = FLECS_IDEcsTypeSerializerID__BindgenGetExtern() : FLECS_IDEcsTypeSerializerID__Ptr);
-
-    public static ref ulong FLECS_IDEcsUnitID_ => ref *(ulong*)(FLECS_IDEcsUnitID__Ptr == null ? FLECS_IDEcsUnitID__Ptr = FLECS_IDEcsUnitID__BindgenGetExtern() : FLECS_IDEcsUnitID__Ptr);
-
-    public static ref ulong FLECS_IDEcsUnitPrefixID_ => ref *(ulong*)(FLECS_IDEcsUnitPrefixID__Ptr == null ? FLECS_IDEcsUnitPrefixID__Ptr = FLECS_IDEcsUnitPrefixID__BindgenGetExtern() : FLECS_IDEcsUnitPrefixID__Ptr);
-
-    public static ref ulong FLECS_IDEcsVectorID_ => ref *(ulong*)(FLECS_IDEcsVectorID__Ptr == null ? FLECS_IDEcsVectorID__Ptr = FLECS_IDEcsVectorID__BindgenGetExtern() : FLECS_IDEcsVectorID__Ptr);
-
-    public static ref ulong FLECS_IDEcsWorldMemoryID_ => ref *(ulong*)(FLECS_IDEcsWorldMemoryID__Ptr == null ? FLECS_IDEcsWorldMemoryID__Ptr = FLECS_IDEcsWorldMemoryID__BindgenGetExtern() : FLECS_IDEcsWorldMemoryID__Ptr);
-
-    public static ref ulong FLECS_IDEcsWorldStatsID_ => ref *(ulong*)(FLECS_IDEcsWorldStatsID__Ptr == null ? FLECS_IDEcsWorldStatsID__Ptr = FLECS_IDEcsWorldStatsID__BindgenGetExtern() : FLECS_IDEcsWorldStatsID__Ptr);
-
-    public static ref ulong FLECS_IDEcsWorldSummaryID_ => ref *(ulong*)(FLECS_IDEcsWorldSummaryID__Ptr == null ? FLECS_IDEcsWorldSummaryID__Ptr = FLECS_IDEcsWorldSummaryID__BindgenGetExtern() : FLECS_IDEcsWorldSummaryID__Ptr);
-
-    public static ref ulong FLECS_IDFlecsAlertsID_ => ref *(ulong*)(FLECS_IDFlecsAlertsID__Ptr == null ? FLECS_IDFlecsAlertsID__Ptr = FLECS_IDFlecsAlertsID__BindgenGetExtern() : FLECS_IDFlecsAlertsID__Ptr);
-
-    public static ref ulong FLECS_IDFlecsMetricsID_ => ref *(ulong*)(FLECS_IDFlecsMetricsID__Ptr == null ? FLECS_IDFlecsMetricsID__Ptr = FLECS_IDFlecsMetricsID__BindgenGetExtern() : FLECS_IDFlecsMetricsID__Ptr);
-
-    public static ref ulong FLECS_IDFlecsStatsID_ => ref *(ulong*)(FLECS_IDFlecsStatsID__Ptr == null ? FLECS_IDFlecsStatsID__Ptr = FLECS_IDFlecsStatsID__BindgenGetExtern() : FLECS_IDFlecsStatsID__Ptr);
-
-    public partial struct ecs_allocator_t : IEquatable<ecs_allocator_t>
-    {
-        public bool Equals(ecs_allocator_t other)
-        {
-            fixed (ecs_allocator_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_allocator_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_allocator_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_allocator_t left, ecs_allocator_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_allocator_t left, ecs_allocator_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_allocator_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_type_t : IEquatable<ecs_type_t>
-    {
-        public bool Equals(ecs_type_t other)
-        {
-            fixed (ecs_type_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_type_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_type_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_type_t left, ecs_type_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_type_t left, ecs_type_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_type_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_t : IEquatable<ecs_world_t>
-    {
-        public bool Equals(ecs_world_t other)
-        {
-            fixed (ecs_world_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_world_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_world_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_world_t left, ecs_world_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_world_t left, ecs_world_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_world_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stage_t : IEquatable<ecs_stage_t>
-    {
-        public bool Equals(ecs_stage_t other)
-        {
-            fixed (ecs_stage_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stage_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stage_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stage_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stage_t left, ecs_stage_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stage_t left, ecs_stage_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stage_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stage_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_t : IEquatable<ecs_table_t>
-    {
-        public bool Equals(ecs_table_t other)
-        {
-            fixed (ecs_table_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_t left, ecs_table_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_t left, ecs_table_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_term_t : IEquatable<ecs_term_t>
-    {
-        public bool Equals(ecs_term_t other)
-        {
-            fixed (ecs_term_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_term_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_term_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_term_t left, ecs_term_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_term_t left, ecs_term_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_term_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_t : IEquatable<ecs_query_t>
-    {
-        public bool Equals(ecs_query_t other)
-        {
-            fixed (ecs_query_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_t left, ecs_query_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_t left, ecs_query_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_observer_t : IEquatable<ecs_observer_t>
-    {
-        public bool Equals(ecs_observer_t other)
-        {
-            fixed (ecs_observer_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_observer_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observer_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_observer_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_observer_t left, ecs_observer_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_observer_t left, ecs_observer_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_observer_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observer_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_observable_t : IEquatable<ecs_observable_t>
-    {
-        public bool Equals(ecs_observable_t other)
-        {
-            fixed (ecs_observable_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_observable_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observable_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_observable_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_observable_t left, ecs_observable_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_observable_t left, ecs_observable_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_observable_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observable_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_iter_t : IEquatable<ecs_iter_t>
-    {
-        public bool Equals(ecs_iter_t other)
-        {
-            fixed (ecs_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_iter_t left, ecs_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_iter_t left, ecs_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_ref_t : IEquatable<ecs_ref_t>
-    {
-        public bool Equals(ecs_ref_t other)
-        {
-            fixed (ecs_ref_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_ref_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_ref_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_ref_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_ref_t left, ecs_ref_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_ref_t left, ecs_ref_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_ref_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_ref_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_type_hooks_t : IEquatable<ecs_type_hooks_t>
-    {
-        public bool Equals(ecs_type_hooks_t other)
-        {
-            fixed (ecs_type_hooks_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_type_hooks_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_hooks_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_type_hooks_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_type_hooks_t left, ecs_type_hooks_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_type_hooks_t left, ecs_type_hooks_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_type_hooks_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_hooks_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_type_info_t : IEquatable<ecs_type_info_t>
-    {
-        public bool Equals(ecs_type_info_t other)
-        {
-            fixed (ecs_type_info_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_type_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_type_info_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_type_info_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_type_info_t left, ecs_type_info_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_type_info_t left, ecs_type_info_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_type_info_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_type_info_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_record_t : IEquatable<ecs_record_t>
-    {
-        public bool Equals(ecs_record_t other)
-        {
-            fixed (ecs_record_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_record_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_record_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_record_t left, ecs_record_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_record_t left, ecs_record_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_record_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_record_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_component_record_t : IEquatable<ecs_component_record_t>
-    {
-        public bool Equals(ecs_component_record_t other)
-        {
-            fixed (ecs_component_record_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_component_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_record_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_component_record_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_component_record_t left, ecs_component_record_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_component_record_t left, ecs_component_record_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_component_record_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_record_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_mixins_t : IEquatable<ecs_mixins_t>
-    {
-        public bool Equals(ecs_mixins_t other)
-        {
-            fixed (ecs_mixins_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_mixins_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_mixins_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_mixins_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_mixins_t left, ecs_mixins_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_mixins_t left, ecs_mixins_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_mixins_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_mixins_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_header_t : IEquatable<ecs_header_t>
-    {
-        public bool Equals(ecs_header_t other)
-        {
-            fixed (ecs_header_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_header_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_header_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_header_t left, ecs_header_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_header_t left, ecs_header_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_header_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_header_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_record_t : IEquatable<ecs_table_record_t>
-    {
-        public bool Equals(ecs_table_record_t other)
-        {
-            fixed (ecs_table_record_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_record_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_record_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_record_t left, ecs_table_record_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_record_t left, ecs_table_record_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_record_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_record_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_vec_t : IEquatable<ecs_vec_t>
-    {
-        public bool Equals(ecs_vec_t other)
-        {
-            fixed (ecs_vec_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_vec_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vec_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_vec_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_vec_t left, ecs_vec_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_vec_t left, ecs_vec_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_vec_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vec_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_sparse_page_t : IEquatable<ecs_sparse_page_t>
-    {
-        public bool Equals(ecs_sparse_page_t other)
-        {
-            fixed (ecs_sparse_page_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_sparse_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_page_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_sparse_page_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_sparse_page_t left, ecs_sparse_page_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_sparse_page_t left, ecs_sparse_page_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_sparse_page_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_page_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_sparse_t : IEquatable<ecs_sparse_t>
-    {
-        public bool Equals(ecs_sparse_t other)
-        {
-            fixed (ecs_sparse_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_sparse_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sparse_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_sparse_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_sparse_t left, ecs_sparse_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_sparse_t left, ecs_sparse_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_sparse_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sparse_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_t : IEquatable<ecs_block_allocator_t>
-    {
-        public bool Equals(ecs_block_allocator_t other)
-        {
-            fixed (ecs_block_allocator_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_t left, ecs_block_allocator_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_t left, ecs_block_allocator_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_map_t : IEquatable<ecs_map_t>
-    {
-        public bool Equals(ecs_map_t other)
-        {
-            fixed (ecs_map_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_map_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_map_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_map_t left, ecs_map_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_map_t left, ecs_map_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_map_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_block_t : IEquatable<ecs_block_allocator_block_t>
-    {
-        public bool Equals(ecs_block_allocator_block_t other)
-        {
-            fixed (ecs_block_allocator_block_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_block_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_block_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_block_t left, ecs_block_allocator_block_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_block_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_block_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_block_allocator_chunk_header_t : IEquatable<ecs_block_allocator_chunk_header_t>
-    {
-        public bool Equals(ecs_block_allocator_chunk_header_t other)
-        {
-            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_block_allocator_chunk_header_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_block_allocator_chunk_header_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_block_allocator_chunk_header_t left, ecs_block_allocator_chunk_header_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_block_allocator_chunk_header_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_block_allocator_chunk_header_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_page_t : IEquatable<ecs_stack_page_t>
-    {
-        public bool Equals(ecs_stack_page_t other)
-        {
-            fixed (ecs_stack_page_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_page_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_page_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_page_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_page_t left, ecs_stack_page_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_page_t left, ecs_stack_page_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_page_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_page_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_cursor_t : IEquatable<ecs_stack_cursor_t>
-    {
-        public bool Equals(ecs_stack_cursor_t other)
-        {
-            fixed (ecs_stack_cursor_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_cursor_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_cursor_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_cursor_t left, ecs_stack_cursor_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_cursor_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_cursor_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_stack_t : IEquatable<ecs_stack_t>
-    {
-        public bool Equals(ecs_stack_t other)
-        {
-            fixed (ecs_stack_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_stack_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_stack_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_stack_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_stack_t left, ecs_stack_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_stack_t left, ecs_stack_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_stack_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_stack_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bucket_entry_t : IEquatable<ecs_bucket_entry_t>
-    {
-        public bool Equals(ecs_bucket_entry_t other)
-        {
-            fixed (ecs_bucket_entry_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bucket_entry_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_entry_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bucket_entry_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bucket_entry_t left, ecs_bucket_entry_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bucket_entry_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_entry_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bucket_t : IEquatable<ecs_bucket_t>
-    {
-        public bool Equals(ecs_bucket_t other)
-        {
-            fixed (ecs_bucket_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bucket_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bucket_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bucket_t left, ecs_bucket_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bucket_t left, ecs_bucket_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bucket_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bucket_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_map_iter_t : IEquatable<ecs_map_iter_t>
-    {
-        public bool Equals(ecs_map_iter_t other)
-        {
-            fixed (ecs_map_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_map_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_map_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_map_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_map_iter_t left, ecs_map_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_map_iter_t left, ecs_map_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_map_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_map_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_strbuf_list_elem : IEquatable<ecs_strbuf_list_elem>
-    {
-        public bool Equals(ecs_strbuf_list_elem other)
-        {
-            fixed (ecs_strbuf_list_elem* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_strbuf_list_elem other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_strbuf_list_elem left, ecs_strbuf_list_elem right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_strbuf_list_elem* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_strbuf_t : IEquatable<ecs_strbuf_t>
-    {
-        public bool Equals(ecs_strbuf_t other)
-        {
-            fixed (ecs_strbuf_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_strbuf_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_strbuf_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_strbuf_t left, ecs_strbuf_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_strbuf_t left, ecs_strbuf_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_strbuf_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_time_t : IEquatable<ecs_time_t>
-    {
-        public bool Equals(ecs_time_t other)
-        {
-            fixed (ecs_time_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_time_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_time_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_time_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_time_t left, ecs_time_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_time_t left, ecs_time_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_time_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_time_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_os_api_t : IEquatable<ecs_os_api_t>
-    {
-        public bool Equals(ecs_os_api_t other)
-        {
-            fixed (ecs_os_api_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_os_api_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_os_api_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_os_api_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_os_api_t left, ecs_os_api_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_os_api_t left, ecs_os_api_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_os_api_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_os_api_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_term_ref_t : IEquatable<ecs_term_ref_t>
-    {
-        public bool Equals(ecs_term_ref_t other)
-        {
-            fixed (ecs_term_ref_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_term_ref_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_ref_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_term_ref_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_term_ref_t left, ecs_term_ref_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_term_ref_t left, ecs_term_ref_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_term_ref_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_ref_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_data_t : IEquatable<ecs_data_t>
-    {
-        public bool Equals(ecs_data_t other)
-        {
-            fixed (ecs_data_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_data_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_data_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_data_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_data_t left, ecs_data_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_data_t left, ecs_data_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_data_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_data_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_cache_match_t : IEquatable<ecs_query_cache_match_t>
-    {
-        public bool Equals(ecs_query_cache_match_t other)
-        {
-            fixed (ecs_query_cache_match_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_cache_match_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_match_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_cache_match_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_cache_match_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_match_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_cache_group_t : IEquatable<ecs_query_cache_group_t>
-    {
-        public bool Equals(ecs_query_cache_group_t other)
-        {
-            fixed (ecs_query_cache_group_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_cache_group_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_group_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_cache_group_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_cache_group_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_group_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_event_record_t : IEquatable<ecs_event_record_t>
-    {
-        public bool Equals(ecs_event_record_t other)
-        {
-            fixed (ecs_event_record_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_event_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_record_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_event_record_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_event_record_t left, ecs_event_record_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_event_record_t left, ecs_event_record_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_event_record_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_record_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_event_id_record_t : IEquatable<ecs_event_id_record_t>
-    {
-        public bool Equals(ecs_event_id_record_t other)
-        {
-            fixed (ecs_event_id_record_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_event_id_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_id_record_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_event_id_record_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_event_id_record_t left, ecs_event_id_record_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_event_id_record_t left, ecs_event_id_record_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_event_id_record_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_id_record_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_range_t : IEquatable<ecs_table_range_t>
-    {
-        public bool Equals(ecs_table_range_t other)
-        {
-            fixed (ecs_table_range_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_range_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_range_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_range_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_range_t left, ecs_table_range_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_range_t left, ecs_table_range_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_range_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_range_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_var_t : IEquatable<ecs_var_t>
-    {
-        public bool Equals(ecs_var_t other)
-        {
-            fixed (ecs_var_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_var_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_var_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_var_t left, ecs_var_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_var_t left, ecs_var_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_var_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_var_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_page_iter_t : IEquatable<ecs_page_iter_t>
-    {
-        public bool Equals(ecs_page_iter_t other)
-        {
-            fixed (ecs_page_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_page_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_page_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_page_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_page_iter_t left, ecs_page_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_page_iter_t left, ecs_page_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_page_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_page_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_worker_iter_t : IEquatable<ecs_worker_iter_t>
-    {
-        public bool Equals(ecs_worker_iter_t other)
-        {
-            fixed (ecs_worker_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_worker_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_worker_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_worker_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_worker_iter_t left, ecs_worker_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_worker_iter_t left, ecs_worker_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_worker_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_worker_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_cache_iter_t : IEquatable<ecs_table_cache_iter_t>
-    {
-        public bool Equals(ecs_table_cache_iter_t other)
-        {
-            fixed (ecs_table_cache_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_cache_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_cache_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_cache_iter_t left, ecs_table_cache_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_cache_iter_t left, ecs_table_cache_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_cache_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_cache_hdr_t : IEquatable<ecs_table_cache_hdr_t>
-    {
-        public bool Equals(ecs_table_cache_hdr_t other)
-        {
-            fixed (ecs_table_cache_hdr_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_hdr_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_cache_hdr_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_cache_hdr_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_each_iter_t : IEquatable<ecs_each_iter_t>
-    {
-        public bool Equals(ecs_each_iter_t other)
-        {
-            fixed (ecs_each_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_each_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_each_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_each_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_each_iter_t left, ecs_each_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_each_iter_t left, ecs_each_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_each_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_each_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_op_profile_t : IEquatable<ecs_query_op_profile_t>
-    {
-        public bool Equals(ecs_query_op_profile_t other)
-        {
-            fixed (ecs_query_op_profile_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_op_profile_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_profile_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_op_profile_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_op_profile_t left, ecs_query_op_profile_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_op_profile_t left, ecs_query_op_profile_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_op_profile_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_profile_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_iter_t : IEquatable<ecs_query_iter_t>
-    {
-        public bool Equals(ecs_query_iter_t other)
-        {
-            fixed (ecs_query_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_iter_t left, ecs_query_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_iter_t left, ecs_query_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_var_t : IEquatable<ecs_query_var_t>
-    {
-        public bool Equals(ecs_query_var_t other)
-        {
-            fixed (ecs_query_var_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_var_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_var_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_var_t left, ecs_query_var_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_var_t left, ecs_query_var_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_var_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_var_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_op_t : IEquatable<ecs_query_op_t>
-    {
-        public bool Equals(ecs_query_op_t other)
-        {
-            fixed (ecs_query_op_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_op_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_op_t left, ecs_query_op_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_op_t left, ecs_query_op_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_op_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_op_ctx_t : IEquatable<ecs_query_op_ctx_t>
-    {
-        public bool Equals(ecs_query_op_ctx_t other)
-        {
-            fixed (ecs_query_op_ctx_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_op_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_ctx_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_op_ctx_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_op_ctx_t left, ecs_query_op_ctx_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_op_ctx_t left, ecs_query_op_ctx_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_op_ctx_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_ctx_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_iter_private_t : IEquatable<ecs_iter_private_t>
-    {
-        public bool Equals(ecs_iter_private_t other)
-        {
-            fixed (ecs_iter_private_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_iter_private_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_private_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_iter_private_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_iter_private_t left, ecs_iter_private_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_iter_private_t left, ecs_iter_private_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_iter_private_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_private_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_iter_private_t
-    {
-        public partial struct AnonymousRecord_api_types_L143_C5 : IEquatable<AnonymousRecord_api_types_L143_C5>
-        {
-            public bool Equals(AnonymousRecord_api_types_L143_C5 other)
-            {
-                fixed (AnonymousRecord_api_types_L143_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L143_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_api_types_L143_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_api_types_L143_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_api_types_L143_C5 left, AnonymousRecord_api_types_L143_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_api_types_L143_C5 left, AnonymousRecord_api_types_L143_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_api_types_L143_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L143_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_commands_t : IEquatable<ecs_commands_t>
-    {
-        public bool Equals(ecs_commands_t other)
-        {
-            fixed (ecs_commands_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_commands_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_commands_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_commands_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_commands_t left, ecs_commands_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_commands_t left, ecs_commands_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_commands_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_commands_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_suspend_readonly_state_t : IEquatable<ecs_suspend_readonly_state_t>
-    {
-        public bool Equals(ecs_suspend_readonly_state_t other)
-        {
-            fixed (ecs_suspend_readonly_state_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_suspend_readonly_state_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_suspend_readonly_state_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_suspend_readonly_state_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_suspend_readonly_state_t left, ecs_suspend_readonly_state_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_suspend_readonly_state_t left, ecs_suspend_readonly_state_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_suspend_readonly_state_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_suspend_readonly_state_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_hm_bucket_t : IEquatable<ecs_hm_bucket_t>
-    {
-        public bool Equals(ecs_hm_bucket_t other)
-        {
-            fixed (ecs_hm_bucket_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_hm_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_hm_bucket_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_hm_bucket_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_hm_bucket_t left, ecs_hm_bucket_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_hm_bucket_t left, ecs_hm_bucket_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_hm_bucket_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_hm_bucket_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_hashmap_t : IEquatable<ecs_hashmap_t>
-    {
-        public bool Equals(ecs_hashmap_t other)
-        {
-            fixed (ecs_hashmap_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_hashmap_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_hashmap_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_hashmap_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_hashmap_t left, ecs_hashmap_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_hashmap_t left, ecs_hashmap_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_hashmap_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_hashmap_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct flecs_hashmap_iter_t : IEquatable<flecs_hashmap_iter_t>
-    {
-        public bool Equals(flecs_hashmap_iter_t other)
-        {
-            fixed (flecs_hashmap_iter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(flecs_hashmap_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(flecs_hashmap_iter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is flecs_hashmap_iter_t other && Equals(other);
-        }
-
-        public static bool operator ==(flecs_hashmap_iter_t left, flecs_hashmap_iter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(flecs_hashmap_iter_t left, flecs_hashmap_iter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (flecs_hashmap_iter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(flecs_hashmap_iter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct flecs_hashmap_result_t : IEquatable<flecs_hashmap_result_t>
-    {
-        public bool Equals(flecs_hashmap_result_t other)
-        {
-            fixed (flecs_hashmap_result_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(flecs_hashmap_result_t)).SequenceEqual(new Span<byte>(&other, sizeof(flecs_hashmap_result_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is flecs_hashmap_result_t other && Equals(other);
-        }
-
-        public static bool operator ==(flecs_hashmap_result_t left, flecs_hashmap_result_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(flecs_hashmap_result_t left, flecs_hashmap_result_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (flecs_hashmap_result_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(flecs_hashmap_result_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_diff_t : IEquatable<ecs_table_diff_t>
-    {
-        public bool Equals(ecs_table_diff_t other)
-        {
-            fixed (ecs_table_diff_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_diff_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_diff_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_diff_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_diff_t left, ecs_table_diff_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_diff_t left, ecs_table_diff_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_diff_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_diff_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_records_t : IEquatable<ecs_table_records_t>
-    {
-        public bool Equals(ecs_table_records_t other)
-        {
-            fixed (ecs_table_records_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_records_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_records_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_records_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_records_t left, ecs_table_records_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_records_t left, ecs_table_records_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_records_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_records_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_value_t : IEquatable<ecs_value_t>
-    {
-        public bool Equals(ecs_value_t other)
-        {
-            fixed (ecs_value_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_value_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_value_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_value_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_value_t left, ecs_value_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_value_t left, ecs_value_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_value_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_value_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_entity_desc_t : IEquatable<ecs_entity_desc_t>
-    {
-        public bool Equals(ecs_entity_desc_t other)
-        {
-            fixed (ecs_entity_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_entity_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entity_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_entity_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_entity_desc_t left, ecs_entity_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_entity_desc_t left, ecs_entity_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_entity_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entity_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bulk_desc_t : IEquatable<ecs_bulk_desc_t>
-    {
-        public bool Equals(ecs_bulk_desc_t other)
-        {
-            fixed (ecs_bulk_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bulk_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bulk_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bulk_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bulk_desc_t left, ecs_bulk_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bulk_desc_t left, ecs_bulk_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bulk_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bulk_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_component_desc_t : IEquatable<ecs_component_desc_t>
-    {
-        public bool Equals(ecs_component_desc_t other)
-        {
-            fixed (ecs_component_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_component_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_component_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_component_desc_t left, ecs_component_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_component_desc_t left, ecs_component_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_component_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_desc_t : IEquatable<ecs_query_desc_t>
-    {
-        public bool Equals(ecs_query_desc_t other)
-        {
-            fixed (ecs_query_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_desc_t left, ecs_query_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_desc_t left, ecs_query_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_observer_desc_t : IEquatable<ecs_observer_desc_t>
-    {
-        public bool Equals(ecs_observer_desc_t other)
-        {
-            fixed (ecs_observer_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_observer_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observer_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_observer_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_observer_desc_t left, ecs_observer_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_observer_desc_t left, ecs_observer_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_observer_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observer_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_event_desc_t : IEquatable<ecs_event_desc_t>
-    {
-        public bool Equals(ecs_event_desc_t other)
-        {
-            fixed (ecs_event_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_event_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_event_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_event_desc_t left, ecs_event_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_event_desc_t left, ecs_event_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_event_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_build_info_t : IEquatable<ecs_build_info_t>
-    {
-        public bool Equals(ecs_build_info_t other)
-        {
-            fixed (ecs_build_info_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_build_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_build_info_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_build_info_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_build_info_t left, ecs_build_info_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_build_info_t left, ecs_build_info_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_build_info_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_build_info_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_info_t : IEquatable<ecs_world_info_t>
-    {
-        public bool Equals(ecs_world_info_t other)
-        {
-            fixed (ecs_world_info_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_world_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_info_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_world_info_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_world_info_t left, ecs_world_info_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_world_info_t left, ecs_world_info_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_world_info_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_info_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_info_t
-    {
-        public partial struct AnonymousRecord_flecs_L1489_C5 : IEquatable<AnonymousRecord_flecs_L1489_C5>
-        {
-            public bool Equals(AnonymousRecord_flecs_L1489_C5 other)
-            {
-                fixed (AnonymousRecord_flecs_L1489_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1489_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_flecs_L1489_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_flecs_L1489_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_flecs_L1489_C5 left, AnonymousRecord_flecs_L1489_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_flecs_L1489_C5 left, AnonymousRecord_flecs_L1489_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_flecs_L1489_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1489_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_query_group_info_t : IEquatable<ecs_query_group_info_t>
-    {
-        public bool Equals(ecs_query_group_info_t other)
-        {
-            fixed (ecs_query_group_info_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_group_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_group_info_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_group_info_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_group_info_t left, ecs_query_group_info_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_group_info_t left, ecs_query_group_info_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_group_info_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_group_info_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsIdentifier : IEquatable<EcsIdentifier>
-    {
-        public bool Equals(EcsIdentifier other)
-        {
-            fixed (EcsIdentifier* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsIdentifier)).SequenceEqual(new Span<byte>(&other, sizeof(EcsIdentifier)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsIdentifier other && Equals(other);
-        }
-
-        public static bool operator ==(EcsIdentifier left, EcsIdentifier right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsIdentifier left, EcsIdentifier right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsIdentifier* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsIdentifier)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsComponent : IEquatable<EcsComponent>
-    {
-        public bool Equals(EcsComponent other)
-        {
-            fixed (EcsComponent* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsComponent)).SequenceEqual(new Span<byte>(&other, sizeof(EcsComponent)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsComponent other && Equals(other);
-        }
-
-        public static bool operator ==(EcsComponent left, EcsComponent right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsComponent left, EcsComponent right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsComponent* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsComponent)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsPoly : IEquatable<EcsPoly>
-    {
-        public bool Equals(EcsPoly other)
-        {
-            fixed (EcsPoly* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsPoly)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPoly)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsPoly other && Equals(other);
-        }
-
-        public static bool operator ==(EcsPoly left, EcsPoly right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsPoly left, EcsPoly right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsPoly* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsPoly)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsDefaultChildComponent : IEquatable<EcsDefaultChildComponent>
-    {
-        public bool Equals(EcsDefaultChildComponent other)
-        {
-            fixed (EcsDefaultChildComponent* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsDefaultChildComponent)).SequenceEqual(new Span<byte>(&other, sizeof(EcsDefaultChildComponent)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsDefaultChildComponent other && Equals(other);
-        }
-
-        public static bool operator ==(EcsDefaultChildComponent left, EcsDefaultChildComponent right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsDefaultChildComponent left, EcsDefaultChildComponent right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsDefaultChildComponent* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsDefaultChildComponent)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_entities_t : IEquatable<ecs_entities_t>
-    {
-        public bool Equals(ecs_entities_t other)
-        {
-            fixed (ecs_entities_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_entities_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entities_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_entities_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_entities_t left, ecs_entities_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_entities_t left, ecs_entities_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_entities_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entities_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_delete_empty_tables_desc_t : IEquatable<ecs_delete_empty_tables_desc_t>
-    {
-        public bool Equals(ecs_delete_empty_tables_desc_t other)
-        {
-            fixed (ecs_delete_empty_tables_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_delete_empty_tables_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_delete_empty_tables_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_delete_empty_tables_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_delete_empty_tables_desc_t left, ecs_delete_empty_tables_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_delete_empty_tables_desc_t left, ecs_delete_empty_tables_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_delete_empty_tables_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_delete_empty_tables_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_count_t : IEquatable<ecs_query_count_t>
-    {
-        public bool Equals(ecs_query_count_t other)
-        {
-            fixed (ecs_query_count_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_count_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_count_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_count_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_count_t left, ecs_query_count_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_count_t left, ecs_query_count_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_count_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_count_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_app_desc_t : IEquatable<ecs_app_desc_t>
-    {
-        public bool Equals(ecs_app_desc_t other)
-        {
-            fixed (ecs_app_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_app_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_app_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_app_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_app_desc_t left, ecs_app_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_app_desc_t left, ecs_app_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_app_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_app_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_server_t : IEquatable<ecs_http_server_t>
-    {
-        public bool Equals(ecs_http_server_t other)
-        {
-            fixed (ecs_http_server_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_server_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_server_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_server_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_server_t left, ecs_http_server_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_server_t left, ecs_http_server_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_server_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_server_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_connection_t : IEquatable<ecs_http_connection_t>
-    {
-        public bool Equals(ecs_http_connection_t other)
-        {
-            fixed (ecs_http_connection_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_connection_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_connection_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_connection_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_connection_t left, ecs_http_connection_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_connection_t left, ecs_http_connection_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_connection_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_connection_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_key_value_t : IEquatable<ecs_http_key_value_t>
-    {
-        public bool Equals(ecs_http_key_value_t other)
-        {
-            fixed (ecs_http_key_value_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_key_value_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_key_value_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_key_value_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_key_value_t left, ecs_http_key_value_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_key_value_t left, ecs_http_key_value_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_key_value_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_key_value_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_request_t : IEquatable<ecs_http_request_t>
-    {
-        public bool Equals(ecs_http_request_t other)
-        {
-            fixed (ecs_http_request_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_request_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_request_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_request_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_request_t left, ecs_http_request_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_request_t left, ecs_http_request_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_request_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_request_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_reply_t : IEquatable<ecs_http_reply_t>
-    {
-        public bool Equals(ecs_http_reply_t other)
-        {
-            fixed (ecs_http_reply_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_reply_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_reply_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_reply_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_reply_t left, ecs_http_reply_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_reply_t left, ecs_http_reply_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_reply_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_reply_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_http_server_desc_t : IEquatable<ecs_http_server_desc_t>
-    {
-        public bool Equals(ecs_http_server_desc_t other)
-        {
-            fixed (ecs_http_server_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_http_server_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_server_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_http_server_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_http_server_desc_t left, ecs_http_server_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_http_server_desc_t left, ecs_http_server_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_http_server_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_server_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_rest_ctx_t : IEquatable<ecs_rest_ctx_t>
-    {
-        public bool Equals(ecs_rest_ctx_t other)
-        {
-            fixed (ecs_rest_ctx_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_rest_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_rest_ctx_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_rest_ctx_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_rest_ctx_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_rest_ctx_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsRest : IEquatable<EcsRest>
-    {
-        public bool Equals(EcsRest other)
-        {
-            fixed (EcsRest* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsRest)).SequenceEqual(new Span<byte>(&other, sizeof(EcsRest)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsRest other && Equals(other);
-        }
-
-        public static bool operator ==(EcsRest left, EcsRest right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsRest left, EcsRest right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsRest* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsRest)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsTimer : IEquatable<EcsTimer>
-    {
-        public bool Equals(EcsTimer other)
-        {
-            fixed (EcsTimer* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsTimer)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTimer)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsTimer other && Equals(other);
-        }
-
-        public static bool operator ==(EcsTimer left, EcsTimer right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsTimer left, EcsTimer right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsTimer* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsTimer)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsRateFilter : IEquatable<EcsRateFilter>
-    {
-        public bool Equals(EcsRateFilter other)
-        {
-            fixed (EcsRateFilter* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsRateFilter)).SequenceEqual(new Span<byte>(&other, sizeof(EcsRateFilter)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsRateFilter other && Equals(other);
-        }
-
-        public static bool operator ==(EcsRateFilter left, EcsRateFilter right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsRateFilter left, EcsRateFilter right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsRateFilter* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsRateFilter)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_pipeline_desc_t : IEquatable<ecs_pipeline_desc_t>
-    {
-        public bool Equals(ecs_pipeline_desc_t other)
-        {
-            fixed (ecs_pipeline_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_pipeline_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_pipeline_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_pipeline_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_pipeline_desc_t left, ecs_pipeline_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_pipeline_desc_t left, ecs_pipeline_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_pipeline_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_pipeline_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsTickSource : IEquatable<EcsTickSource>
-    {
-        public bool Equals(EcsTickSource other)
-        {
-            fixed (EcsTickSource* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsTickSource)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTickSource)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsTickSource other && Equals(other);
-        }
-
-        public static bool operator ==(EcsTickSource left, EcsTickSource right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsTickSource left, EcsTickSource right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsTickSource* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsTickSource)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_system_desc_t : IEquatable<ecs_system_desc_t>
-    {
-        public bool Equals(ecs_system_desc_t other)
-        {
-            fixed (ecs_system_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_system_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_system_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_system_desc_t left, ecs_system_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_system_desc_t left, ecs_system_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_system_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_system_t : IEquatable<ecs_system_t>
-    {
-        public bool Equals(ecs_system_t other)
-        {
-            fixed (ecs_system_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_system_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_system_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_system_t left, ecs_system_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_system_t left, ecs_system_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_system_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_gauge_t : IEquatable<ecs_gauge_t>
-    {
-        public bool Equals(ecs_gauge_t other)
-        {
-            fixed (ecs_gauge_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_gauge_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_gauge_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_gauge_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_gauge_t left, ecs_gauge_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_gauge_t left, ecs_gauge_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_gauge_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_gauge_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_counter_t : IEquatable<ecs_counter_t>
-    {
-        public bool Equals(ecs_counter_t other)
-        {
-            fixed (ecs_counter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_counter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_counter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_counter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_counter_t left, ecs_counter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_counter_t left, ecs_counter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_counter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_counter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_metric_t : IEquatable<ecs_metric_t>
-    {
-        public bool Equals(ecs_metric_t other)
-        {
-            fixed (ecs_metric_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_metric_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_metric_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_metric_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_metric_t left, ecs_metric_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_metric_t left, ecs_metric_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_metric_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_metric_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t : IEquatable<ecs_world_stats_t>
-    {
-        public bool Equals(ecs_world_stats_t other)
-        {
-            fixed (ecs_world_stats_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_world_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_stats_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_world_stats_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_world_stats_t left, ecs_world_stats_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_world_stats_t left, ecs_world_stats_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_world_stats_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_stats_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L65_C5 : IEquatable<AnonymousRecord_stats_L65_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L65_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L65_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L65_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L65_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L65_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L65_C5 left, AnonymousRecord_stats_L65_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L65_C5 left, AnonymousRecord_stats_L65_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L65_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L65_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L71_C5 : IEquatable<AnonymousRecord_stats_L71_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L71_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L71_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L71_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L71_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L71_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L71_C5 left, AnonymousRecord_stats_L71_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L71_C5 left, AnonymousRecord_stats_L71_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L71_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L71_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L81_C5 : IEquatable<AnonymousRecord_stats_L81_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L81_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L81_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L81_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L81_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L81_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L81_C5 left, AnonymousRecord_stats_L81_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L81_C5 left, AnonymousRecord_stats_L81_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L81_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L81_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L89_C5 : IEquatable<AnonymousRecord_stats_L89_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L89_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L89_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L89_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L89_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L89_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L89_C5 left, AnonymousRecord_stats_L89_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L89_C5 left, AnonymousRecord_stats_L89_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L89_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L89_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L96_C5 : IEquatable<AnonymousRecord_stats_L96_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L96_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L96_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L96_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L96_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L96_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L96_C5 left, AnonymousRecord_stats_L96_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L96_C5 left, AnonymousRecord_stats_L96_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L96_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L96_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L111_C5 : IEquatable<AnonymousRecord_stats_L111_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L111_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L111_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L111_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L111_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L111_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L111_C5 left, AnonymousRecord_stats_L111_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L111_C5 left, AnonymousRecord_stats_L111_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L111_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L111_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L122_C5 : IEquatable<AnonymousRecord_stats_L122_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L122_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L122_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L122_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L122_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L122_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L122_C5 left, AnonymousRecord_stats_L122_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L122_C5 left, AnonymousRecord_stats_L122_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L122_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L122_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L134_C5 : IEquatable<AnonymousRecord_stats_L134_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L134_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L134_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L134_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L134_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L134_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L134_C5 left, AnonymousRecord_stats_L134_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L134_C5 left, AnonymousRecord_stats_L134_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L134_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L134_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_world_stats_t
-    {
-        public partial struct AnonymousRecord_stats_L151_C5 : IEquatable<AnonymousRecord_stats_L151_C5>
-        {
-            public bool Equals(AnonymousRecord_stats_L151_C5 other)
-            {
-                fixed (AnonymousRecord_stats_L151_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L151_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L151_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_stats_L151_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_stats_L151_C5 left, AnonymousRecord_stats_L151_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_stats_L151_C5 left, AnonymousRecord_stats_L151_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_stats_L151_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L151_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct ecs_query_stats_t : IEquatable<ecs_query_stats_t>
-    {
-        public bool Equals(ecs_query_stats_t other)
-        {
-            fixed (ecs_query_stats_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_stats_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_stats_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_stats_t left, ecs_query_stats_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_stats_t left, ecs_query_stats_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_stats_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_stats_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_system_stats_t : IEquatable<ecs_system_stats_t>
-    {
-        public bool Equals(ecs_system_stats_t other)
-        {
-            fixed (ecs_system_stats_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_system_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_stats_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_system_stats_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_system_stats_t left, ecs_system_stats_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_system_stats_t left, ecs_system_stats_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_system_stats_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_stats_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_sync_stats_t : IEquatable<ecs_sync_stats_t>
-    {
-        public bool Equals(ecs_sync_stats_t other)
-        {
-            fixed (ecs_sync_stats_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_sync_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sync_stats_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_sync_stats_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_sync_stats_t left, ecs_sync_stats_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_sync_stats_t left, ecs_sync_stats_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_sync_stats_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sync_stats_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_pipeline_stats_t : IEquatable<ecs_pipeline_stats_t>
-    {
-        public bool Equals(ecs_pipeline_stats_t other)
-        {
-            fixed (ecs_pipeline_stats_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_pipeline_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_pipeline_stats_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_pipeline_stats_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_pipeline_stats_t left, ecs_pipeline_stats_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_pipeline_stats_t left, ecs_pipeline_stats_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_pipeline_stats_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_pipeline_stats_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsStatsHeader : IEquatable<EcsStatsHeader>
-    {
-        public bool Equals(EcsStatsHeader other)
-        {
-            fixed (EcsStatsHeader* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsStatsHeader)).SequenceEqual(new Span<byte>(&other, sizeof(EcsStatsHeader)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsStatsHeader other && Equals(other);
-        }
-
-        public static bool operator ==(EcsStatsHeader left, EcsStatsHeader right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsStatsHeader left, EcsStatsHeader right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsStatsHeader* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsStatsHeader)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsWorldStats : IEquatable<EcsWorldStats>
-    {
-        public bool Equals(EcsWorldStats other)
-        {
-            fixed (EcsWorldStats* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsWorldStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldStats)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsWorldStats other && Equals(other);
-        }
-
-        public static bool operator ==(EcsWorldStats left, EcsWorldStats right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsWorldStats left, EcsWorldStats right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsWorldStats* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldStats)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsSystemStats : IEquatable<EcsSystemStats>
-    {
-        public bool Equals(EcsSystemStats other)
-        {
-            fixed (EcsSystemStats* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsSystemStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsSystemStats)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsSystemStats other && Equals(other);
-        }
-
-        public static bool operator ==(EcsSystemStats left, EcsSystemStats right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsSystemStats left, EcsSystemStats right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsSystemStats* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsSystemStats)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsPipelineStats : IEquatable<EcsPipelineStats>
-    {
-        public bool Equals(EcsPipelineStats other)
-        {
-            fixed (EcsPipelineStats* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsPipelineStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPipelineStats)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsPipelineStats other && Equals(other);
-        }
-
-        public static bool operator ==(EcsPipelineStats left, EcsPipelineStats right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsPipelineStats left, EcsPipelineStats right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsPipelineStats* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsPipelineStats)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsWorldSummary : IEquatable<EcsWorldSummary>
-    {
-        public bool Equals(EcsWorldSummary other)
-        {
-            fixed (EcsWorldSummary* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsWorldSummary)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldSummary)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsWorldSummary other && Equals(other);
-        }
-
-        public static bool operator ==(EcsWorldSummary left, EcsWorldSummary right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsWorldSummary left, EcsWorldSummary right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsWorldSummary* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldSummary)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_entities_memory_t : IEquatable<ecs_entities_memory_t>
-    {
-        public bool Equals(ecs_entities_memory_t other)
-        {
-            fixed (ecs_entities_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_entities_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entities_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_entities_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_entities_memory_t left, ecs_entities_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_entities_memory_t left, ecs_entities_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_entities_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entities_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_component_memory_t : IEquatable<ecs_component_memory_t>
-    {
-        public bool Equals(ecs_component_memory_t other)
-        {
-            fixed (ecs_component_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_component_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_component_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_component_memory_t left, ecs_component_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_component_memory_t left, ecs_component_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_component_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_component_index_memory_t : IEquatable<ecs_component_index_memory_t>
-    {
-        public bool Equals(ecs_component_index_memory_t other)
-        {
-            fixed (ecs_component_index_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_component_index_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_index_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_component_index_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_component_index_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_index_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_query_memory_t : IEquatable<ecs_query_memory_t>
-    {
-        public bool Equals(ecs_query_memory_t other)
-        {
-            fixed (ecs_query_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_query_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_query_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_query_memory_t left, ecs_query_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_query_memory_t left, ecs_query_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_query_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_memory_t : IEquatable<ecs_table_memory_t>
-    {
-        public bool Equals(ecs_table_memory_t other)
-        {
-            fixed (ecs_table_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_memory_t left, ecs_table_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_memory_t left, ecs_table_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_table_histogram_t : IEquatable<ecs_table_histogram_t>
-    {
-        public bool Equals(ecs_table_histogram_t other)
-        {
-            fixed (ecs_table_histogram_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_table_histogram_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_histogram_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_table_histogram_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_table_histogram_t left, ecs_table_histogram_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_table_histogram_t left, ecs_table_histogram_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_table_histogram_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_histogram_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_misc_memory_t : IEquatable<ecs_misc_memory_t>
-    {
-        public bool Equals(ecs_misc_memory_t other)
-        {
-            fixed (ecs_misc_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_misc_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_misc_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_misc_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_misc_memory_t left, ecs_misc_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_misc_memory_t left, ecs_misc_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_misc_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_misc_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_allocator_memory_t : IEquatable<ecs_allocator_memory_t>
-    {
-        public bool Equals(ecs_allocator_memory_t other)
-        {
-            fixed (ecs_allocator_memory_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_allocator_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_allocator_memory_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_allocator_memory_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_allocator_memory_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_memory_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsWorldMemory : IEquatable<EcsWorldMemory>
-    {
-        public bool Equals(EcsWorldMemory other)
-        {
-            fixed (EcsWorldMemory* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsWorldMemory)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldMemory)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsWorldMemory other && Equals(other);
-        }
-
-        public static bool operator ==(EcsWorldMemory left, EcsWorldMemory right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsWorldMemory left, EcsWorldMemory right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsWorldMemory* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldMemory)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsMetricValue : IEquatable<EcsMetricValue>
-    {
-        public bool Equals(EcsMetricValue other)
-        {
-            fixed (EcsMetricValue* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsMetricValue)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMetricValue)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsMetricValue other && Equals(other);
-        }
-
-        public static bool operator ==(EcsMetricValue left, EcsMetricValue right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsMetricValue left, EcsMetricValue right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsMetricValue* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsMetricValue)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsMetricSource : IEquatable<EcsMetricSource>
-    {
-        public bool Equals(EcsMetricSource other)
-        {
-            fixed (EcsMetricSource* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsMetricSource)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMetricSource)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsMetricSource other && Equals(other);
-        }
-
-        public static bool operator ==(EcsMetricSource left, EcsMetricSource right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsMetricSource left, EcsMetricSource right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsMetricSource* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsMetricSource)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_metric_desc_t : IEquatable<ecs_metric_desc_t>
-    {
-        public bool Equals(ecs_metric_desc_t other)
-        {
-            fixed (ecs_metric_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_metric_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_metric_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_metric_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_metric_desc_t left, ecs_metric_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_metric_desc_t left, ecs_metric_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_metric_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_metric_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsAlertInstance : IEquatable<EcsAlertInstance>
-    {
-        public bool Equals(EcsAlertInstance other)
-        {
-            fixed (EcsAlertInstance* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsAlertInstance)).SequenceEqual(new Span<byte>(&other, sizeof(EcsAlertInstance)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsAlertInstance other && Equals(other);
-        }
-
-        public static bool operator ==(EcsAlertInstance left, EcsAlertInstance right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsAlertInstance left, EcsAlertInstance right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsAlertInstance* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsAlertInstance)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsAlertsActive : IEquatable<EcsAlertsActive>
-    {
-        public bool Equals(EcsAlertsActive other)
-        {
-            fixed (EcsAlertsActive* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsAlertsActive)).SequenceEqual(new Span<byte>(&other, sizeof(EcsAlertsActive)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsAlertsActive other && Equals(other);
-        }
-
-        public static bool operator ==(EcsAlertsActive left, EcsAlertsActive right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsAlertsActive left, EcsAlertsActive right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsAlertsActive* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsAlertsActive)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_alert_severity_filter_t : IEquatable<ecs_alert_severity_filter_t>
-    {
-        public bool Equals(ecs_alert_severity_filter_t other)
-        {
-            fixed (ecs_alert_severity_filter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_severity_filter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_alert_severity_filter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_alert_severity_filter_t left, ecs_alert_severity_filter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_alert_severity_filter_t left, ecs_alert_severity_filter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_alert_severity_filter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_alert_desc_t : IEquatable<ecs_alert_desc_t>
-    {
-        public bool Equals(ecs_alert_desc_t other)
-        {
-            fixed (ecs_alert_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_alert_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_alert_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_alert_desc_t left, ecs_alert_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_alert_desc_t left, ecs_alert_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_alert_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_from_json_desc_t : IEquatable<ecs_from_json_desc_t>
-    {
-        public bool Equals(ecs_from_json_desc_t other)
-        {
-            fixed (ecs_from_json_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_from_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_from_json_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_from_json_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_from_json_desc_t left, ecs_from_json_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_from_json_desc_t left, ecs_from_json_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_from_json_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_from_json_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_entity_to_json_desc_t : IEquatable<ecs_entity_to_json_desc_t>
-    {
-        public bool Equals(ecs_entity_to_json_desc_t other)
-        {
-            fixed (ecs_entity_to_json_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_entity_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entity_to_json_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_entity_to_json_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_entity_to_json_desc_t left, ecs_entity_to_json_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_entity_to_json_desc_t left, ecs_entity_to_json_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_entity_to_json_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entity_to_json_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_iter_to_json_desc_t : IEquatable<ecs_iter_to_json_desc_t>
-    {
-        public bool Equals(ecs_iter_to_json_desc_t other)
-        {
-            fixed (ecs_iter_to_json_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_iter_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_to_json_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_iter_to_json_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_iter_to_json_desc_t left, ecs_iter_to_json_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_iter_to_json_desc_t left, ecs_iter_to_json_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_iter_to_json_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_to_json_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_world_to_json_desc_t : IEquatable<ecs_world_to_json_desc_t>
-    {
-        public bool Equals(ecs_world_to_json_desc_t other)
-        {
-            fixed (ecs_world_to_json_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_world_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_to_json_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_world_to_json_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_world_to_json_desc_t left, ecs_world_to_json_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_world_to_json_desc_t left, ecs_world_to_json_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_world_to_json_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_to_json_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_template_t : IEquatable<ecs_script_template_t>
-    {
-        public bool Equals(ecs_script_template_t other)
-        {
-            fixed (ecs_script_template_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_template_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_template_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_template_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_template_t left, ecs_script_template_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_template_t left, ecs_script_template_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_template_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_template_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_var_t : IEquatable<ecs_script_var_t>
-    {
-        public bool Equals(ecs_script_var_t other)
-        {
-            fixed (ecs_script_var_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_var_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_var_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_var_t left, ecs_script_var_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_var_t left, ecs_script_var_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_var_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_var_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_vars_t : IEquatable<ecs_script_vars_t>
-    {
-        public bool Equals(ecs_script_vars_t other)
-        {
-            fixed (ecs_script_vars_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_vars_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_vars_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_vars_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_vars_t left, ecs_script_vars_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_vars_t left, ecs_script_vars_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_vars_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_vars_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_t : IEquatable<ecs_script_t>
-    {
-        public bool Equals(ecs_script_t other)
-        {
-            fixed (ecs_script_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_t left, ecs_script_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_t left, ecs_script_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_runtime_t : IEquatable<ecs_script_runtime_t>
-    {
-        public bool Equals(ecs_script_runtime_t other)
-        {
-            fixed (ecs_script_runtime_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_runtime_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_runtime_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_runtime_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_runtime_t left, ecs_script_runtime_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_runtime_t left, ecs_script_runtime_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_runtime_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_runtime_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsScript : IEquatable<EcsScript>
-    {
-        public bool Equals(EcsScript other)
-        {
-            fixed (EcsScript* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsScript)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScript)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsScript other && Equals(other);
-        }
-
-        public static bool operator ==(EcsScript left, EcsScript right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsScript left, EcsScript right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsScript* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsScript)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_function_ctx_t : IEquatable<ecs_function_ctx_t>
-    {
-        public bool Equals(ecs_function_ctx_t other)
-        {
-            fixed (ecs_function_ctx_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_function_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_function_ctx_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_function_ctx_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_function_ctx_t left, ecs_function_ctx_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_function_ctx_t left, ecs_function_ctx_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_function_ctx_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_function_ctx_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_parameter_t : IEquatable<ecs_script_parameter_t>
-    {
-        public bool Equals(ecs_script_parameter_t other)
-        {
-            fixed (ecs_script_parameter_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_parameter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_parameter_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_parameter_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_parameter_t left, ecs_script_parameter_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_parameter_t left, ecs_script_parameter_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_parameter_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_parameter_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsScriptConstVar : IEquatable<EcsScriptConstVar>
-    {
-        public bool Equals(EcsScriptConstVar other)
-        {
-            fixed (EcsScriptConstVar* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsScriptConstVar)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScriptConstVar)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsScriptConstVar other && Equals(other);
-        }
-
-        public static bool operator ==(EcsScriptConstVar left, EcsScriptConstVar right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsScriptConstVar left, EcsScriptConstVar right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsScriptConstVar* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsScriptConstVar)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsScriptFunction : IEquatable<EcsScriptFunction>
-    {
-        public bool Equals(EcsScriptFunction other)
-        {
-            fixed (EcsScriptFunction* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsScriptFunction)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScriptFunction)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsScriptFunction other && Equals(other);
-        }
-
-        public static bool operator ==(EcsScriptFunction left, EcsScriptFunction right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsScriptFunction left, EcsScriptFunction right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsScriptFunction* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsScriptFunction)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsScriptMethod : IEquatable<EcsScriptMethod>
-    {
-        public bool Equals(EcsScriptMethod other)
-        {
-            fixed (EcsScriptMethod* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsScriptMethod)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScriptMethod)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsScriptMethod other && Equals(other);
-        }
-
-        public static bool operator ==(EcsScriptMethod left, EcsScriptMethod right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsScriptMethod left, EcsScriptMethod right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsScriptMethod* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsScriptMethod)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_eval_desc_t : IEquatable<ecs_script_eval_desc_t>
-    {
-        public bool Equals(ecs_script_eval_desc_t other)
-        {
-            fixed (ecs_script_eval_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_eval_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_eval_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_eval_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_eval_desc_t left, ecs_script_eval_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_eval_desc_t left, ecs_script_eval_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_eval_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_eval_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_eval_result_t : IEquatable<ecs_script_eval_result_t>
-    {
-        public bool Equals(ecs_script_eval_result_t other)
-        {
-            fixed (ecs_script_eval_result_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_eval_result_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_eval_result_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_eval_result_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_eval_result_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_eval_result_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_script_desc_t : IEquatable<ecs_script_desc_t>
-    {
-        public bool Equals(ecs_script_desc_t other)
-        {
-            fixed (ecs_script_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_script_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_script_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_script_desc_t left, ecs_script_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_script_desc_t left, ecs_script_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_script_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_expr_eval_desc_t : IEquatable<ecs_expr_eval_desc_t>
-    {
-        public bool Equals(ecs_expr_eval_desc_t other)
-        {
-            fixed (ecs_expr_eval_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_expr_eval_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_expr_eval_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_expr_eval_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_expr_eval_desc_t left, ecs_expr_eval_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_expr_eval_desc_t left, ecs_expr_eval_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_expr_eval_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_expr_eval_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_const_var_desc_t : IEquatable<ecs_const_var_desc_t>
-    {
-        public bool Equals(ecs_const_var_desc_t other)
-        {
-            fixed (ecs_const_var_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_const_var_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_const_var_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_const_var_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_const_var_desc_t left, ecs_const_var_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_const_var_desc_t left, ecs_const_var_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_const_var_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_const_var_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_function_desc_t : IEquatable<ecs_function_desc_t>
-    {
-        public bool Equals(ecs_function_desc_t other)
-        {
-            fixed (ecs_function_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_function_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_function_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_function_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_function_desc_t left, ecs_function_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_function_desc_t left, ecs_function_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_function_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_function_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_expr_node_t : IEquatable<ecs_expr_node_t>
-    {
-        public bool Equals(ecs_expr_node_t other)
-        {
-            fixed (ecs_expr_node_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_expr_node_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_expr_node_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_expr_node_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_expr_node_t left, ecs_expr_node_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_expr_node_t left, ecs_expr_node_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_expr_node_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_expr_node_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsDocDescription : IEquatable<EcsDocDescription>
-    {
-        public bool Equals(EcsDocDescription other)
-        {
-            fixed (EcsDocDescription* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsDocDescription)).SequenceEqual(new Span<byte>(&other, sizeof(EcsDocDescription)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsDocDescription other && Equals(other);
-        }
-
-        public static bool operator ==(EcsDocDescription left, EcsDocDescription right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsDocDescription left, EcsDocDescription right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsDocDescription* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsDocDescription)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsType : IEquatable<EcsType>
-    {
-        public bool Equals(EcsType other)
-        {
-            fixed (EcsType* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsType)).SequenceEqual(new Span<byte>(&other, sizeof(EcsType)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsType other && Equals(other);
-        }
-
-        public static bool operator ==(EcsType left, EcsType right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsType left, EcsType right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsType* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsType)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsPrimitive : IEquatable<EcsPrimitive>
-    {
-        public bool Equals(EcsPrimitive other)
-        {
-            fixed (EcsPrimitive* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsPrimitive)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPrimitive)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsPrimitive other && Equals(other);
-        }
-
-        public static bool operator ==(EcsPrimitive left, EcsPrimitive right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsPrimitive left, EcsPrimitive right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsPrimitive* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsPrimitive)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsMember : IEquatable<EcsMember>
-    {
-        public bool Equals(EcsMember other)
-        {
-            fixed (EcsMember* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsMember)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMember)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsMember other && Equals(other);
-        }
-
-        public static bool operator ==(EcsMember left, EcsMember right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsMember left, EcsMember right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsMember* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsMember)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_member_value_range_t : IEquatable<ecs_member_value_range_t>
-    {
-        public bool Equals(ecs_member_value_range_t other)
-        {
-            fixed (ecs_member_value_range_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_member_value_range_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_value_range_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_member_value_range_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_member_value_range_t left, ecs_member_value_range_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_member_value_range_t left, ecs_member_value_range_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_member_value_range_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_value_range_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsMemberRanges : IEquatable<EcsMemberRanges>
-    {
-        public bool Equals(EcsMemberRanges other)
-        {
-            fixed (EcsMemberRanges* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsMemberRanges)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMemberRanges)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsMemberRanges other && Equals(other);
-        }
-
-        public static bool operator ==(EcsMemberRanges left, EcsMemberRanges right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsMemberRanges left, EcsMemberRanges right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsMemberRanges* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsMemberRanges)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_member_t : IEquatable<ecs_member_t>
-    {
-        public bool Equals(ecs_member_t other)
-        {
-            fixed (ecs_member_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_member_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_member_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_member_t left, ecs_member_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_member_t left, ecs_member_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_member_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsStruct : IEquatable<EcsStruct>
-    {
-        public bool Equals(EcsStruct other)
-        {
-            fixed (EcsStruct* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsStruct)).SequenceEqual(new Span<byte>(&other, sizeof(EcsStruct)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsStruct other && Equals(other);
-        }
-
-        public static bool operator ==(EcsStruct left, EcsStruct right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsStruct left, EcsStruct right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsStruct* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsStruct)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_enum_constant_t : IEquatable<ecs_enum_constant_t>
-    {
-        public bool Equals(ecs_enum_constant_t other)
-        {
-            fixed (ecs_enum_constant_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_enum_constant_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_constant_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_enum_constant_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_enum_constant_t left, ecs_enum_constant_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_enum_constant_t left, ecs_enum_constant_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_enum_constant_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_constant_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsEnum : IEquatable<EcsEnum>
-    {
-        public bool Equals(EcsEnum other)
-        {
-            fixed (EcsEnum* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsEnum)).SequenceEqual(new Span<byte>(&other, sizeof(EcsEnum)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsEnum other && Equals(other);
-        }
-
-        public static bool operator ==(EcsEnum left, EcsEnum right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsEnum left, EcsEnum right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsEnum* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsEnum)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bitmask_constant_t : IEquatable<ecs_bitmask_constant_t>
-    {
-        public bool Equals(ecs_bitmask_constant_t other)
-        {
-            fixed (ecs_bitmask_constant_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bitmask_constant_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_constant_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bitmask_constant_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bitmask_constant_t left, ecs_bitmask_constant_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bitmask_constant_t left, ecs_bitmask_constant_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bitmask_constant_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_constant_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsBitmask : IEquatable<EcsBitmask>
-    {
-        public bool Equals(EcsBitmask other)
-        {
-            fixed (EcsBitmask* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsBitmask)).SequenceEqual(new Span<byte>(&other, sizeof(EcsBitmask)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsBitmask other && Equals(other);
-        }
-
-        public static bool operator ==(EcsBitmask left, EcsBitmask right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsBitmask left, EcsBitmask right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsBitmask* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsBitmask)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsConstants : IEquatable<EcsConstants>
-    {
-        public bool Equals(EcsConstants other)
-        {
-            fixed (EcsConstants* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsConstants)).SequenceEqual(new Span<byte>(&other, sizeof(EcsConstants)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsConstants other && Equals(other);
-        }
-
-        public static bool operator ==(EcsConstants left, EcsConstants right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsConstants left, EcsConstants right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsConstants* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsConstants)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsArray : IEquatable<EcsArray>
-    {
-        public bool Equals(EcsArray other)
-        {
-            fixed (EcsArray* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsArray)).SequenceEqual(new Span<byte>(&other, sizeof(EcsArray)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsArray other && Equals(other);
-        }
-
-        public static bool operator ==(EcsArray left, EcsArray right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsArray left, EcsArray right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsArray* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsArray)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsVector : IEquatable<EcsVector>
-    {
-        public bool Equals(EcsVector other)
-        {
-            fixed (EcsVector* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsVector)).SequenceEqual(new Span<byte>(&other, sizeof(EcsVector)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsVector other && Equals(other);
-        }
-
-        public static bool operator ==(EcsVector left, EcsVector right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsVector left, EcsVector right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsVector* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsVector)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_serializer_t : IEquatable<ecs_serializer_t>
-    {
-        public bool Equals(ecs_serializer_t other)
-        {
-            fixed (ecs_serializer_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_serializer_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_serializer_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_serializer_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_serializer_t left, ecs_serializer_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_serializer_t left, ecs_serializer_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_serializer_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_serializer_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsOpaque : IEquatable<EcsOpaque>
-    {
-        public bool Equals(EcsOpaque other)
-        {
-            fixed (EcsOpaque* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsOpaque)).SequenceEqual(new Span<byte>(&other, sizeof(EcsOpaque)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsOpaque other && Equals(other);
-        }
-
-        public static bool operator ==(EcsOpaque left, EcsOpaque right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsOpaque left, EcsOpaque right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsOpaque* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsOpaque)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_unit_translation_t : IEquatable<ecs_unit_translation_t>
-    {
-        public bool Equals(ecs_unit_translation_t other)
-        {
-            fixed (ecs_unit_translation_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_unit_translation_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_translation_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_unit_translation_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_unit_translation_t left, ecs_unit_translation_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_unit_translation_t left, ecs_unit_translation_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_unit_translation_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_translation_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsUnit : IEquatable<EcsUnit>
-    {
-        public bool Equals(EcsUnit other)
-        {
-            fixed (EcsUnit* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsUnit)).SequenceEqual(new Span<byte>(&other, sizeof(EcsUnit)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsUnit other && Equals(other);
-        }
-
-        public static bool operator ==(EcsUnit left, EcsUnit right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsUnit left, EcsUnit right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsUnit* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsUnit)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct EcsUnitPrefix : IEquatable<EcsUnitPrefix>
-    {
-        public bool Equals(EcsUnitPrefix other)
-        {
-            fixed (EcsUnitPrefix* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsUnitPrefix)).SequenceEqual(new Span<byte>(&other, sizeof(EcsUnitPrefix)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsUnitPrefix other && Equals(other);
-        }
-
-        public static bool operator ==(EcsUnitPrefix left, EcsUnitPrefix right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsUnitPrefix left, EcsUnitPrefix right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsUnitPrefix* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsUnitPrefix)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_meta_op_t : IEquatable<ecs_meta_op_t>
-    {
-        public bool Equals(ecs_meta_op_t other)
-        {
-            fixed (ecs_meta_op_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_meta_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_op_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_meta_op_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_meta_op_t left, ecs_meta_op_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_meta_op_t left, ecs_meta_op_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_meta_op_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_op_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_meta_op_t
-    {
-        public partial struct AnonymousRecord_meta_L578_C5 : IEquatable<AnonymousRecord_meta_L578_C5>
-        {
-            public bool Equals(AnonymousRecord_meta_L578_C5 other)
-            {
-                fixed (AnonymousRecord_meta_L578_C5* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(AnonymousRecord_meta_L578_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_meta_L578_C5)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is AnonymousRecord_meta_L578_C5 other && Equals(other);
-            }
-
-            public static bool operator ==(AnonymousRecord_meta_L578_C5 left, AnonymousRecord_meta_L578_C5 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(AnonymousRecord_meta_L578_C5 left, AnonymousRecord_meta_L578_C5 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (AnonymousRecord_meta_L578_C5* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_meta_L578_C5)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
-    }
-
-    public partial struct EcsTypeSerializer : IEquatable<EcsTypeSerializer>
-    {
-        public bool Equals(EcsTypeSerializer other)
-        {
-            fixed (EcsTypeSerializer* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(EcsTypeSerializer)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTypeSerializer)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is EcsTypeSerializer other && Equals(other);
-        }
-
-        public static bool operator ==(EcsTypeSerializer left, EcsTypeSerializer right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(EcsTypeSerializer left, EcsTypeSerializer right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (EcsTypeSerializer* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(EcsTypeSerializer)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_meta_scope_t : IEquatable<ecs_meta_scope_t>
-    {
-        public bool Equals(ecs_meta_scope_t other)
-        {
-            fixed (ecs_meta_scope_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_meta_scope_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_scope_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_meta_scope_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_meta_scope_t left, ecs_meta_scope_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_meta_scope_t left, ecs_meta_scope_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_meta_scope_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_scope_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_meta_cursor_t : IEquatable<ecs_meta_cursor_t>
-    {
-        public bool Equals(ecs_meta_cursor_t other)
-        {
-            fixed (ecs_meta_cursor_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_meta_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_cursor_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_meta_cursor_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_meta_cursor_t left, ecs_meta_cursor_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_meta_cursor_t left, ecs_meta_cursor_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_meta_cursor_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_cursor_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_primitive_desc_t : IEquatable<ecs_primitive_desc_t>
-    {
-        public bool Equals(ecs_primitive_desc_t other)
-        {
-            fixed (ecs_primitive_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_primitive_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_primitive_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_primitive_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_primitive_desc_t left, ecs_primitive_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_primitive_desc_t left, ecs_primitive_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_primitive_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_primitive_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_enum_desc_t : IEquatable<ecs_enum_desc_t>
-    {
-        public bool Equals(ecs_enum_desc_t other)
-        {
-            fixed (ecs_enum_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_enum_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_enum_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_enum_desc_t left, ecs_enum_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_enum_desc_t left, ecs_enum_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_enum_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_bitmask_desc_t : IEquatable<ecs_bitmask_desc_t>
-    {
-        public bool Equals(ecs_bitmask_desc_t other)
-        {
-            fixed (ecs_bitmask_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_bitmask_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_bitmask_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_bitmask_desc_t left, ecs_bitmask_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_bitmask_desc_t left, ecs_bitmask_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_bitmask_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
-    }
-
-    public partial struct ecs_array_desc_t : IEquatable<ecs_array_desc_t>
-    {
-        public bool Equals(ecs_array_desc_t other)
-        {
-            fixed (ecs_array_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_array_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_array_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_array_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_array_desc_t left, ecs_array_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_array_desc_t left, ecs_array_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_array_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_array_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
+        return obj is ecs_term_ref_t other && Equals(other);
     }
 
-    public partial struct ecs_vector_desc_t : IEquatable<ecs_vector_desc_t>
+    public static bool operator ==(ecs_term_ref_t left, ecs_term_ref_t right)
     {
-        public bool Equals(ecs_vector_desc_t other)
-        {
-            fixed (ecs_vector_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_vector_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vector_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_vector_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_vector_desc_t left, ecs_vector_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_vector_desc_t left, ecs_vector_desc_t right)
-        {
-            return !(left == right);
-        }
-
-        public override int GetHashCode()
-        {
-            fixed (ecs_vector_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vector_desc_t)));
-                return hash.ToHashCode();
-            }
-        }
+        return left.Equals(right);
     }
 
-    public partial struct ecs_struct_desc_t : IEquatable<ecs_struct_desc_t>
+    public static bool operator !=(ecs_term_ref_t left, ecs_term_ref_t right)
     {
-        public bool Equals(ecs_struct_desc_t other)
-        {
-            fixed (ecs_struct_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_struct_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_struct_desc_t)));
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_struct_desc_t other && Equals(other);
-        }
-
-        public static bool operator ==(ecs_struct_desc_t left, ecs_struct_desc_t right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ecs_struct_desc_t left, ecs_struct_desc_t right)
-        {
-            return !(left == right);
-        }
+        return !(left == right);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        fixed (ecs_term_ref_t* __self = &this)
         {
-            fixed (ecs_struct_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_struct_desc_t)));
-                return hash.ToHashCode();
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_ref_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct ecs_opaque_desc_t : IEquatable<ecs_opaque_desc_t>
+public partial struct ecs_data_t : IEquatable<ecs_data_t>
+{
+    public bool Equals(ecs_data_t other)
     {
-        public bool Equals(ecs_opaque_desc_t other)
+        fixed (ecs_data_t* __self = &this)
         {
-            fixed (ecs_opaque_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_opaque_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_opaque_desc_t)));
-            }
+            return new Span<byte>(__self, sizeof(ecs_data_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_data_t)));
         }
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_opaque_desc_t other && Equals(other);
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_data_t other && Equals(other);
+    }
 
-        public static bool operator ==(ecs_opaque_desc_t left, ecs_opaque_desc_t right)
-        {
-            return left.Equals(right);
-        }
+    public static bool operator ==(ecs_data_t left, ecs_data_t right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator !=(ecs_opaque_desc_t left, ecs_opaque_desc_t right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(ecs_data_t left, ecs_data_t right)
+    {
+        return !(left == right);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        fixed (ecs_data_t* __self = &this)
         {
-            fixed (ecs_opaque_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_opaque_desc_t)));
-                return hash.ToHashCode();
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_data_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct ecs_unit_desc_t : IEquatable<ecs_unit_desc_t>
+public partial struct ecs_query_cache_match_t : IEquatable<ecs_query_cache_match_t>
+{
+    public bool Equals(ecs_query_cache_match_t other)
     {
-        public bool Equals(ecs_unit_desc_t other)
+        fixed (ecs_query_cache_match_t* __self = &this)
         {
-            fixed (ecs_unit_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_unit_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_desc_t)));
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_cache_match_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_match_t)));
         }
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_unit_desc_t other && Equals(other);
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_cache_match_t other && Equals(other);
+    }
 
-        public static bool operator ==(ecs_unit_desc_t left, ecs_unit_desc_t right)
-        {
-            return left.Equals(right);
-        }
+    public static bool operator ==(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator !=(ecs_unit_desc_t left, ecs_unit_desc_t right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(ecs_query_cache_match_t left, ecs_query_cache_match_t right)
+    {
+        return !(left == right);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_cache_match_t* __self = &this)
         {
-            fixed (ecs_unit_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_desc_t)));
-                return hash.ToHashCode();
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_match_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct ecs_unit_prefix_desc_t : IEquatable<ecs_unit_prefix_desc_t>
+public partial struct ecs_query_cache_group_t : IEquatable<ecs_query_cache_group_t>
+{
+    public bool Equals(ecs_query_cache_group_t other)
     {
-        public bool Equals(ecs_unit_prefix_desc_t other)
+        fixed (ecs_query_cache_group_t* __self = &this)
         {
-            fixed (ecs_unit_prefix_desc_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_unit_prefix_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_prefix_desc_t)));
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_cache_group_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_cache_group_t)));
         }
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_unit_prefix_desc_t other && Equals(other);
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_cache_group_t other && Equals(other);
+    }
 
-        public static bool operator ==(ecs_unit_prefix_desc_t left, ecs_unit_prefix_desc_t right)
-        {
-            return left.Equals(right);
-        }
+    public static bool operator ==(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator !=(ecs_unit_prefix_desc_t left, ecs_unit_prefix_desc_t right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(ecs_query_cache_group_t left, ecs_query_cache_group_t right)
+    {
+        return !(left == right);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_cache_group_t* __self = &this)
         {
-            fixed (ecs_unit_prefix_desc_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_prefix_desc_t)));
-                return hash.ToHashCode();
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_cache_group_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct ecs_cpp_get_mut_t : IEquatable<ecs_cpp_get_mut_t>
+public partial struct ecs_event_record_t : IEquatable<ecs_event_record_t>
+{
+    public bool Equals(ecs_event_record_t other)
     {
-        public bool Equals(ecs_cpp_get_mut_t other)
+        fixed (ecs_event_record_t* __self = &this)
         {
-            fixed (ecs_cpp_get_mut_t* __self = &this)
-            {
-                return new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_cpp_get_mut_t)));
-            }
+            return new Span<byte>(__self, sizeof(ecs_event_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_record_t)));
         }
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ecs_cpp_get_mut_t other && Equals(other);
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_event_record_t other && Equals(other);
+    }
 
-        public static bool operator ==(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
-        {
-            return left.Equals(right);
-        }
+    public static bool operator ==(ecs_event_record_t left, ecs_event_record_t right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator !=(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(ecs_event_record_t left, ecs_event_record_t right)
+    {
+        return !(left == right);
+    }
 
-        public override int GetHashCode()
+    public override int GetHashCode()
+    {
+        fixed (ecs_event_record_t* __self = &this)
         {
-            fixed (ecs_cpp_get_mut_t* __self = &this)
-            {
-                HashCode hash = new();
-                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)));
-                return hash.ToHashCode();
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_record_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_event_id_record_t : IEquatable<ecs_event_id_record_t>
+{
+    public bool Equals(ecs_event_id_record_t other)
     {
-        public partial struct ecs_strbuf_list_elem_32 : IEquatable<ecs_strbuf_list_elem_32>
+        fixed (ecs_event_id_record_t* __self = &this)
         {
-            public bool Equals(ecs_strbuf_list_elem_32 other)
-            {
-                fixed (ecs_strbuf_list_elem_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem_32)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_strbuf_list_elem_32 other && Equals(other);
-            }
-
-            public static bool operator ==(ecs_strbuf_list_elem_32 left, ecs_strbuf_list_elem_32 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(ecs_strbuf_list_elem_32 left, ecs_strbuf_list_elem_32 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (ecs_strbuf_list_elem_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem_32)));
-                    return hash.ToHashCode();
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_event_id_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_id_record_t)));
         }
     }
 
-    public partial struct InlineArrays
+    public override bool Equals(object? obj)
     {
-        public partial struct byte_512 : IEquatable<byte_512>
-        {
-            public bool Equals(byte_512 other)
-            {
-                fixed (byte_512* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(byte_512)).SequenceEqual(new Span<byte>(&other, sizeof(byte_512)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is byte_512 other && Equals(other);
-            }
-
-            public static bool operator ==(byte_512 left, byte_512 right)
-            {
-                return left.Equals(right);
-            }
+        return obj is ecs_event_id_record_t other && Equals(other);
+    }
 
-            public static bool operator !=(byte_512 left, byte_512 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator ==(ecs_event_id_record_t left, ecs_event_id_record_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (byte_512* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(byte_512)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
+    public static bool operator !=(ecs_event_id_record_t left, ecs_event_id_record_t right)
+    {
+        return !(left == right);
     }
 
-    public partial struct InlineArrays
+    public override int GetHashCode()
     {
-        public partial struct ulong_8 : IEquatable<ulong_8>
+        fixed (ecs_event_id_record_t* __self = &this)
         {
-            public bool Equals(ulong_8 other)
-            {
-                fixed (ulong_8* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ulong_8)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_8)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ulong_8 other && Equals(other);
-            }
-
-            public static bool operator ==(ulong_8 left, ulong_8 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(ulong_8 left, ulong_8 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (ulong_8* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ulong_8)));
-                    return hash.ToHashCode();
-                }
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_id_record_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_table_range_t : IEquatable<ecs_table_range_t>
+{
+    public bool Equals(ecs_table_range_t other)
     {
-        public partial struct int_2 : IEquatable<int_2>
+        fixed (ecs_table_range_t* __self = &this)
         {
-            public bool Equals(int_2 other)
-            {
-                fixed (int_2* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(int_2)).SequenceEqual(new Span<byte>(&other, sizeof(int_2)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is int_2 other && Equals(other);
-            }
-
-            public static bool operator ==(int_2 left, int_2 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(int_2 left, int_2 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (int_2* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(int_2)));
-                    return hash.ToHashCode();
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_table_range_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_range_t)));
         }
     }
 
-    public partial struct InlineArrays
+    public override bool Equals(object? obj)
     {
-        public partial struct ecs_commands_t_2 : IEquatable<ecs_commands_t_2>
-        {
-            public bool Equals(ecs_commands_t_2 other)
-            {
-                fixed (ecs_commands_t_2* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_commands_t_2)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_commands_t_2)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_commands_t_2 other && Equals(other);
-            }
-
-            public static bool operator ==(ecs_commands_t_2 left, ecs_commands_t_2 right)
-            {
-                return left.Equals(right);
-            }
+        return obj is ecs_table_range_t other && Equals(other);
+    }
 
-            public static bool operator !=(ecs_commands_t_2 left, ecs_commands_t_2 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator ==(ecs_table_range_t left, ecs_table_range_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_commands_t_2* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_commands_t_2)));
-                    return hash.ToHashCode();
-                }
-            }
-        }
+    public static bool operator !=(ecs_table_range_t left, ecs_table_range_t right)
+    {
+        return !(left == right);
     }
 
-    public partial struct InlineArrays
+    public override int GetHashCode()
     {
-        public partial struct ulong_32 : IEquatable<ulong_32>
+        fixed (ecs_table_range_t* __self = &this)
         {
-            public bool Equals(ulong_32 other)
-            {
-                fixed (ulong_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ulong_32)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_32)));
-                }
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is ulong_32 other && Equals(other);
-            }
-
-            public static bool operator ==(ulong_32 left, ulong_32 right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(ulong_32 left, ulong_32 right)
-            {
-                return !(left == right);
-            }
-
-            public override int GetHashCode()
-            {
-                fixed (ulong_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ulong_32)));
-                    return hash.ToHashCode();
-                }
-            }
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_range_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_var_t : IEquatable<ecs_var_t>
+{
+    public bool Equals(ecs_var_t other)
     {
-        public partial struct ecs_term_t_32 : IEquatable<ecs_term_t_32>
+        fixed (ecs_var_t* __self = &this)
         {
-            public bool Equals(ecs_term_t_32 other)
-            {
-                fixed (ecs_term_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_term_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t_32)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_var_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_term_t_32 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_var_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_term_t_32 left, ecs_term_t_32 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_var_t left, ecs_var_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_term_t_32 left, ecs_term_t_32 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_var_t left, ecs_var_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_term_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_var_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_var_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_page_iter_t : IEquatable<ecs_page_iter_t>
+{
+    public bool Equals(ecs_page_iter_t other)
     {
-        public partial struct byte_128 : IEquatable<byte_128>
+        fixed (ecs_page_iter_t* __self = &this)
         {
-            public bool Equals(byte_128 other)
-            {
-                fixed (byte_128* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(byte_128)).SequenceEqual(new Span<byte>(&other, sizeof(byte_128)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_page_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_page_iter_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is byte_128 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_page_iter_t other && Equals(other);
+    }
 
-            public static bool operator ==(byte_128 left, byte_128 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_page_iter_t left, ecs_page_iter_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(byte_128 left, byte_128 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_page_iter_t left, ecs_page_iter_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (byte_128* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(byte_128)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_page_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_page_iter_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_worker_iter_t : IEquatable<ecs_worker_iter_t>
+{
+    public bool Equals(ecs_worker_iter_t other)
     {
-        public partial struct byte_16 : IEquatable<byte_16>
+        fixed (ecs_worker_iter_t* __self = &this)
         {
-            public bool Equals(byte_16 other)
-            {
-                fixed (byte_16* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(byte_16)).SequenceEqual(new Span<byte>(&other, sizeof(byte_16)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_worker_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_worker_iter_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is byte_16 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_worker_iter_t other && Equals(other);
+    }
 
-            public static bool operator ==(byte_16 left, byte_16 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_worker_iter_t left, ecs_worker_iter_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(byte_16 left, byte_16 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_worker_iter_t left, ecs_worker_iter_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (byte_16* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(byte_16)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_worker_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_worker_iter_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_table_cache_iter_t : IEquatable<ecs_table_cache_iter_t>
+{
+    public bool Equals(ecs_table_cache_iter_t other)
     {
-        public partial struct ecs_http_key_value_t_32 : IEquatable<ecs_http_key_value_t_32>
+        fixed (ecs_table_cache_iter_t* __self = &this)
         {
-            public bool Equals(ecs_http_key_value_t_32 other)
-            {
-                fixed (ecs_http_key_value_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_http_key_value_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_key_value_t_32)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_table_cache_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_iter_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_http_key_value_t_32 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_cache_iter_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_http_key_value_t_32 left, ecs_http_key_value_t_32 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_table_cache_iter_t left, ecs_table_cache_iter_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_http_key_value_t_32 left, ecs_http_key_value_t_32 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_table_cache_iter_t left, ecs_table_cache_iter_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_http_key_value_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_key_value_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_cache_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_iter_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_table_cache_hdr_t : IEquatable<ecs_table_cache_hdr_t>
+{
+    public bool Equals(ecs_table_cache_hdr_t other)
     {
-        public partial struct float_60 : IEquatable<float_60>
+        fixed (ecs_table_cache_hdr_t* __self = &this)
         {
-            public bool Equals(float_60 other)
-            {
-                fixed (float_60* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(float_60)).SequenceEqual(new Span<byte>(&other, sizeof(float_60)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_cache_hdr_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is float_60 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_cache_hdr_t other && Equals(other);
+    }
 
-            public static bool operator ==(float_60 left, float_60 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(float_60 left, float_60 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_table_cache_hdr_t left, ecs_table_cache_hdr_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (float_60* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(float_60)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_cache_hdr_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_cache_hdr_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_each_iter_t : IEquatable<ecs_each_iter_t>
+{
+    public bool Equals(ecs_each_iter_t other)
     {
-        public partial struct double_60 : IEquatable<double_60>
+        fixed (ecs_each_iter_t* __self = &this)
         {
-            public bool Equals(double_60 other)
-            {
-                fixed (double_60* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(double_60)).SequenceEqual(new Span<byte>(&other, sizeof(double_60)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_each_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_each_iter_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is double_60 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_each_iter_t other && Equals(other);
+    }
 
-            public static bool operator ==(double_60 left, double_60 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_each_iter_t left, ecs_each_iter_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(double_60 left, double_60 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_each_iter_t left, ecs_each_iter_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (double_60* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(double_60)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_each_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_each_iter_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_query_op_profile_t : IEquatable<ecs_query_op_profile_t>
+{
+    public bool Equals(ecs_query_op_profile_t other)
     {
-        public partial struct int_14 : IEquatable<int_14>
+        fixed (ecs_query_op_profile_t* __self = &this)
         {
-            public bool Equals(int_14 other)
-            {
-                fixed (int_14* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(int_14)).SequenceEqual(new Span<byte>(&other, sizeof(int_14)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_op_profile_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_profile_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is int_14 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_op_profile_t other && Equals(other);
+    }
 
-            public static bool operator ==(int_14 left, int_14 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_query_op_profile_t left, ecs_query_op_profile_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(int_14 left, int_14 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_query_op_profile_t left, ecs_query_op_profile_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (int_14* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(int_14)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_op_profile_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_profile_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_query_iter_t : IEquatable<ecs_query_iter_t>
+{
+    public bool Equals(ecs_query_iter_t other)
     {
-        public partial struct ecs_alert_severity_filter_t_4 : IEquatable<ecs_alert_severity_filter_t_4>
+        fixed (ecs_query_iter_t* __self = &this)
         {
-            public bool Equals(ecs_alert_severity_filter_t_4 other)
-            {
-                fixed (ecs_alert_severity_filter_t_4* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t_4)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_severity_filter_t_4)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_iter_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_alert_severity_filter_t_4 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_iter_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_alert_severity_filter_t_4 left, ecs_alert_severity_filter_t_4 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_query_iter_t left, ecs_query_iter_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_alert_severity_filter_t_4 left, ecs_alert_severity_filter_t_4 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_query_iter_t left, ecs_query_iter_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_alert_severity_filter_t_4* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t_4)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_iter_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_query_var_t : IEquatable<ecs_query_var_t>
+{
+    public bool Equals(ecs_query_var_t other)
     {
-        public partial struct ecs_script_parameter_t_16 : IEquatable<ecs_script_parameter_t_16>
+        fixed (ecs_query_var_t* __self = &this)
         {
-            public bool Equals(ecs_script_parameter_t_16 other)
-            {
-                fixed (ecs_script_parameter_t_16* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_script_parameter_t_16)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_parameter_t_16)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_var_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_script_parameter_t_16 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_var_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_script_parameter_t_16 left, ecs_script_parameter_t_16 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_query_var_t left, ecs_query_var_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_script_parameter_t_16 left, ecs_script_parameter_t_16 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_query_var_t left, ecs_query_var_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_script_parameter_t_16* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_parameter_t_16)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_var_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_var_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_query_op_t : IEquatable<ecs_query_op_t>
+{
+    public bool Equals(ecs_query_op_t other)
     {
-        public partial struct ecs_meta_scope_t_32 : IEquatable<ecs_meta_scope_t_32>
+        fixed (ecs_query_op_t* __self = &this)
         {
-            public bool Equals(ecs_meta_scope_t_32 other)
-            {
-                fixed (ecs_meta_scope_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_meta_scope_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_scope_t_32)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_meta_scope_t_32 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_op_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_meta_scope_t_32 left, ecs_meta_scope_t_32 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_query_op_t left, ecs_query_op_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_meta_scope_t_32 left, ecs_meta_scope_t_32 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_query_op_t left, ecs_query_op_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_meta_scope_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_scope_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_op_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_query_op_ctx_t : IEquatable<ecs_query_op_ctx_t>
+{
+    public bool Equals(ecs_query_op_ctx_t other)
     {
-        public partial struct ecs_enum_constant_t_32 : IEquatable<ecs_enum_constant_t_32>
+        fixed (ecs_query_op_ctx_t* __self = &this)
         {
-            public bool Equals(ecs_enum_constant_t_32 other)
-            {
-                fixed (ecs_enum_constant_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_enum_constant_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_constant_t_32)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_query_op_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_op_ctx_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_enum_constant_t_32 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_op_ctx_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_enum_constant_t_32 left, ecs_enum_constant_t_32 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_query_op_ctx_t left, ecs_query_op_ctx_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_enum_constant_t_32 left, ecs_enum_constant_t_32 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_query_op_ctx_t left, ecs_query_op_ctx_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_enum_constant_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_constant_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_op_ctx_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_op_ctx_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_iter_private_t : IEquatable<ecs_iter_private_t>
+{
+    public bool Equals(ecs_iter_private_t other)
     {
-        public partial struct ecs_bitmask_constant_t_32 : IEquatable<ecs_bitmask_constant_t_32>
+        fixed (ecs_iter_private_t* __self = &this)
         {
-            public bool Equals(ecs_bitmask_constant_t_32 other)
-            {
-                fixed (ecs_bitmask_constant_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_bitmask_constant_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_constant_t_32)));
-                }
-            }
+            return new Span<byte>(__self, sizeof(ecs_iter_private_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_private_t)));
+        }
+    }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_bitmask_constant_t_32 other && Equals(other);
-            }
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_iter_private_t other && Equals(other);
+    }
 
-            public static bool operator ==(ecs_bitmask_constant_t_32 left, ecs_bitmask_constant_t_32 right)
-            {
-                return left.Equals(right);
-            }
+    public static bool operator ==(ecs_iter_private_t left, ecs_iter_private_t right)
+    {
+        return left.Equals(right);
+    }
 
-            public static bool operator !=(ecs_bitmask_constant_t_32 left, ecs_bitmask_constant_t_32 right)
-            {
-                return !(left == right);
-            }
+    public static bool operator !=(ecs_iter_private_t left, ecs_iter_private_t right)
+    {
+        return !(left == right);
+    }
 
-            public override int GetHashCode()
-            {
-                fixed (ecs_bitmask_constant_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_constant_t_32)));
-                    return hash.ToHashCode();
-                }
-            }
+    public override int GetHashCode()
+    {
+        fixed (ecs_iter_private_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_private_t)));
+            return hash.ToHashCode();
         }
     }
+}
 
-    public partial struct InlineArrays
+public partial struct ecs_iter_private_t
+{
+    public partial struct AnonymousRecord_api_types_L144_C5 : IEquatable<AnonymousRecord_api_types_L144_C5>
     {
-        public partial struct ecs_member_t_32 : IEquatable<ecs_member_t_32>
+        public bool Equals(AnonymousRecord_api_types_L144_C5 other)
         {
-            public bool Equals(ecs_member_t_32 other)
+            fixed (AnonymousRecord_api_types_L144_C5* __self = &this)
             {
-                fixed (ecs_member_t_32* __self = &this)
-                {
-                    return new Span<byte>(__self, sizeof(ecs_member_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_t_32)));
-                }
+                return new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L144_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_api_types_L144_C5)));
             }
+        }
 
-            public override bool Equals(object? obj)
-            {
-                return obj is ecs_member_t_32 other && Equals(other);
-            }
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_api_types_L144_C5 other && Equals(other);
+        }
 
-            public static bool operator ==(ecs_member_t_32 left, ecs_member_t_32 right)
-            {
-                return left.Equals(right);
-            }
+        public static bool operator ==(AnonymousRecord_api_types_L144_C5 left, AnonymousRecord_api_types_L144_C5 right)
+        {
+            return left.Equals(right);
+        }
 
-            public static bool operator !=(ecs_member_t_32 left, ecs_member_t_32 right)
-            {
-                return !(left == right);
-            }
+        public static bool operator !=(AnonymousRecord_api_types_L144_C5 left, AnonymousRecord_api_types_L144_C5 right)
+        {
+            return !(left == right);
+        }
 
-            public override int GetHashCode()
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_api_types_L144_C5* __self = &this)
             {
-                fixed (ecs_member_t_32* __self = &this)
-                {
-                    HashCode hash = new();
-                    hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_t_32)));
-                    return hash.ToHashCode();
-                }
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_api_types_L144_C5)));
+                return hash.ToHashCode();
             }
         }
     }
 }
+
+public partial struct ecs_commands_t : IEquatable<ecs_commands_t>
+{
+    public bool Equals(ecs_commands_t other)
+    {
+        fixed (ecs_commands_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_commands_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_commands_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_commands_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_commands_t left, ecs_commands_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_commands_t left, ecs_commands_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_commands_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_commands_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_suspend_readonly_state_t : IEquatable<ecs_suspend_readonly_state_t>
+{
+    public bool Equals(ecs_suspend_readonly_state_t other)
+    {
+        fixed (ecs_suspend_readonly_state_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_suspend_readonly_state_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_suspend_readonly_state_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_suspend_readonly_state_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_suspend_readonly_state_t left, ecs_suspend_readonly_state_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_suspend_readonly_state_t left, ecs_suspend_readonly_state_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_suspend_readonly_state_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_suspend_readonly_state_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_hm_bucket_t : IEquatable<ecs_hm_bucket_t>
+{
+    public bool Equals(ecs_hm_bucket_t other)
+    {
+        fixed (ecs_hm_bucket_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_hm_bucket_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_hm_bucket_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_hm_bucket_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_hm_bucket_t left, ecs_hm_bucket_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_hm_bucket_t left, ecs_hm_bucket_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_hm_bucket_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_hm_bucket_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_hashmap_t : IEquatable<ecs_hashmap_t>
+{
+    public bool Equals(ecs_hashmap_t other)
+    {
+        fixed (ecs_hashmap_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_hashmap_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_hashmap_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_hashmap_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_hashmap_t left, ecs_hashmap_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_hashmap_t left, ecs_hashmap_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_hashmap_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_hashmap_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct flecs_hashmap_iter_t : IEquatable<flecs_hashmap_iter_t>
+{
+    public bool Equals(flecs_hashmap_iter_t other)
+    {
+        fixed (flecs_hashmap_iter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(flecs_hashmap_iter_t)).SequenceEqual(new Span<byte>(&other, sizeof(flecs_hashmap_iter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is flecs_hashmap_iter_t other && Equals(other);
+    }
+
+    public static bool operator ==(flecs_hashmap_iter_t left, flecs_hashmap_iter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(flecs_hashmap_iter_t left, flecs_hashmap_iter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (flecs_hashmap_iter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(flecs_hashmap_iter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct flecs_hashmap_result_t : IEquatable<flecs_hashmap_result_t>
+{
+    public bool Equals(flecs_hashmap_result_t other)
+    {
+        fixed (flecs_hashmap_result_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(flecs_hashmap_result_t)).SequenceEqual(new Span<byte>(&other, sizeof(flecs_hashmap_result_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is flecs_hashmap_result_t other && Equals(other);
+    }
+
+    public static bool operator ==(flecs_hashmap_result_t left, flecs_hashmap_result_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(flecs_hashmap_result_t left, flecs_hashmap_result_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (flecs_hashmap_result_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(flecs_hashmap_result_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_diff_t : IEquatable<ecs_table_diff_t>
+{
+    public bool Equals(ecs_table_diff_t other)
+    {
+        fixed (ecs_table_diff_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_diff_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_diff_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_diff_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_diff_t left, ecs_table_diff_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_diff_t left, ecs_table_diff_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_diff_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_diff_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_parent_record_t : IEquatable<ecs_parent_record_t>
+{
+    public bool Equals(ecs_parent_record_t other)
+    {
+        fixed (ecs_parent_record_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_parent_record_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_parent_record_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_parent_record_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_parent_record_t left, ecs_parent_record_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_parent_record_t left, ecs_parent_record_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_parent_record_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_parent_record_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_records_t : IEquatable<ecs_table_records_t>
+{
+    public bool Equals(ecs_table_records_t other)
+    {
+        fixed (ecs_table_records_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_records_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_records_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_records_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_records_t left, ecs_table_records_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_records_t left, ecs_table_records_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_records_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_records_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_value_t : IEquatable<ecs_value_t>
+{
+    public bool Equals(ecs_value_t other)
+    {
+        fixed (ecs_value_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_value_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_value_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_value_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_value_t left, ecs_value_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_value_t left, ecs_value_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_value_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_value_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_entity_desc_t : IEquatable<ecs_entity_desc_t>
+{
+    public bool Equals(ecs_entity_desc_t other)
+    {
+        fixed (ecs_entity_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_entity_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entity_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_entity_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_entity_desc_t left, ecs_entity_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_entity_desc_t left, ecs_entity_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_entity_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entity_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_bulk_desc_t : IEquatable<ecs_bulk_desc_t>
+{
+    public bool Equals(ecs_bulk_desc_t other)
+    {
+        fixed (ecs_bulk_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_bulk_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bulk_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_bulk_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_bulk_desc_t left, ecs_bulk_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_bulk_desc_t left, ecs_bulk_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_bulk_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bulk_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_component_desc_t : IEquatable<ecs_component_desc_t>
+{
+    public bool Equals(ecs_component_desc_t other)
+    {
+        fixed (ecs_component_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_component_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_component_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_component_desc_t left, ecs_component_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_component_desc_t left, ecs_component_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_component_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_query_desc_t : IEquatable<ecs_query_desc_t>
+{
+    public bool Equals(ecs_query_desc_t other)
+    {
+        fixed (ecs_query_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_desc_t left, ecs_query_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_desc_t left, ecs_query_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_observer_desc_t : IEquatable<ecs_observer_desc_t>
+{
+    public bool Equals(ecs_observer_desc_t other)
+    {
+        fixed (ecs_observer_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_observer_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_observer_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_observer_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_observer_desc_t left, ecs_observer_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_observer_desc_t left, ecs_observer_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_observer_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_observer_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_event_desc_t : IEquatable<ecs_event_desc_t>
+{
+    public bool Equals(ecs_event_desc_t other)
+    {
+        fixed (ecs_event_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_event_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_event_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_event_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_event_desc_t left, ecs_event_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_event_desc_t left, ecs_event_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_event_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_event_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_build_info_t : IEquatable<ecs_build_info_t>
+{
+    public bool Equals(ecs_build_info_t other)
+    {
+        fixed (ecs_build_info_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_build_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_build_info_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_build_info_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_build_info_t left, ecs_build_info_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_build_info_t left, ecs_build_info_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_build_info_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_build_info_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_info_t : IEquatable<ecs_world_info_t>
+{
+    public bool Equals(ecs_world_info_t other)
+    {
+        fixed (ecs_world_info_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_world_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_info_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_world_info_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_world_info_t left, ecs_world_info_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_world_info_t left, ecs_world_info_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_world_info_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_info_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_info_t
+{
+    public partial struct AnonymousRecord_flecs_L1518_C5 : IEquatable<AnonymousRecord_flecs_L1518_C5>
+    {
+        public bool Equals(AnonymousRecord_flecs_L1518_C5 other)
+        {
+            fixed (AnonymousRecord_flecs_L1518_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1518_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_flecs_L1518_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_flecs_L1518_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_flecs_L1518_C5 left, AnonymousRecord_flecs_L1518_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_flecs_L1518_C5 left, AnonymousRecord_flecs_L1518_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_flecs_L1518_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_flecs_L1518_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_query_group_info_t : IEquatable<ecs_query_group_info_t>
+{
+    public bool Equals(ecs_query_group_info_t other)
+    {
+        fixed (ecs_query_group_info_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_group_info_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_group_info_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_group_info_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_group_info_t left, ecs_query_group_info_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_group_info_t left, ecs_query_group_info_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_group_info_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_group_info_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsIdentifier : IEquatable<EcsIdentifier>
+{
+    public bool Equals(EcsIdentifier other)
+    {
+        fixed (EcsIdentifier* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsIdentifier)).SequenceEqual(new Span<byte>(&other, sizeof(EcsIdentifier)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsIdentifier other && Equals(other);
+    }
+
+    public static bool operator ==(EcsIdentifier left, EcsIdentifier right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsIdentifier left, EcsIdentifier right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsIdentifier* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsIdentifier)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsComponent : IEquatable<EcsComponent>
+{
+    public bool Equals(EcsComponent other)
+    {
+        fixed (EcsComponent* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsComponent)).SequenceEqual(new Span<byte>(&other, sizeof(EcsComponent)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsComponent other && Equals(other);
+    }
+
+    public static bool operator ==(EcsComponent left, EcsComponent right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsComponent left, EcsComponent right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsComponent* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsComponent)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsPoly : IEquatable<EcsPoly>
+{
+    public bool Equals(EcsPoly other)
+    {
+        fixed (EcsPoly* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsPoly)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPoly)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsPoly other && Equals(other);
+    }
+
+    public static bool operator ==(EcsPoly left, EcsPoly right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsPoly left, EcsPoly right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsPoly* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsPoly)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsDefaultChildComponent : IEquatable<EcsDefaultChildComponent>
+{
+    public bool Equals(EcsDefaultChildComponent other)
+    {
+        fixed (EcsDefaultChildComponent* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsDefaultChildComponent)).SequenceEqual(new Span<byte>(&other, sizeof(EcsDefaultChildComponent)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsDefaultChildComponent other && Equals(other);
+    }
+
+    public static bool operator ==(EcsDefaultChildComponent left, EcsDefaultChildComponent right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsDefaultChildComponent left, EcsDefaultChildComponent right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsDefaultChildComponent* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsDefaultChildComponent)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsParent : IEquatable<EcsParent>
+{
+    public bool Equals(EcsParent other)
+    {
+        fixed (EcsParent* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsParent)).SequenceEqual(new Span<byte>(&other, sizeof(EcsParent)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsParent other && Equals(other);
+    }
+
+    public static bool operator ==(EcsParent left, EcsParent right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsParent left, EcsParent right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsParent* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsParent)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_tree_spawner_child_t : IEquatable<ecs_tree_spawner_child_t>
+{
+    public bool Equals(ecs_tree_spawner_child_t other)
+    {
+        fixed (ecs_tree_spawner_child_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_tree_spawner_child_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_tree_spawner_child_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_tree_spawner_child_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_tree_spawner_child_t left, ecs_tree_spawner_child_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_tree_spawner_child_t left, ecs_tree_spawner_child_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_tree_spawner_child_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_tree_spawner_child_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_tree_spawner_t : IEquatable<ecs_tree_spawner_t>
+{
+    public bool Equals(ecs_tree_spawner_t other)
+    {
+        fixed (ecs_tree_spawner_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_tree_spawner_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_tree_spawner_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_tree_spawner_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_tree_spawner_t left, ecs_tree_spawner_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_tree_spawner_t left, ecs_tree_spawner_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_tree_spawner_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_tree_spawner_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsTreeSpawner : IEquatable<EcsTreeSpawner>
+{
+    public bool Equals(EcsTreeSpawner other)
+    {
+        fixed (EcsTreeSpawner* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsTreeSpawner)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTreeSpawner)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsTreeSpawner other && Equals(other);
+    }
+
+    public static bool operator ==(EcsTreeSpawner left, EcsTreeSpawner right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsTreeSpawner left, EcsTreeSpawner right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsTreeSpawner* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsTreeSpawner)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_entities_t : IEquatable<ecs_entities_t>
+{
+    public bool Equals(ecs_entities_t other)
+    {
+        fixed (ecs_entities_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_entities_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entities_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_entities_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_entities_t left, ecs_entities_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_entities_t left, ecs_entities_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_entities_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entities_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_delete_empty_tables_desc_t : IEquatable<ecs_delete_empty_tables_desc_t>
+{
+    public bool Equals(ecs_delete_empty_tables_desc_t other)
+    {
+        fixed (ecs_delete_empty_tables_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_delete_empty_tables_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_delete_empty_tables_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_delete_empty_tables_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_delete_empty_tables_desc_t left, ecs_delete_empty_tables_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_delete_empty_tables_desc_t left, ecs_delete_empty_tables_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_delete_empty_tables_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_delete_empty_tables_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_query_count_t : IEquatable<ecs_query_count_t>
+{
+    public bool Equals(ecs_query_count_t other)
+    {
+        fixed (ecs_query_count_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_count_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_count_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_count_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_count_t left, ecs_query_count_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_count_t left, ecs_query_count_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_count_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_count_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_app_desc_t : IEquatable<ecs_app_desc_t>
+{
+    public bool Equals(ecs_app_desc_t other)
+    {
+        fixed (ecs_app_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_app_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_app_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_app_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_app_desc_t left, ecs_app_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_app_desc_t left, ecs_app_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_app_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_app_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_server_t : IEquatable<ecs_http_server_t>
+{
+    public bool Equals(ecs_http_server_t other)
+    {
+        fixed (ecs_http_server_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_server_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_server_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_server_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_server_t left, ecs_http_server_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_server_t left, ecs_http_server_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_server_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_server_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_connection_t : IEquatable<ecs_http_connection_t>
+{
+    public bool Equals(ecs_http_connection_t other)
+    {
+        fixed (ecs_http_connection_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_connection_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_connection_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_connection_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_connection_t left, ecs_http_connection_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_connection_t left, ecs_http_connection_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_connection_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_connection_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_key_value_t : IEquatable<ecs_http_key_value_t>
+{
+    public bool Equals(ecs_http_key_value_t other)
+    {
+        fixed (ecs_http_key_value_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_key_value_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_key_value_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_key_value_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_key_value_t left, ecs_http_key_value_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_key_value_t left, ecs_http_key_value_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_key_value_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_key_value_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_request_t : IEquatable<ecs_http_request_t>
+{
+    public bool Equals(ecs_http_request_t other)
+    {
+        fixed (ecs_http_request_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_request_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_request_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_request_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_request_t left, ecs_http_request_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_request_t left, ecs_http_request_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_request_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_request_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_reply_t : IEquatable<ecs_http_reply_t>
+{
+    public bool Equals(ecs_http_reply_t other)
+    {
+        fixed (ecs_http_reply_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_reply_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_reply_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_reply_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_reply_t left, ecs_http_reply_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_reply_t left, ecs_http_reply_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_reply_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_reply_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_http_server_desc_t : IEquatable<ecs_http_server_desc_t>
+{
+    public bool Equals(ecs_http_server_desc_t other)
+    {
+        fixed (ecs_http_server_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_http_server_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_server_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_http_server_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_http_server_desc_t left, ecs_http_server_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_http_server_desc_t left, ecs_http_server_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_http_server_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_server_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_rest_ctx_t : IEquatable<ecs_rest_ctx_t>
+{
+    public bool Equals(ecs_rest_ctx_t other)
+    {
+        fixed (ecs_rest_ctx_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_rest_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_rest_ctx_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_rest_ctx_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_rest_ctx_t left, ecs_rest_ctx_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_rest_ctx_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_rest_ctx_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsRest : IEquatable<EcsRest>
+{
+    public bool Equals(EcsRest other)
+    {
+        fixed (EcsRest* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsRest)).SequenceEqual(new Span<byte>(&other, sizeof(EcsRest)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsRest other && Equals(other);
+    }
+
+    public static bool operator ==(EcsRest left, EcsRest right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsRest left, EcsRest right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsRest* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsRest)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsTimer : IEquatable<EcsTimer>
+{
+    public bool Equals(EcsTimer other)
+    {
+        fixed (EcsTimer* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsTimer)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTimer)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsTimer other && Equals(other);
+    }
+
+    public static bool operator ==(EcsTimer left, EcsTimer right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsTimer left, EcsTimer right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsTimer* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsTimer)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsRateFilter : IEquatable<EcsRateFilter>
+{
+    public bool Equals(EcsRateFilter other)
+    {
+        fixed (EcsRateFilter* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsRateFilter)).SequenceEqual(new Span<byte>(&other, sizeof(EcsRateFilter)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsRateFilter other && Equals(other);
+    }
+
+    public static bool operator ==(EcsRateFilter left, EcsRateFilter right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsRateFilter left, EcsRateFilter right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsRateFilter* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsRateFilter)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_pipeline_desc_t : IEquatable<ecs_pipeline_desc_t>
+{
+    public bool Equals(ecs_pipeline_desc_t other)
+    {
+        fixed (ecs_pipeline_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_pipeline_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_pipeline_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_pipeline_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_pipeline_desc_t left, ecs_pipeline_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_pipeline_desc_t left, ecs_pipeline_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_pipeline_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_pipeline_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsTickSource : IEquatable<EcsTickSource>
+{
+    public bool Equals(EcsTickSource other)
+    {
+        fixed (EcsTickSource* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsTickSource)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTickSource)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsTickSource other && Equals(other);
+    }
+
+    public static bool operator ==(EcsTickSource left, EcsTickSource right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsTickSource left, EcsTickSource right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsTickSource* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsTickSource)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_system_desc_t : IEquatable<ecs_system_desc_t>
+{
+    public bool Equals(ecs_system_desc_t other)
+    {
+        fixed (ecs_system_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_system_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_system_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_system_desc_t left, ecs_system_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_system_desc_t left, ecs_system_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_system_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_system_t : IEquatable<ecs_system_t>
+{
+    public bool Equals(ecs_system_t other)
+    {
+        fixed (ecs_system_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_system_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_system_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_system_t left, ecs_system_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_system_t left, ecs_system_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_system_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_gauge_t : IEquatable<ecs_gauge_t>
+{
+    public bool Equals(ecs_gauge_t other)
+    {
+        fixed (ecs_gauge_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_gauge_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_gauge_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_gauge_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_gauge_t left, ecs_gauge_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_gauge_t left, ecs_gauge_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_gauge_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_gauge_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_counter_t : IEquatable<ecs_counter_t>
+{
+    public bool Equals(ecs_counter_t other)
+    {
+        fixed (ecs_counter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_counter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_counter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_counter_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_counter_t left, ecs_counter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_counter_t left, ecs_counter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_counter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_counter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_metric_t : IEquatable<ecs_metric_t>
+{
+    public bool Equals(ecs_metric_t other)
+    {
+        fixed (ecs_metric_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_metric_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_metric_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_metric_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_metric_t left, ecs_metric_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_metric_t left, ecs_metric_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_metric_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_metric_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t : IEquatable<ecs_world_stats_t>
+{
+    public bool Equals(ecs_world_stats_t other)
+    {
+        fixed (ecs_world_stats_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_world_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_stats_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_world_stats_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_world_stats_t left, ecs_world_stats_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_world_stats_t left, ecs_world_stats_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_world_stats_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_stats_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L67_C5 : IEquatable<AnonymousRecord_stats_L67_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L67_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L67_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L67_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L67_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L67_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L67_C5 left, AnonymousRecord_stats_L67_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L67_C5 left, AnonymousRecord_stats_L67_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L67_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L67_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L73_C5 : IEquatable<AnonymousRecord_stats_L73_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L73_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L73_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L73_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L73_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L73_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L73_C5 left, AnonymousRecord_stats_L73_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L73_C5 left, AnonymousRecord_stats_L73_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L73_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L73_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L83_C5 : IEquatable<AnonymousRecord_stats_L83_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L83_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L83_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L83_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L83_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L83_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L83_C5 left, AnonymousRecord_stats_L83_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L83_C5 left, AnonymousRecord_stats_L83_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L83_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L83_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L91_C5 : IEquatable<AnonymousRecord_stats_L91_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L91_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L91_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L91_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L91_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L91_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L91_C5 left, AnonymousRecord_stats_L91_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L91_C5 left, AnonymousRecord_stats_L91_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L91_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L91_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L98_C5 : IEquatable<AnonymousRecord_stats_L98_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L98_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L98_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L98_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L98_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L98_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L98_C5 left, AnonymousRecord_stats_L98_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L98_C5 left, AnonymousRecord_stats_L98_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L98_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L98_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L113_C5 : IEquatable<AnonymousRecord_stats_L113_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L113_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L113_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L113_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L113_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L113_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L113_C5 left, AnonymousRecord_stats_L113_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L113_C5 left, AnonymousRecord_stats_L113_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L113_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L113_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L124_C5 : IEquatable<AnonymousRecord_stats_L124_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L124_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L124_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L124_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L124_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L124_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L124_C5 left, AnonymousRecord_stats_L124_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L124_C5 left, AnonymousRecord_stats_L124_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L124_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L124_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L136_C5 : IEquatable<AnonymousRecord_stats_L136_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L136_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L136_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L136_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L136_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L136_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L136_C5 left, AnonymousRecord_stats_L136_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L136_C5 left, AnonymousRecord_stats_L136_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L136_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L136_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_world_stats_t
+{
+    public partial struct AnonymousRecord_stats_L153_C5 : IEquatable<AnonymousRecord_stats_L153_C5>
+    {
+        public bool Equals(AnonymousRecord_stats_L153_C5 other)
+        {
+            fixed (AnonymousRecord_stats_L153_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_stats_L153_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_stats_L153_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_stats_L153_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_stats_L153_C5 left, AnonymousRecord_stats_L153_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_stats_L153_C5 left, AnonymousRecord_stats_L153_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_stats_L153_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_stats_L153_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct ecs_query_stats_t : IEquatable<ecs_query_stats_t>
+{
+    public bool Equals(ecs_query_stats_t other)
+    {
+        fixed (ecs_query_stats_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_stats_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_stats_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_stats_t left, ecs_query_stats_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_stats_t left, ecs_query_stats_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_stats_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_stats_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_system_stats_t : IEquatable<ecs_system_stats_t>
+{
+    public bool Equals(ecs_system_stats_t other)
+    {
+        fixed (ecs_system_stats_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_system_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_system_stats_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_system_stats_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_system_stats_t left, ecs_system_stats_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_system_stats_t left, ecs_system_stats_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_system_stats_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_system_stats_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_sync_stats_t : IEquatable<ecs_sync_stats_t>
+{
+    public bool Equals(ecs_sync_stats_t other)
+    {
+        fixed (ecs_sync_stats_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_sync_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_sync_stats_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_sync_stats_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_sync_stats_t left, ecs_sync_stats_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_sync_stats_t left, ecs_sync_stats_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_sync_stats_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_sync_stats_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_pipeline_stats_t : IEquatable<ecs_pipeline_stats_t>
+{
+    public bool Equals(ecs_pipeline_stats_t other)
+    {
+        fixed (ecs_pipeline_stats_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_pipeline_stats_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_pipeline_stats_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_pipeline_stats_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_pipeline_stats_t left, ecs_pipeline_stats_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_pipeline_stats_t left, ecs_pipeline_stats_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_pipeline_stats_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_pipeline_stats_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsStatsHeader : IEquatable<EcsStatsHeader>
+{
+    public bool Equals(EcsStatsHeader other)
+    {
+        fixed (EcsStatsHeader* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsStatsHeader)).SequenceEqual(new Span<byte>(&other, sizeof(EcsStatsHeader)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsStatsHeader other && Equals(other);
+    }
+
+    public static bool operator ==(EcsStatsHeader left, EcsStatsHeader right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsStatsHeader left, EcsStatsHeader right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsStatsHeader* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsStatsHeader)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsWorldStats : IEquatable<EcsWorldStats>
+{
+    public bool Equals(EcsWorldStats other)
+    {
+        fixed (EcsWorldStats* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsWorldStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldStats)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsWorldStats other && Equals(other);
+    }
+
+    public static bool operator ==(EcsWorldStats left, EcsWorldStats right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsWorldStats left, EcsWorldStats right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsWorldStats* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldStats)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsSystemStats : IEquatable<EcsSystemStats>
+{
+    public bool Equals(EcsSystemStats other)
+    {
+        fixed (EcsSystemStats* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsSystemStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsSystemStats)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsSystemStats other && Equals(other);
+    }
+
+    public static bool operator ==(EcsSystemStats left, EcsSystemStats right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsSystemStats left, EcsSystemStats right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsSystemStats* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsSystemStats)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsPipelineStats : IEquatable<EcsPipelineStats>
+{
+    public bool Equals(EcsPipelineStats other)
+    {
+        fixed (EcsPipelineStats* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsPipelineStats)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPipelineStats)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsPipelineStats other && Equals(other);
+    }
+
+    public static bool operator ==(EcsPipelineStats left, EcsPipelineStats right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsPipelineStats left, EcsPipelineStats right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsPipelineStats* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsPipelineStats)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsWorldSummary : IEquatable<EcsWorldSummary>
+{
+    public bool Equals(EcsWorldSummary other)
+    {
+        fixed (EcsWorldSummary* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsWorldSummary)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldSummary)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsWorldSummary other && Equals(other);
+    }
+
+    public static bool operator ==(EcsWorldSummary left, EcsWorldSummary right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsWorldSummary left, EcsWorldSummary right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsWorldSummary* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldSummary)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_entities_memory_t : IEquatable<ecs_entities_memory_t>
+{
+    public bool Equals(ecs_entities_memory_t other)
+    {
+        fixed (ecs_entities_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_entities_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entities_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_entities_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_entities_memory_t left, ecs_entities_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_entities_memory_t left, ecs_entities_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_entities_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entities_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_component_memory_t : IEquatable<ecs_component_memory_t>
+{
+    public bool Equals(ecs_component_memory_t other)
+    {
+        fixed (ecs_component_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_component_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_component_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_component_memory_t left, ecs_component_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_component_memory_t left, ecs_component_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_component_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_component_index_memory_t : IEquatable<ecs_component_index_memory_t>
+{
+    public bool Equals(ecs_component_index_memory_t other)
+    {
+        fixed (ecs_component_index_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_component_index_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_component_index_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_component_index_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_component_index_memory_t left, ecs_component_index_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_component_index_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_component_index_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_query_memory_t : IEquatable<ecs_query_memory_t>
+{
+    public bool Equals(ecs_query_memory_t other)
+    {
+        fixed (ecs_query_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_query_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_query_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_query_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_query_memory_t left, ecs_query_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_query_memory_t left, ecs_query_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_query_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_query_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_memory_t : IEquatable<ecs_table_memory_t>
+{
+    public bool Equals(ecs_table_memory_t other)
+    {
+        fixed (ecs_table_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_memory_t left, ecs_table_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_memory_t left, ecs_table_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_table_histogram_t : IEquatable<ecs_table_histogram_t>
+{
+    public bool Equals(ecs_table_histogram_t other)
+    {
+        fixed (ecs_table_histogram_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_table_histogram_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_table_histogram_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_table_histogram_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_table_histogram_t left, ecs_table_histogram_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_table_histogram_t left, ecs_table_histogram_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_table_histogram_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_table_histogram_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_misc_memory_t : IEquatable<ecs_misc_memory_t>
+{
+    public bool Equals(ecs_misc_memory_t other)
+    {
+        fixed (ecs_misc_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_misc_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_misc_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_misc_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_misc_memory_t left, ecs_misc_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_misc_memory_t left, ecs_misc_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_misc_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_misc_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_allocator_memory_t : IEquatable<ecs_allocator_memory_t>
+{
+    public bool Equals(ecs_allocator_memory_t other)
+    {
+        fixed (ecs_allocator_memory_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_allocator_memory_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_allocator_memory_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_allocator_memory_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_allocator_memory_t left, ecs_allocator_memory_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_allocator_memory_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_allocator_memory_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsWorldMemory : IEquatable<EcsWorldMemory>
+{
+    public bool Equals(EcsWorldMemory other)
+    {
+        fixed (EcsWorldMemory* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsWorldMemory)).SequenceEqual(new Span<byte>(&other, sizeof(EcsWorldMemory)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsWorldMemory other && Equals(other);
+    }
+
+    public static bool operator ==(EcsWorldMemory left, EcsWorldMemory right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsWorldMemory left, EcsWorldMemory right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsWorldMemory* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsWorldMemory)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsMetricValue : IEquatable<EcsMetricValue>
+{
+    public bool Equals(EcsMetricValue other)
+    {
+        fixed (EcsMetricValue* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsMetricValue)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMetricValue)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsMetricValue other && Equals(other);
+    }
+
+    public static bool operator ==(EcsMetricValue left, EcsMetricValue right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsMetricValue left, EcsMetricValue right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsMetricValue* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsMetricValue)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsMetricSource : IEquatable<EcsMetricSource>
+{
+    public bool Equals(EcsMetricSource other)
+    {
+        fixed (EcsMetricSource* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsMetricSource)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMetricSource)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsMetricSource other && Equals(other);
+    }
+
+    public static bool operator ==(EcsMetricSource left, EcsMetricSource right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsMetricSource left, EcsMetricSource right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsMetricSource* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsMetricSource)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_metric_desc_t : IEquatable<ecs_metric_desc_t>
+{
+    public bool Equals(ecs_metric_desc_t other)
+    {
+        fixed (ecs_metric_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_metric_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_metric_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_metric_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_metric_desc_t left, ecs_metric_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_metric_desc_t left, ecs_metric_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_metric_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_metric_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsAlertInstance : IEquatable<EcsAlertInstance>
+{
+    public bool Equals(EcsAlertInstance other)
+    {
+        fixed (EcsAlertInstance* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsAlertInstance)).SequenceEqual(new Span<byte>(&other, sizeof(EcsAlertInstance)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsAlertInstance other && Equals(other);
+    }
+
+    public static bool operator ==(EcsAlertInstance left, EcsAlertInstance right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsAlertInstance left, EcsAlertInstance right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsAlertInstance* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsAlertInstance)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsAlertsActive : IEquatable<EcsAlertsActive>
+{
+    public bool Equals(EcsAlertsActive other)
+    {
+        fixed (EcsAlertsActive* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsAlertsActive)).SequenceEqual(new Span<byte>(&other, sizeof(EcsAlertsActive)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsAlertsActive other && Equals(other);
+    }
+
+    public static bool operator ==(EcsAlertsActive left, EcsAlertsActive right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsAlertsActive left, EcsAlertsActive right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsAlertsActive* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsAlertsActive)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_alert_severity_filter_t : IEquatable<ecs_alert_severity_filter_t>
+{
+    public bool Equals(ecs_alert_severity_filter_t other)
+    {
+        fixed (ecs_alert_severity_filter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_severity_filter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_alert_severity_filter_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_alert_severity_filter_t left, ecs_alert_severity_filter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_alert_severity_filter_t left, ecs_alert_severity_filter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_alert_severity_filter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_alert_desc_t : IEquatable<ecs_alert_desc_t>
+{
+    public bool Equals(ecs_alert_desc_t other)
+    {
+        fixed (ecs_alert_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_alert_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_alert_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_alert_desc_t left, ecs_alert_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_alert_desc_t left, ecs_alert_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_alert_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_from_json_desc_t : IEquatable<ecs_from_json_desc_t>
+{
+    public bool Equals(ecs_from_json_desc_t other)
+    {
+        fixed (ecs_from_json_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_from_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_from_json_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_from_json_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_from_json_desc_t left, ecs_from_json_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_from_json_desc_t left, ecs_from_json_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_from_json_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_from_json_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_entity_to_json_desc_t : IEquatable<ecs_entity_to_json_desc_t>
+{
+    public bool Equals(ecs_entity_to_json_desc_t other)
+    {
+        fixed (ecs_entity_to_json_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_entity_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_entity_to_json_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_entity_to_json_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_entity_to_json_desc_t left, ecs_entity_to_json_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_entity_to_json_desc_t left, ecs_entity_to_json_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_entity_to_json_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_entity_to_json_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_iter_to_json_desc_t : IEquatable<ecs_iter_to_json_desc_t>
+{
+    public bool Equals(ecs_iter_to_json_desc_t other)
+    {
+        fixed (ecs_iter_to_json_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_iter_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_iter_to_json_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_iter_to_json_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_iter_to_json_desc_t left, ecs_iter_to_json_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_iter_to_json_desc_t left, ecs_iter_to_json_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_iter_to_json_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_iter_to_json_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_world_to_json_desc_t : IEquatable<ecs_world_to_json_desc_t>
+{
+    public bool Equals(ecs_world_to_json_desc_t other)
+    {
+        fixed (ecs_world_to_json_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_world_to_json_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_world_to_json_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_world_to_json_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_world_to_json_desc_t left, ecs_world_to_json_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_world_to_json_desc_t left, ecs_world_to_json_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_world_to_json_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_world_to_json_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_template_t : IEquatable<ecs_script_template_t>
+{
+    public bool Equals(ecs_script_template_t other)
+    {
+        fixed (ecs_script_template_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_template_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_template_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_template_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_template_t left, ecs_script_template_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_template_t left, ecs_script_template_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_template_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_template_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_var_t : IEquatable<ecs_script_var_t>
+{
+    public bool Equals(ecs_script_var_t other)
+    {
+        fixed (ecs_script_var_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_var_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_var_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_var_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_var_t left, ecs_script_var_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_var_t left, ecs_script_var_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_var_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_var_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_vars_t : IEquatable<ecs_script_vars_t>
+{
+    public bool Equals(ecs_script_vars_t other)
+    {
+        fixed (ecs_script_vars_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_vars_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_vars_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_vars_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_vars_t left, ecs_script_vars_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_vars_t left, ecs_script_vars_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_vars_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_vars_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_t : IEquatable<ecs_script_t>
+{
+    public bool Equals(ecs_script_t other)
+    {
+        fixed (ecs_script_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_t left, ecs_script_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_t left, ecs_script_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_runtime_t : IEquatable<ecs_script_runtime_t>
+{
+    public bool Equals(ecs_script_runtime_t other)
+    {
+        fixed (ecs_script_runtime_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_runtime_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_runtime_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_runtime_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_runtime_t left, ecs_script_runtime_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_runtime_t left, ecs_script_runtime_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_runtime_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_runtime_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsScript : IEquatable<EcsScript>
+{
+    public bool Equals(EcsScript other)
+    {
+        fixed (EcsScript* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsScript)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScript)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsScript other && Equals(other);
+    }
+
+    public static bool operator ==(EcsScript left, EcsScript right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsScript left, EcsScript right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsScript* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsScript)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_function_ctx_t : IEquatable<ecs_function_ctx_t>
+{
+    public bool Equals(ecs_function_ctx_t other)
+    {
+        fixed (ecs_function_ctx_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_function_ctx_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_function_ctx_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_function_ctx_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_function_ctx_t left, ecs_function_ctx_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_function_ctx_t left, ecs_function_ctx_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_function_ctx_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_function_ctx_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_parameter_t : IEquatable<ecs_script_parameter_t>
+{
+    public bool Equals(ecs_script_parameter_t other)
+    {
+        fixed (ecs_script_parameter_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_parameter_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_parameter_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_parameter_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_parameter_t left, ecs_script_parameter_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_parameter_t left, ecs_script_parameter_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_parameter_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_parameter_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsScriptConstVar : IEquatable<EcsScriptConstVar>
+{
+    public bool Equals(EcsScriptConstVar other)
+    {
+        fixed (EcsScriptConstVar* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsScriptConstVar)).SequenceEqual(new Span<byte>(&other, sizeof(EcsScriptConstVar)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsScriptConstVar other && Equals(other);
+    }
+
+    public static bool operator ==(EcsScriptConstVar left, EcsScriptConstVar right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsScriptConstVar left, EcsScriptConstVar right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsScriptConstVar* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsScriptConstVar)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_function_t : IEquatable<ecs_script_function_t>
+{
+    public bool Equals(ecs_script_function_t other)
+    {
+        fixed (ecs_script_function_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_function_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_function_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_function_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_function_t left, ecs_script_function_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_function_t left, ecs_script_function_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_function_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_function_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_eval_desc_t : IEquatable<ecs_script_eval_desc_t>
+{
+    public bool Equals(ecs_script_eval_desc_t other)
+    {
+        fixed (ecs_script_eval_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_eval_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_eval_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_eval_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_eval_desc_t left, ecs_script_eval_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_eval_desc_t left, ecs_script_eval_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_eval_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_eval_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_eval_result_t : IEquatable<ecs_script_eval_result_t>
+{
+    public bool Equals(ecs_script_eval_result_t other)
+    {
+        fixed (ecs_script_eval_result_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_eval_result_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_eval_result_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_eval_result_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_eval_result_t left, ecs_script_eval_result_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_eval_result_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_eval_result_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_script_desc_t : IEquatable<ecs_script_desc_t>
+{
+    public bool Equals(ecs_script_desc_t other)
+    {
+        fixed (ecs_script_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_script_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_script_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_script_desc_t left, ecs_script_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_script_desc_t left, ecs_script_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_script_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_expr_eval_desc_t : IEquatable<ecs_expr_eval_desc_t>
+{
+    public bool Equals(ecs_expr_eval_desc_t other)
+    {
+        fixed (ecs_expr_eval_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_expr_eval_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_expr_eval_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_expr_eval_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_expr_eval_desc_t left, ecs_expr_eval_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_expr_eval_desc_t left, ecs_expr_eval_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_expr_eval_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_expr_eval_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_const_var_desc_t : IEquatable<ecs_const_var_desc_t>
+{
+    public bool Equals(ecs_const_var_desc_t other)
+    {
+        fixed (ecs_const_var_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_const_var_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_const_var_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_const_var_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_const_var_desc_t left, ecs_const_var_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_const_var_desc_t left, ecs_const_var_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_const_var_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_const_var_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_vector_fn_callbacks_t : IEquatable<ecs_vector_fn_callbacks_t>
+{
+    public bool Equals(ecs_vector_fn_callbacks_t other)
+    {
+        fixed (ecs_vector_fn_callbacks_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_vector_fn_callbacks_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vector_fn_callbacks_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_vector_fn_callbacks_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_vector_fn_callbacks_t left, ecs_vector_fn_callbacks_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_vector_fn_callbacks_t left, ecs_vector_fn_callbacks_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_vector_fn_callbacks_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vector_fn_callbacks_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_function_desc_t : IEquatable<ecs_function_desc_t>
+{
+    public bool Equals(ecs_function_desc_t other)
+    {
+        fixed (ecs_function_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_function_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_function_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_function_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_function_desc_t left, ecs_function_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_function_desc_t left, ecs_function_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_function_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_function_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_expr_node_t : IEquatable<ecs_expr_node_t>
+{
+    public bool Equals(ecs_expr_node_t other)
+    {
+        fixed (ecs_expr_node_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_expr_node_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_expr_node_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_expr_node_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_expr_node_t left, ecs_expr_node_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_expr_node_t left, ecs_expr_node_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_expr_node_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_expr_node_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsDocDescription : IEquatable<EcsDocDescription>
+{
+    public bool Equals(EcsDocDescription other)
+    {
+        fixed (EcsDocDescription* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsDocDescription)).SequenceEqual(new Span<byte>(&other, sizeof(EcsDocDescription)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsDocDescription other && Equals(other);
+    }
+
+    public static bool operator ==(EcsDocDescription left, EcsDocDescription right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsDocDescription left, EcsDocDescription right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsDocDescription* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsDocDescription)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsType : IEquatable<EcsType>
+{
+    public bool Equals(EcsType other)
+    {
+        fixed (EcsType* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsType)).SequenceEqual(new Span<byte>(&other, sizeof(EcsType)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsType other && Equals(other);
+    }
+
+    public static bool operator ==(EcsType left, EcsType right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsType left, EcsType right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsType* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsType)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsPrimitive : IEquatable<EcsPrimitive>
+{
+    public bool Equals(EcsPrimitive other)
+    {
+        fixed (EcsPrimitive* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsPrimitive)).SequenceEqual(new Span<byte>(&other, sizeof(EcsPrimitive)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsPrimitive other && Equals(other);
+    }
+
+    public static bool operator ==(EcsPrimitive left, EcsPrimitive right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsPrimitive left, EcsPrimitive right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsPrimitive* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsPrimitive)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsMember : IEquatable<EcsMember>
+{
+    public bool Equals(EcsMember other)
+    {
+        fixed (EcsMember* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsMember)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMember)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsMember other && Equals(other);
+    }
+
+    public static bool operator ==(EcsMember left, EcsMember right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsMember left, EcsMember right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsMember* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsMember)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_member_value_range_t : IEquatable<ecs_member_value_range_t>
+{
+    public bool Equals(ecs_member_value_range_t other)
+    {
+        fixed (ecs_member_value_range_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_member_value_range_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_value_range_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_member_value_range_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_member_value_range_t left, ecs_member_value_range_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_member_value_range_t left, ecs_member_value_range_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_member_value_range_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_value_range_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsMemberRanges : IEquatable<EcsMemberRanges>
+{
+    public bool Equals(EcsMemberRanges other)
+    {
+        fixed (EcsMemberRanges* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsMemberRanges)).SequenceEqual(new Span<byte>(&other, sizeof(EcsMemberRanges)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsMemberRanges other && Equals(other);
+    }
+
+    public static bool operator ==(EcsMemberRanges left, EcsMemberRanges right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsMemberRanges left, EcsMemberRanges right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsMemberRanges* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsMemberRanges)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_member_t : IEquatable<ecs_member_t>
+{
+    public bool Equals(ecs_member_t other)
+    {
+        fixed (ecs_member_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_member_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_member_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_member_t left, ecs_member_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_member_t left, ecs_member_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_member_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsStruct : IEquatable<EcsStruct>
+{
+    public bool Equals(EcsStruct other)
+    {
+        fixed (EcsStruct* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsStruct)).SequenceEqual(new Span<byte>(&other, sizeof(EcsStruct)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsStruct other && Equals(other);
+    }
+
+    public static bool operator ==(EcsStruct left, EcsStruct right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsStruct left, EcsStruct right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsStruct* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsStruct)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_enum_constant_t : IEquatable<ecs_enum_constant_t>
+{
+    public bool Equals(ecs_enum_constant_t other)
+    {
+        fixed (ecs_enum_constant_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_enum_constant_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_constant_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_enum_constant_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_enum_constant_t left, ecs_enum_constant_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_enum_constant_t left, ecs_enum_constant_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_enum_constant_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_constant_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsEnum : IEquatable<EcsEnum>
+{
+    public bool Equals(EcsEnum other)
+    {
+        fixed (EcsEnum* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsEnum)).SequenceEqual(new Span<byte>(&other, sizeof(EcsEnum)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsEnum other && Equals(other);
+    }
+
+    public static bool operator ==(EcsEnum left, EcsEnum right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsEnum left, EcsEnum right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsEnum* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsEnum)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_bitmask_constant_t : IEquatable<ecs_bitmask_constant_t>
+{
+    public bool Equals(ecs_bitmask_constant_t other)
+    {
+        fixed (ecs_bitmask_constant_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_bitmask_constant_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_constant_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_bitmask_constant_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_bitmask_constant_t left, ecs_bitmask_constant_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_bitmask_constant_t left, ecs_bitmask_constant_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_bitmask_constant_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_constant_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsBitmask : IEquatable<EcsBitmask>
+{
+    public bool Equals(EcsBitmask other)
+    {
+        fixed (EcsBitmask* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsBitmask)).SequenceEqual(new Span<byte>(&other, sizeof(EcsBitmask)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsBitmask other && Equals(other);
+    }
+
+    public static bool operator ==(EcsBitmask left, EcsBitmask right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsBitmask left, EcsBitmask right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsBitmask* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsBitmask)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsConstants : IEquatable<EcsConstants>
+{
+    public bool Equals(EcsConstants other)
+    {
+        fixed (EcsConstants* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsConstants)).SequenceEqual(new Span<byte>(&other, sizeof(EcsConstants)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsConstants other && Equals(other);
+    }
+
+    public static bool operator ==(EcsConstants left, EcsConstants right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsConstants left, EcsConstants right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsConstants* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsConstants)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsArray : IEquatable<EcsArray>
+{
+    public bool Equals(EcsArray other)
+    {
+        fixed (EcsArray* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsArray)).SequenceEqual(new Span<byte>(&other, sizeof(EcsArray)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsArray other && Equals(other);
+    }
+
+    public static bool operator ==(EcsArray left, EcsArray right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsArray left, EcsArray right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsArray* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsArray)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsVector : IEquatable<EcsVector>
+{
+    public bool Equals(EcsVector other)
+    {
+        fixed (EcsVector* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsVector)).SequenceEqual(new Span<byte>(&other, sizeof(EcsVector)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsVector other && Equals(other);
+    }
+
+    public static bool operator ==(EcsVector left, EcsVector right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsVector left, EcsVector right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsVector* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsVector)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_serializer_t : IEquatable<ecs_serializer_t>
+{
+    public bool Equals(ecs_serializer_t other)
+    {
+        fixed (ecs_serializer_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_serializer_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_serializer_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_serializer_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_serializer_t left, ecs_serializer_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_serializer_t left, ecs_serializer_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_serializer_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_serializer_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsOpaque : IEquatable<EcsOpaque>
+{
+    public bool Equals(EcsOpaque other)
+    {
+        fixed (EcsOpaque* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsOpaque)).SequenceEqual(new Span<byte>(&other, sizeof(EcsOpaque)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsOpaque other && Equals(other);
+    }
+
+    public static bool operator ==(EcsOpaque left, EcsOpaque right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsOpaque left, EcsOpaque right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsOpaque* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsOpaque)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_unit_translation_t : IEquatable<ecs_unit_translation_t>
+{
+    public bool Equals(ecs_unit_translation_t other)
+    {
+        fixed (ecs_unit_translation_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_unit_translation_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_translation_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_unit_translation_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_unit_translation_t left, ecs_unit_translation_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_unit_translation_t left, ecs_unit_translation_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_unit_translation_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_translation_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsUnit : IEquatable<EcsUnit>
+{
+    public bool Equals(EcsUnit other)
+    {
+        fixed (EcsUnit* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsUnit)).SequenceEqual(new Span<byte>(&other, sizeof(EcsUnit)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsUnit other && Equals(other);
+    }
+
+    public static bool operator ==(EcsUnit left, EcsUnit right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsUnit left, EcsUnit right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsUnit* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsUnit)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct EcsUnitPrefix : IEquatable<EcsUnitPrefix>
+{
+    public bool Equals(EcsUnitPrefix other)
+    {
+        fixed (EcsUnitPrefix* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsUnitPrefix)).SequenceEqual(new Span<byte>(&other, sizeof(EcsUnitPrefix)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsUnitPrefix other && Equals(other);
+    }
+
+    public static bool operator ==(EcsUnitPrefix left, EcsUnitPrefix right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsUnitPrefix left, EcsUnitPrefix right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsUnitPrefix* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsUnitPrefix)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_meta_op_t : IEquatable<ecs_meta_op_t>
+{
+    public bool Equals(ecs_meta_op_t other)
+    {
+        fixed (ecs_meta_op_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_meta_op_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_op_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_meta_op_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_meta_op_t left, ecs_meta_op_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_meta_op_t left, ecs_meta_op_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_meta_op_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_op_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_meta_op_t
+{
+    public partial struct AnonymousRecord_meta_L579_C5 : IEquatable<AnonymousRecord_meta_L579_C5>
+    {
+        public bool Equals(AnonymousRecord_meta_L579_C5 other)
+        {
+            fixed (AnonymousRecord_meta_L579_C5* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(AnonymousRecord_meta_L579_C5)).SequenceEqual(new Span<byte>(&other, sizeof(AnonymousRecord_meta_L579_C5)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is AnonymousRecord_meta_L579_C5 other && Equals(other);
+        }
+
+        public static bool operator ==(AnonymousRecord_meta_L579_C5 left, AnonymousRecord_meta_L579_C5 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(AnonymousRecord_meta_L579_C5 left, AnonymousRecord_meta_L579_C5 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (AnonymousRecord_meta_L579_C5* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(AnonymousRecord_meta_L579_C5)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct EcsTypeSerializer : IEquatable<EcsTypeSerializer>
+{
+    public bool Equals(EcsTypeSerializer other)
+    {
+        fixed (EcsTypeSerializer* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(EcsTypeSerializer)).SequenceEqual(new Span<byte>(&other, sizeof(EcsTypeSerializer)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is EcsTypeSerializer other && Equals(other);
+    }
+
+    public static bool operator ==(EcsTypeSerializer left, EcsTypeSerializer right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(EcsTypeSerializer left, EcsTypeSerializer right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (EcsTypeSerializer* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(EcsTypeSerializer)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_meta_scope_t : IEquatable<ecs_meta_scope_t>
+{
+    public bool Equals(ecs_meta_scope_t other)
+    {
+        fixed (ecs_meta_scope_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_meta_scope_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_scope_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_meta_scope_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_meta_scope_t left, ecs_meta_scope_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_meta_scope_t left, ecs_meta_scope_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_meta_scope_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_scope_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_meta_cursor_t : IEquatable<ecs_meta_cursor_t>
+{
+    public bool Equals(ecs_meta_cursor_t other)
+    {
+        fixed (ecs_meta_cursor_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_meta_cursor_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_cursor_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_meta_cursor_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_meta_cursor_t left, ecs_meta_cursor_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_meta_cursor_t left, ecs_meta_cursor_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_meta_cursor_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_cursor_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_primitive_desc_t : IEquatable<ecs_primitive_desc_t>
+{
+    public bool Equals(ecs_primitive_desc_t other)
+    {
+        fixed (ecs_primitive_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_primitive_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_primitive_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_primitive_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_primitive_desc_t left, ecs_primitive_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_primitive_desc_t left, ecs_primitive_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_primitive_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_primitive_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_enum_desc_t : IEquatable<ecs_enum_desc_t>
+{
+    public bool Equals(ecs_enum_desc_t other)
+    {
+        fixed (ecs_enum_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_enum_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_enum_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_enum_desc_t left, ecs_enum_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_enum_desc_t left, ecs_enum_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_enum_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_bitmask_desc_t : IEquatable<ecs_bitmask_desc_t>
+{
+    public bool Equals(ecs_bitmask_desc_t other)
+    {
+        fixed (ecs_bitmask_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_bitmask_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_bitmask_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_bitmask_desc_t left, ecs_bitmask_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_bitmask_desc_t left, ecs_bitmask_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_bitmask_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_array_desc_t : IEquatable<ecs_array_desc_t>
+{
+    public bool Equals(ecs_array_desc_t other)
+    {
+        fixed (ecs_array_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_array_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_array_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_array_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_array_desc_t left, ecs_array_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_array_desc_t left, ecs_array_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_array_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_array_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_vector_desc_t : IEquatable<ecs_vector_desc_t>
+{
+    public bool Equals(ecs_vector_desc_t other)
+    {
+        fixed (ecs_vector_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_vector_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_vector_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_vector_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_vector_desc_t left, ecs_vector_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_vector_desc_t left, ecs_vector_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_vector_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vector_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_struct_desc_t : IEquatable<ecs_struct_desc_t>
+{
+    public bool Equals(ecs_struct_desc_t other)
+    {
+        fixed (ecs_struct_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_struct_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_struct_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_struct_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_struct_desc_t left, ecs_struct_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_struct_desc_t left, ecs_struct_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_struct_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_struct_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_opaque_desc_t : IEquatable<ecs_opaque_desc_t>
+{
+    public bool Equals(ecs_opaque_desc_t other)
+    {
+        fixed (ecs_opaque_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_opaque_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_opaque_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_opaque_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_opaque_desc_t left, ecs_opaque_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_opaque_desc_t left, ecs_opaque_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_opaque_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_opaque_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_unit_desc_t : IEquatable<ecs_unit_desc_t>
+{
+    public bool Equals(ecs_unit_desc_t other)
+    {
+        fixed (ecs_unit_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_unit_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_unit_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_unit_desc_t left, ecs_unit_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_unit_desc_t left, ecs_unit_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_unit_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_unit_prefix_desc_t : IEquatable<ecs_unit_prefix_desc_t>
+{
+    public bool Equals(ecs_unit_prefix_desc_t other)
+    {
+        fixed (ecs_unit_prefix_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_unit_prefix_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_unit_prefix_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_unit_prefix_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_unit_prefix_desc_t left, ecs_unit_prefix_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_unit_prefix_desc_t left, ecs_unit_prefix_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_unit_prefix_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_unit_prefix_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_cpp_component_desc_t : IEquatable<ecs_cpp_component_desc_t>
+{
+    public bool Equals(ecs_cpp_component_desc_t other)
+    {
+        fixed (ecs_cpp_component_desc_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_cpp_component_desc_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_cpp_component_desc_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_cpp_component_desc_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_cpp_component_desc_t left, ecs_cpp_component_desc_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_cpp_component_desc_t left, ecs_cpp_component_desc_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_cpp_component_desc_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_cpp_component_desc_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct ecs_cpp_get_mut_t : IEquatable<ecs_cpp_get_mut_t>
+{
+    public bool Equals(ecs_cpp_get_mut_t other)
+    {
+        fixed (ecs_cpp_get_mut_t* __self = &this)
+        {
+            return new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_cpp_get_mut_t)));
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_cpp_get_mut_t other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_cpp_get_mut_t left, ecs_cpp_get_mut_t right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_cpp_get_mut_t* __self = &this)
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_cpp_get_mut_t)));
+            return hash.ToHashCode();
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_strbuf_list_elem_32 : IEquatable<ecs_strbuf_list_elem_32>
+    {
+        public bool Equals(ecs_strbuf_list_elem_32 other)
+        {
+            fixed (ecs_strbuf_list_elem_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_strbuf_list_elem_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_strbuf_list_elem_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_strbuf_list_elem_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_strbuf_list_elem_32 left, ecs_strbuf_list_elem_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_strbuf_list_elem_32 left, ecs_strbuf_list_elem_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_strbuf_list_elem_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_strbuf_list_elem_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct byte_512 : IEquatable<byte_512>
+    {
+        public bool Equals(byte_512 other)
+        {
+            fixed (byte_512* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(byte_512)).SequenceEqual(new Span<byte>(&other, sizeof(byte_512)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is byte_512 other && Equals(other);
+        }
+
+        public static bool operator ==(byte_512 left, byte_512 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(byte_512 left, byte_512 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (byte_512* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(byte_512)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ulong_8 : IEquatable<ulong_8>
+    {
+        public bool Equals(ulong_8 other)
+        {
+            fixed (ulong_8* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ulong_8)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_8)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ulong_8 other && Equals(other);
+        }
+
+        public static bool operator ==(ulong_8 left, ulong_8 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ulong_8 left, ulong_8 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ulong_8* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ulong_8)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct int_2 : IEquatable<int_2>
+    {
+        public bool Equals(int_2 other)
+        {
+            fixed (int_2* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(int_2)).SequenceEqual(new Span<byte>(&other, sizeof(int_2)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is int_2 other && Equals(other);
+        }
+
+        public static bool operator ==(int_2 left, int_2 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(int_2 left, int_2 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (int_2* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(int_2)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_commands_t_2 : IEquatable<ecs_commands_t_2>
+    {
+        public bool Equals(ecs_commands_t_2 other)
+        {
+            fixed (ecs_commands_t_2* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_commands_t_2)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_commands_t_2)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_commands_t_2 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_commands_t_2 left, ecs_commands_t_2 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_commands_t_2 left, ecs_commands_t_2 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_commands_t_2* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_commands_t_2)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ulong_32 : IEquatable<ulong_32>
+    {
+        public bool Equals(ulong_32 other)
+        {
+            fixed (ulong_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ulong_32)).SequenceEqual(new Span<byte>(&other, sizeof(ulong_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ulong_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ulong_32 left, ulong_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ulong_32 left, ulong_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ulong_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ulong_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_term_t_32 : IEquatable<ecs_term_t_32>
+    {
+        public bool Equals(ecs_term_t_32 other)
+        {
+            fixed (ecs_term_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_term_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_term_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_term_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_term_t_32 left, ecs_term_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_term_t_32 left, ecs_term_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_term_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_term_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_tree_spawner_t_6 : IEquatable<ecs_tree_spawner_t_6>
+    {
+        public bool Equals(ecs_tree_spawner_t_6 other)
+        {
+            fixed (ecs_tree_spawner_t_6* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_tree_spawner_t_6)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_tree_spawner_t_6)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_tree_spawner_t_6 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_tree_spawner_t_6 left, ecs_tree_spawner_t_6 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_tree_spawner_t_6 left, ecs_tree_spawner_t_6 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_tree_spawner_t_6* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_tree_spawner_t_6)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct byte_128 : IEquatable<byte_128>
+    {
+        public bool Equals(byte_128 other)
+        {
+            fixed (byte_128* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(byte_128)).SequenceEqual(new Span<byte>(&other, sizeof(byte_128)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is byte_128 other && Equals(other);
+        }
+
+        public static bool operator ==(byte_128 left, byte_128 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(byte_128 left, byte_128 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (byte_128* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(byte_128)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct byte_16 : IEquatable<byte_16>
+    {
+        public bool Equals(byte_16 other)
+        {
+            fixed (byte_16* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(byte_16)).SequenceEqual(new Span<byte>(&other, sizeof(byte_16)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is byte_16 other && Equals(other);
+        }
+
+        public static bool operator ==(byte_16 left, byte_16 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(byte_16 left, byte_16 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (byte_16* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(byte_16)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_http_key_value_t_32 : IEquatable<ecs_http_key_value_t_32>
+    {
+        public bool Equals(ecs_http_key_value_t_32 other)
+        {
+            fixed (ecs_http_key_value_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_http_key_value_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_http_key_value_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_http_key_value_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_http_key_value_t_32 left, ecs_http_key_value_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_http_key_value_t_32 left, ecs_http_key_value_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_http_key_value_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_http_key_value_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct float_60 : IEquatable<float_60>
+    {
+        public bool Equals(float_60 other)
+        {
+            fixed (float_60* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(float_60)).SequenceEqual(new Span<byte>(&other, sizeof(float_60)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is float_60 other && Equals(other);
+        }
+
+        public static bool operator ==(float_60 left, float_60 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(float_60 left, float_60 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (float_60* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(float_60)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct double_60 : IEquatable<double_60>
+    {
+        public bool Equals(double_60 other)
+        {
+            fixed (double_60* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(double_60)).SequenceEqual(new Span<byte>(&other, sizeof(double_60)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is double_60 other && Equals(other);
+        }
+
+        public static bool operator ==(double_60 left, double_60 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(double_60 left, double_60 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (double_60* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(double_60)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct int_14 : IEquatable<int_14>
+    {
+        public bool Equals(int_14 other)
+        {
+            fixed (int_14* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(int_14)).SequenceEqual(new Span<byte>(&other, sizeof(int_14)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is int_14 other && Equals(other);
+        }
+
+        public static bool operator ==(int_14 left, int_14 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(int_14 left, int_14 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (int_14* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(int_14)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_alert_severity_filter_t_4 : IEquatable<ecs_alert_severity_filter_t_4>
+    {
+        public bool Equals(ecs_alert_severity_filter_t_4 other)
+        {
+            fixed (ecs_alert_severity_filter_t_4* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t_4)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_alert_severity_filter_t_4)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_alert_severity_filter_t_4 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_alert_severity_filter_t_4 left, ecs_alert_severity_filter_t_4 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_alert_severity_filter_t_4 left, ecs_alert_severity_filter_t_4 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_alert_severity_filter_t_4* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_alert_severity_filter_t_4)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct 
+
+ecs_vector_function_callback_t_18 : 
+
+IEquatable<ecs_vector_function_callback_t_18> {
+
+    public bool Equals(ecs_vector_function_callback_t_18 other)
+    {
+        fixed (ecs_vector_function_callback_t_18*__self = &this )
+        {
+            return new Span<byte>(__self, sizeof(ecs_vector_function_callback_t_18) ) .
+            SequenceEqual(new Span<byte>(&other, sizeof(ecs_vector_function_callback_t_18)) )
+            ;
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ecs_vector_function_callback_t_18 other && Equals(other);
+    }
+
+    public static bool operator ==(ecs_vector_function_callback_t_18 left, ecs_vector_function_callback_t_18 right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(ecs_vector_function_callback_t_18 left, ecs_vector_function_callback_t_18 right)
+    {
+        return !(left == right);
+    }
+
+    public override int GetHashCode()
+    {
+        fixed (ecs_vector_function_callback_t_18*__self = &this )
+        {
+            HashCode hash = new();
+            hash.AddBytes(new Span<byte>(__self, sizeof(ecs_vector_function_callback_t_18)) )
+            ;
+            return hash.ToHashCode();
+        }
+    }
+} }
+public partial struct InlineArrays
+{
+    public partial struct ecs_script_parameter_t_16 : IEquatable<ecs_script_parameter_t_16>
+    {
+        public bool Equals(ecs_script_parameter_t_16 other)
+        {
+            fixed (ecs_script_parameter_t_16* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_script_parameter_t_16)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_script_parameter_t_16)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_script_parameter_t_16 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_script_parameter_t_16 left, ecs_script_parameter_t_16 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_script_parameter_t_16 left, ecs_script_parameter_t_16 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_script_parameter_t_16* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_script_parameter_t_16)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_meta_scope_t_32 : IEquatable<ecs_meta_scope_t_32>
+    {
+        public bool Equals(ecs_meta_scope_t_32 other)
+        {
+            fixed (ecs_meta_scope_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_meta_scope_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_meta_scope_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_meta_scope_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_meta_scope_t_32 left, ecs_meta_scope_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_meta_scope_t_32 left, ecs_meta_scope_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_meta_scope_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_meta_scope_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_enum_constant_t_32 : IEquatable<ecs_enum_constant_t_32>
+    {
+        public bool Equals(ecs_enum_constant_t_32 other)
+        {
+            fixed (ecs_enum_constant_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_enum_constant_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_enum_constant_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_enum_constant_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_enum_constant_t_32 left, ecs_enum_constant_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_enum_constant_t_32 left, ecs_enum_constant_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_enum_constant_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_enum_constant_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_bitmask_constant_t_32 : IEquatable<ecs_bitmask_constant_t_32>
+    {
+        public bool Equals(ecs_bitmask_constant_t_32 other)
+        {
+            fixed (ecs_bitmask_constant_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_bitmask_constant_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_bitmask_constant_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_bitmask_constant_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_bitmask_constant_t_32 left, ecs_bitmask_constant_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_bitmask_constant_t_32 left, ecs_bitmask_constant_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_bitmask_constant_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_bitmask_constant_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+}
+
+public partial struct InlineArrays
+{
+    public partial struct ecs_member_t_32 : IEquatable<ecs_member_t_32>
+    {
+        public bool Equals(ecs_member_t_32 other)
+        {
+            fixed (ecs_member_t_32* __self = &this)
+            {
+                return new Span<byte>(__self, sizeof(ecs_member_t_32)).SequenceEqual(new Span<byte>(&other, sizeof(ecs_member_t_32)));
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ecs_member_t_32 other && Equals(other);
+        }
+
+        public static bool operator ==(ecs_member_t_32 left, ecs_member_t_32 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ecs_member_t_32 left, ecs_member_t_32 right)
+        {
+            return !(left == right);
+        }
+
+        public override int GetHashCode()
+        {
+            fixed (ecs_member_t_32* __self = &this)
+            {
+                HashCode hash = new();
+                hash.AddBytes(new Span<byte>(__self, sizeof(ecs_member_t_32)));
+                return hash.ToHashCode();
+            }
+        }
+    }
+} }
 #pragma warning restore CS8981
 #nullable disable

@@ -176,11 +176,6 @@ public static partial class Ecs
     public static ref ulong Observer => ref EcsObserver;
 
     /// <summary>
-    ///     Reference to <see cref="EcsPrivate"/>.
-    /// </summary>
-    public static ref ulong Private => ref EcsPrivate;
-
-    /// <summary>
     ///     Reference to <see cref="EcsModule"/>.
     /// </summary>
     public static ref ulong Module => ref EcsModule;

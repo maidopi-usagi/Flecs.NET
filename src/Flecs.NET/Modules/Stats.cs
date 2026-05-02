@@ -16,7 +16,29 @@ public static unsafe partial class Ecs
         /// <param name="world"></param>
         public readonly void InitModule(World world)
         {
+            world.Import<Units>();
+            ResetStatsIds();
             FlecsStatsImport(world);
+        }
+
+        private static void ResetStatsIds()
+        {
+            // Flecs addon component ids are process-global C externs. Reset them so
+            // importing Stats into a new world does not reuse ids from a prior world.
+            FLECS_IDFlecsStatsID_ = 0;
+            FLECS_IDEcsWorldStatsID_ = 0;
+            FLECS_IDEcsWorldSummaryID_ = 0;
+            FLECS_IDEcsSystemStatsID_ = 0;
+            FLECS_IDEcsPipelineStatsID_ = 0;
+            FLECS_IDecs_entities_memory_tID_ = 0;
+            FLECS_IDecs_component_index_memory_tID_ = 0;
+            FLECS_IDecs_query_memory_tID_ = 0;
+            FLECS_IDecs_component_memory_tID_ = 0;
+            FLECS_IDecs_table_memory_tID_ = 0;
+            FLECS_IDecs_misc_memory_tID_ = 0;
+            FLECS_IDecs_table_histogram_tID_ = 0;
+            FLECS_IDecs_allocator_memory_tID_ = 0;
+            FLECS_IDEcsWorldMemoryID_ = 0;
         }
 
         /// <summary>

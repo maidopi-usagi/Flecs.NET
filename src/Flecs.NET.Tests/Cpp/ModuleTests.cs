@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Flecs.NET.Core;
 using Namespace;
 using NamespaceLvl1.NamespaceLvl2;
@@ -224,6 +225,21 @@ public class ModuleTests
     }
 
     [Fact]
+    private void ImportAddonsConcurrentWorlds()
+    {
+        Parallel.For(0, 32, _ =>
+        {
+            using World world = World.Create();
+
+            Entity stats = world.Import<Ecs.Stats>();
+            Entity units = world.Import<Ecs.Units>();
+
+            Assert.True(stats != 0);
+            Assert.True(units != 0);
+        });
+    }
+
+    [Fact]
     private void LookupModuleAfterReparent()
     {
         using World world = World.Create();
@@ -242,7 +258,7 @@ public class ModuleTests
         Entity e = world.Entity(".Namespace.NestedModule");
         Assert.True(e != m);
 
-        Assert.Equal(1, world.QueryBuilder().Expr("(ChildOf, p.NestedModule)").Build().Count());
+        Assert.True(m.Lookup("Velocity") != 0);
         Assert.Equal(0, world.QueryBuilder().Expr("(ChildOf, Namespace.NestedModule)").Build().Count());
     }
 

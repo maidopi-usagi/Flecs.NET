@@ -701,11 +701,55 @@ internal static unsafe partial class Functions
 
     #region OnAdd Hook Callbacks
 
+    private static void NormalizeHookIter(ecs_iter_t* iter)
+    {
+        if (iter->field_count > 0 && iter->set_fields == 0)
+            iter->set_fields = iter->field_count >= 32 ? uint.MaxValue : (1u << iter->field_count) - 1u;
+    }
+
+    private static void InvokeHook(ecs_iter_t* iter, delegate*<ecs_iter_t*, void> invoker)
+    {
+        NormalizeHookIter(iter);
+
+        if (iter->count <= 0)
+        {
+            invoker(iter);
+            return;
+        }
+
+        ulong* originalEntities = iter->entities;
+        ulong* hookEntities = iter->table != null ? ecs_table_entities(iter->table) + iter->offset : originalEntities;
+
+        if (hookEntities == null)
+        {
+            invoker(iter);
+            return;
+        }
+
+        Span<ulong> entities = iter->count <= 256 ? stackalloc ulong[iter->count] : new ulong[iter->count];
+
+        for (int i = 0; i < iter->count; i++)
+            entities[i] = hookEntities[i];
+
+        fixed (ulong* entitiesPtr = entities)
+        {
+            iter->entities = entitiesPtr;
+            try
+            {
+                invoker(iter);
+            }
+            finally
+            {
+                iter->entities = originalEntities;
+            }
+        }
+    }
+
     [UnmanagedCallersOnly]
     internal static void OnAddCallback(ecs_iter_t* iter)
     {
         TypeHooksContext* context = (TypeHooksContext*)iter->callback_ctx;
-        ((delegate*<ecs_iter_t*, void>)context->OnAdd.Invoker)(iter);
+        InvokeHook(iter, (delegate*<ecs_iter_t*, void>)context->OnAdd.Invoker);
     }
 
     internal static void OnAddIterFieldCallbackDelegate<T>(ecs_iter_t* iter)
@@ -824,7 +868,7 @@ internal static unsafe partial class Functions
     internal static void OnSetCallback(ecs_iter_t* iter)
     {
         TypeHooksContext* context = (TypeHooksContext*)iter->callback_ctx;
-        ((delegate*<ecs_iter_t*, void>)context->OnSet.Invoker)(iter);
+        InvokeHook(iter, (delegate*<ecs_iter_t*, void>)context->OnSet.Invoker);
     }
 
     internal static void OnSetIterFieldCallbackDelegate<T>(ecs_iter_t* iter)
@@ -943,7 +987,7 @@ internal static unsafe partial class Functions
     internal static void OnRemoveCallback(ecs_iter_t* iter)
     {
         TypeHooksContext* context = (TypeHooksContext*)iter->callback_ctx;
-        ((delegate*<ecs_iter_t*, void>)context->OnRemove.Invoker)(iter);
+        InvokeHook(iter, (delegate*<ecs_iter_t*, void>)context->OnRemove.Invoker);
     }
 
     internal static void OnRemoveIterFieldCallbackDelegate<T>(ecs_iter_t* iter)

@@ -4,6 +4,10 @@ namespace Flecs.NET.Core;
 
 public static unsafe partial class Ecs
 {
+    // Flecs C addons store module/component ids in process-global externs.
+    // Serialize world initialization and imports so concurrent worlds do not reuse stale ids.
+    internal static readonly object ImportLock = new();
+
     /// <summary>
     ///     Imports a module.
     /// </summary>
@@ -12,10 +16,13 @@ public static unsafe partial class Ecs
     /// <returns>The module entity.</returns>
     public static Entity Import<T>(World world) where T : IFlecsModule, new()
     {
-        if (Type<T>.IsRegistered(world, out Entity module) && module.Has(EcsModule))
-            return module;
+        lock (ImportLock)
+        {
+            if (Type<T>.IsRegistered(world, out Entity module) && module.Has(EcsModule))
+                return module;
 
-        return new Entity(world, DoImport<T>(world));
+            return new Entity(world, DoImport<T>(world));
+        }
     }
 
     private static ulong DoImport<T>(World world) where T : IFlecsModule, new()
@@ -30,7 +37,6 @@ public static unsafe partial class Ecs
 
         if (!Type<T>.IsTag)
         {
-            module.Add(EcsSparse);
             world.Set(in moduleInstance);
         }
 

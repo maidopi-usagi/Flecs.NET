@@ -24,6 +24,7 @@ extern void* ECS_PAIR;
 extern void* ecs_stack_allocator_alloc_count;
 extern void* ecs_stack_allocator_free_count;
 extern void* ECS_TOGGLE;
+extern void* ECS_VALUE_PAIR;
 extern void* EcsAcceleration;
 extern void* EcsAcyclic;
 extern void* EcsAlertCritical;
@@ -168,6 +169,7 @@ extern void* EcsOrderedChildren;
 extern void* EcsOverride;
 extern void* EcsPairIsTag;
 extern void* EcsPanic;
+extern void* EcsParentDepth;
 extern void* EcsPascal;
 extern void* EcsPebi;
 extern void* EcsPercentage;
@@ -193,7 +195,6 @@ extern void* EcsPreFrame;
 extern void* EcsPressure;
 extern void* EcsPreStore;
 extern void* EcsPreUpdate;
-extern void* EcsPrivate;
 extern void* EcsQuantity;
 extern void* EcsQuery;
 extern void* EcsRadians;
@@ -203,6 +204,7 @@ extern void* EcsRemove;
 extern void* EcsScopeClose;
 extern void* EcsScopeOpen;
 extern void* EcsScriptTemplate;
+extern void* EcsScriptVectorType;
 extern void* EcsSeconds;
 extern void* EcsSingleton;
 extern void* EcsSlotOf;
@@ -288,6 +290,7 @@ extern void* FLECS_IDEcsMetricInstanceID_;
 extern void* FLECS_IDEcsMetricSourceID_;
 extern void* FLECS_IDEcsMetricValueID_;
 extern void* FLECS_IDEcsOpaqueID_;
+extern void* FLECS_IDEcsParentID_;
 extern void* FLECS_IDEcsPipelineID_;
 extern void* FLECS_IDEcsPipelineStatsID_;
 extern void* FLECS_IDEcsPolyID_;
@@ -299,10 +302,12 @@ extern void* FLECS_IDEcsScriptFunctionID_;
 extern void* FLECS_IDEcsScriptID_;
 extern void* FLECS_IDEcsScriptMethodID_;
 extern void* FLECS_IDEcsScriptTemplateID_;
+extern void* FLECS_IDEcsScriptVectorTypeID_;
 extern void* FLECS_IDEcsStructID_;
 extern void* FLECS_IDEcsSystemStatsID_;
 extern void* FLECS_IDEcsTickSourceID_;
 extern void* FLECS_IDEcsTimerID_;
+extern void* FLECS_IDEcsTreeSpawnerID_;
 extern void* FLECS_IDEcsTypeID_;
 extern void* FLECS_IDEcsTypeSerializerID_;
 extern void* FLECS_IDEcsUnitID_;
@@ -376,6 +381,9 @@ BINDGEN_API void* ecs_stack_allocator_free_count_BindgenGetExtern() {
 }
 BINDGEN_API void* ECS_TOGGLE_BindgenGetExtern() {
     return &ECS_TOGGLE;
+}
+BINDGEN_API void* ECS_VALUE_PAIR_BindgenGetExtern() {
+    return &ECS_VALUE_PAIR;
 }
 BINDGEN_API void* EcsAcceleration_BindgenGetExtern() {
     return &EcsAcceleration;
@@ -809,6 +817,9 @@ BINDGEN_API void* EcsPairIsTag_BindgenGetExtern() {
 BINDGEN_API void* EcsPanic_BindgenGetExtern() {
     return &EcsPanic;
 }
+BINDGEN_API void* EcsParentDepth_BindgenGetExtern() {
+    return &EcsParentDepth;
+}
 BINDGEN_API void* EcsPascal_BindgenGetExtern() {
     return &EcsPascal;
 }
@@ -884,9 +895,6 @@ BINDGEN_API void* EcsPreStore_BindgenGetExtern() {
 BINDGEN_API void* EcsPreUpdate_BindgenGetExtern() {
     return &EcsPreUpdate;
 }
-BINDGEN_API void* EcsPrivate_BindgenGetExtern() {
-    return &EcsPrivate;
-}
 BINDGEN_API void* EcsQuantity_BindgenGetExtern() {
     return &EcsQuantity;
 }
@@ -913,6 +921,9 @@ BINDGEN_API void* EcsScopeOpen_BindgenGetExtern() {
 }
 BINDGEN_API void* EcsScriptTemplate_BindgenGetExtern() {
     return &EcsScriptTemplate;
+}
+BINDGEN_API void* EcsScriptVectorType_BindgenGetExtern() {
+    return &EcsScriptVectorType;
 }
 BINDGEN_API void* EcsSeconds_BindgenGetExtern() {
     return &EcsSeconds;
@@ -1169,6 +1180,9 @@ BINDGEN_API void* FLECS_IDEcsMetricValueID__BindgenGetExtern() {
 BINDGEN_API void* FLECS_IDEcsOpaqueID__BindgenGetExtern() {
     return &FLECS_IDEcsOpaqueID_;
 }
+BINDGEN_API void* FLECS_IDEcsParentID__BindgenGetExtern() {
+    return &FLECS_IDEcsParentID_;
+}
 BINDGEN_API void* FLECS_IDEcsPipelineID__BindgenGetExtern() {
     return &FLECS_IDEcsPipelineID_;
 }
@@ -1202,6 +1216,9 @@ BINDGEN_API void* FLECS_IDEcsScriptMethodID__BindgenGetExtern() {
 BINDGEN_API void* FLECS_IDEcsScriptTemplateID__BindgenGetExtern() {
     return &FLECS_IDEcsScriptTemplateID_;
 }
+BINDGEN_API void* FLECS_IDEcsScriptVectorTypeID__BindgenGetExtern() {
+    return &FLECS_IDEcsScriptVectorTypeID_;
+}
 BINDGEN_API void* FLECS_IDEcsStructID__BindgenGetExtern() {
     return &FLECS_IDEcsStructID_;
 }
@@ -1213,6 +1230,9 @@ BINDGEN_API void* FLECS_IDEcsTickSourceID__BindgenGetExtern() {
 }
 BINDGEN_API void* FLECS_IDEcsTimerID__BindgenGetExtern() {
     return &FLECS_IDEcsTimerID_;
+}
+BINDGEN_API void* FLECS_IDEcsTreeSpawnerID__BindgenGetExtern() {
+    return &FLECS_IDEcsTreeSpawnerID_;
 }
 BINDGEN_API void* FLECS_IDEcsTypeID__BindgenGetExtern() {
     return &FLECS_IDEcsTypeID_;

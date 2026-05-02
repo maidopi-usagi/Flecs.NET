@@ -37,6 +37,7 @@ const src_files = [_][]const u8{
     "../../native/flecs/src/ref.c",
     "../../native/flecs/src/search.c",
     "../../native/flecs/src/stage.c",
+    "../../native/flecs/src/tree_spawner.c",
     "../../native/flecs/src/type_info.c",
     "../../native/flecs/src/value.c",
     "../../native/flecs/src/world.c",
@@ -87,6 +88,7 @@ const src_files = [_][]const u8{
     "../../native/flecs/src/addons/script/function.c",
     "../../native/flecs/src/addons/script/functions_builtin.c",
     "../../native/flecs/src/addons/script/functions_math.c",
+    "../../native/flecs/src/addons/script/functions_math_perlin.c",
     "../../native/flecs/src/addons/script/parser.c",
     "../../native/flecs/src/addons/script/script.c",
     "../../native/flecs/src/addons/script/serialize.c",
@@ -139,6 +141,7 @@ const src_files = [_][]const u8{
     "../../native/flecs/src/query/engine/eval_iter.c",
     "../../native/flecs/src/query/engine/eval_member.c",
     "../../native/flecs/src/query/engine/eval_pred.c",
+    "../../native/flecs/src/query/engine/eval_tree.c",
     "../../native/flecs/src/query/engine/eval_toggle.c",
     "../../native/flecs/src/query/engine/eval_trav.c",
     "../../native/flecs/src/query/engine/eval_sparse.c",
@@ -151,6 +154,7 @@ const src_files = [_][]const u8{
     "../../native/flecs/src/query/engine/trivial_iter.c",
     "../../native/flecs/src/storage/entity_index.c",
     "../../native/flecs/src/storage/component_index.c",
+    "../../native/flecs/src/storage/non_fragmenting_childof.c",
     "../../native/flecs/src/storage/ordered_children.c",
     "../../native/flecs/src/storage/sparse_storage.c",
     "../../native/flecs/src/storage/table_cache.c",
@@ -212,6 +216,9 @@ pub fn compileFlecs(b: *Build, options: BuildOptions) void {
             if (b.sysroot == null) {
                 @panic("Pass '--sysroot \"$EMSDK/upstream/emscripten\"'");
             }
+
+            lib.defineCMacro("__UINT8_C(c)", "c");
+            lib.defineCMacro("__UINT16_C(c)", "c");
 
             const cache_include = b.pathJoin(&.{ b.sysroot.?, "cache", "sysroot", "include" });
             var dir = std.fs.openDirAbsolute(cache_include, std.fs.Dir.OpenDirOptions{ .access_sub_paths = true, .no_follow = true }) catch @panic("No emscripten cache. Generate it!");

@@ -1627,7 +1627,7 @@ public unsafe struct QueryBuilder : IDisposable, IEquatable<QueryBuilder>, IQuer
         for (int i = 0; i < _termCount; i++)
         {
             ecs_term_t term = _desc.terms[i];
-            if (Ecs.TypeIdIs<T>(World, term.id) || Ecs.TypeIdIs<T>(World, Ecs.Pair(term.first.id, term.second.id)))
+            if (!TermHasTagPair(ref term) && TermTypeIdIs<T>(ref term))
                 return ref TermAt(i);
         }
         Ecs.Error("Term not found.");
@@ -1659,8 +1659,29 @@ public unsafe struct QueryBuilder : IDisposable, IEquatable<QueryBuilder>, IQuer
     /// <returns></returns>
     public ref QueryBuilder TermAt<T>(int termIndex)
     {
-        Ecs.Assert(Ecs.TypeIdIs<T>(World, CurrentTerm.id) || Ecs.TypeIdIs<T>(World, Ecs.Pair(CurrentTerm.first.id, CurrentTerm.second.id)), "Term type does not match.");
+        Ecs.Assert(termIndex >= 0 && termIndex < FLECS_TERM_COUNT_MAX, "TermIndex argument must be between 0-31.");
+
+        ecs_term_t term = Desc.terms[termIndex];
+        Ecs.Assert(ecs_term_is_initialized(&term), "Term is not initialized.");
+
+        Ecs.Assert(!TermHasTagPair(ref term), "Term type does not match.");
+        Ecs.Assert(TermTypeIdIs<T>(ref term), "Term type does not match.");
         return ref TermAt(termIndex);
+    }
+
+    private bool TermTypeIdIs<T>(ref ecs_term_t term)
+    {
+        return Ecs.TypeIdIs<T>(World, term.id) || Ecs.TypeIdIs<T>(World, Ecs.Pair(term.first.id, term.second.id));
+    }
+
+    private bool TermHasTagPair(ref ecs_term_t term)
+    {
+        ulong id = term.id != 0 ? term.id : Ecs.Pair(term.first.id, term.second.id);
+        if (!Ecs.IsPair(id))
+            return false;
+
+        ulong first = term.id != 0 ? Ecs.PairFirst(World, id) : term.first.id;
+        return first != 0 && ecs_has_id(World, first, EcsPairIsTag);
     }
 
     /// <summary>

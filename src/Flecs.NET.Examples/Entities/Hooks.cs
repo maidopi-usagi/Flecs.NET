@@ -53,19 +53,19 @@ file struct NativeString(string str) :
     // The on add hook gets called when the component is added.
     public static void OnAdd(Iter it, int i, ref NativeString _)
     {
-        Ecs.Log.Trace($"{it.Event()}: {it.Entity(i)}");
+        Ecs.Log.Trace($"OnAdd: {it.Entity(i).Name()}");
     }
 
     // The on set hook gets called when the component is set.
     public static void OnSet(Iter it, int i, ref NativeString _)
     {
-        Ecs.Log.Trace($"{it.Event()}: {it.Entity(i)}");
+        Ecs.Log.Trace($"OnSet: {it.Entity(i).Name()}");
     }
 
     // The on remove hook gets called when the component is removed.
     public static void OnRemove(Iter it, int i, ref NativeString _)
     {
-        Ecs.Log.Trace($"{it.Event()}: {it.Entity(i)}");
+        Ecs.Log.Trace($"OnRemove: {it.Entity(i).Name()}");
     }
 }
 
@@ -73,12 +73,13 @@ public static class Entities_Hooks
 {
     public static void Main()
     {
-        World world = World.Create();
+        using World world = World.Create();
 
-        Ecs.Log.SetLevel(0);
-
+        world.Component<NativeString>();
         Entity e = world.Entity("Entity");
         Entity tag = world.Entity();
+
+        Ecs.Log.SetLevel(0);
 
         Ecs.Log.Trace("e.Add<NativeString>()");
         Ecs.Log.Push();

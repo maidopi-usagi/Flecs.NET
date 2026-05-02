@@ -36,13 +36,16 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
     /// <returns></returns>
     public static World Create()
     {
-        Ecs.Os.OverrideOsApi();
+        lock (Ecs.ImportLock)
+        {
+            Ecs.Os.OverrideOsApi();
 
-        World w = new World(ecs_init());
-        w.EnsureBindingContext();
-        w.InitBuiltinComponents();
+            World w = new World(ecs_init());
+            w.EnsureBindingContext();
+            w.InitBuiltinComponents();
 
-        return w;
+            return w;
+        }
     }
 
     /// <summary>
@@ -52,13 +55,16 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
     /// <returns>A newly created world.</returns>
     public static World Create(ecs_world_t* world)
     {
-        Ecs.Os.OverrideOsApi();
+        lock (Ecs.ImportLock)
+        {
+            Ecs.Os.OverrideOsApi();
 
-        World w = new World(world);
-        w.EnsureBindingContext();
-        w.InitBuiltinComponents();
+            World w = new World(world);
+            w.EnsureBindingContext();
+            w.InitBuiltinComponents();
 
-        return w;
+            return w;
+        }
     }
 
     /// <summary>
@@ -68,23 +74,26 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
     /// <returns></returns>
     public static World Create(params Span<string> args)
     {
-        NativeString* nativeStrings = Memory.AllocZeroed<NativeString>(args.Length);
+        lock (Ecs.ImportLock)
+        {
+            NativeString* nativeStrings = Memory.AllocZeroed<NativeString>(args.Length);
 
-        for (int i = 0; i < args.Length; i++)
-            nativeStrings[i] = (NativeString)args[i];
+            for (int i = 0; i < args.Length; i++)
+                nativeStrings[i] = (NativeString)args[i];
 
-        Ecs.Os.OverrideOsApi();
+            Ecs.Os.OverrideOsApi();
 
-        World w = new World(ecs_init_w_args(args.Length, (byte**)nativeStrings));
-        w.EnsureBindingContext();
-        w.InitBuiltinComponents();
+            World w = new World(ecs_init_w_args(args.Length, (byte**)nativeStrings));
+            w.EnsureBindingContext();
+            w.InitBuiltinComponents();
 
-        for (int i = 0; i < args.Length; i++)
-            nativeStrings[i].Dispose();
+            for (int i = 0; i < args.Length; i++)
+                nativeStrings[i].Dispose();
 
-        Memory.Free(nativeStrings);
+            Memory.Free(nativeStrings);
 
-        return w;
+            return w;
+        }
     }
 
     /// <summary>
@@ -95,7 +104,8 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
         if (Handle == null || !Ecs.IsStageOrWorld(Handle))
             return;
 
-        _ = ecs_fini(Handle);
+        lock (Ecs.ImportLock)
+            _ = ecs_fini(Handle);
     }
 
     /// <summary>
@@ -2991,9 +3001,7 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
         {
             Entity next = current.Parent();
 
-            ecs_iter_t it = ecs_each_id(Handle, Pair(Ecs.ChildOf, current));
-
-            if (!ecs_iter_is_true(&it))
+            if (CanCleanupModuleParent(current))
             {
                 current.Destruct();
                 SetVersion(current);
@@ -3003,6 +3011,22 @@ public readonly unsafe partial struct World : IDisposable, IEquatable<World>
         }
 
         return Entity(result);
+    }
+
+    private bool CanCleanupModuleParent(Entity entity)
+    {
+        ecs_iter_t it = ecs_each_id(Handle, Pair(Ecs.ChildOf, entity));
+        while (ecs_each_next(&it))
+        {
+            for (int i = 0; i < it.count; i++)
+            {
+                ulong child = it.entities[i];
+                if (ecs_get_name(Handle, child) != null || !ecs_has_id(Handle, child, EcsObserver))
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>

@@ -3,8 +3,10 @@ using Xunit;
 namespace Flecs.NET.Tests.CSharp.Core;
 
 // Parallelization needs to be disabled for this test collection because Ecs.Log functions aren't thread safe.
-[Collection(nameof(ExampleTests))]
 [CollectionDefinition(nameof(ExampleTests), DisableParallelization = true)]
+public class ExampleTestsCollection;
+
+[Collection(nameof(ExampleTests))]
 public class ExampleTests
 {
     [Fact]
